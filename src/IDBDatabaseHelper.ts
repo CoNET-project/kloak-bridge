@@ -11,10 +11,10 @@ class IDBDatabaseHelper {
         req.onupgradeneeded = (evt: IDBVersionChangeEvent): void => {
             try {
                 const db = (evt.target as IDBDatabaseEventTarget).result;
-                db.createObjectStore("data");
+                db.createObjectStore('data');
             } catch (err: any) {
                 callback(err, null)
-                console.log("IDBDatabaseHelper error:", err)
+                console.log('IDBDatabaseHelper error:', err)
             }
         }
 
@@ -26,7 +26,7 @@ class IDBDatabaseHelper {
                 callback(null, objectStore)
             } catch (err: any) {
                 callback(err, null)
-                console.log("IDBDatabaseHelper error:", err);
+                console.log('IDBDatabaseHelper error:', err);
             }
         }
     }

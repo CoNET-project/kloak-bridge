@@ -122,7 +122,7 @@ export default {
 
     // A list of paths to directories that Jest should use to search for files in
     roots: [
-      "<rootDir>"
+        '<rootDir>'
     ],
 
     // Allows you to use a custom runner instead of Jest's default test runner
@@ -151,13 +151,13 @@ export default {
 
     // The glob patterns Jest uses to detect test files
     testMatch: [
-      "**/__tests__/**/*.[jt]s?(x)",
-      "**/?(*.)+(spec|test).[tj]s?(x)"
+        '**/__tests__/**/*.[jt]s?(x)',
+        '**/?(*.)+(spec|test).[tj]s?(x)'
     ],
 
     // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
     testPathIgnorePatterns: [
-      "/node_modules/"
+        '/node_modules/'
     ],
 
     // The regexp pattern or array of patterns that Jest uses to detect test files
@@ -177,7 +177,7 @@ export default {
 
     // A map from regular expressions to paths to transformers
     transform: {
-        "^.+\\.(ts|tsx)$": "ts-jest"
+        '^.+\\.(ts|tsx)$': 'ts-jest'
     },
 
     // An array of regexp pattern strings that are matched against all source file paths, matched files
@@ -192,7 +192,7 @@ export default {
     // unmockedModulePathPatterns: undefined,
 
     // Indicates whether each individual test should be reported during the run
-    verbose: true,
+    verbose: true
 
     // An array of regexp patterns that are matched against all source file paths before re-running tests in watch mode
     // watchPathIgnorePatterns: [],

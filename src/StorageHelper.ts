@@ -15,7 +15,7 @@ class StorageHelper {
             if (unlock) {
                 const isUnlocked = await this.encrypt.checkPassword(stringPGPKeys, options.passphrase);
                 stringPGPKeys['unlocked'] = isUnlocked;
-                isUnlocked ? resolve(stringPGPKeys) : reject(new Error("Unable to unlock your new OpenPGP key."))
+                isUnlocked ? resolve(stringPGPKeys) : reject(new Error('Unable to unlock your new OpenPGP key.'))
             }
             return resolve(stringPGPKeys);
         })

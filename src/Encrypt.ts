@@ -14,12 +14,12 @@ class Encrypt {
     public generateKey = (options: PGPGenerateOptions): Promise<StringPGPKeys> => {
         return new Promise((resolve, reject) => {
             const userIds = {
-                name: options.nickname || "",
-                email: options.email || ""
+                name: options.nickname || '',
+                email: options.email || ''
             }
 
             const pgpKeyOptions: KeyOptions = {
-                passphrase: options.passphrase || "",
+                passphrase: options.passphrase || '',
                 userIds: [ userIds ],
                 curve: 'ed25519'
             }
@@ -39,7 +39,7 @@ class Encrypt {
             if (this.pgpKeyPair.armoredPublicKey && this.pgpKeyPair.armoredPrivateKey) {
                 if ((this.pgpKeyPair.armoredPrivateKey !== keyPair.privateKey && this.pgpKeyPair.armoredPublicKey !== keyPair.publicKey)) {
                     const unlocked = this.pgpKeyPair.readPrivateKey?.isDecrypted()
-                    return reject(new Error(`This instance contains an ${unlocked ? "unlocked" : "locked"} OpenPGP key pair, please start new instance.`))
+                    return reject(new Error(`This instance contains an ${unlocked ? 'unlocked' : 'locked'} OpenPGP key pair, please start new instance.`))
                 }
             }
 

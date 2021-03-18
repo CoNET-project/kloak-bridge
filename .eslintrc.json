@@ -2,6 +2,7 @@
     "extends": [
         "airbnb-base"
     ],
+    "plugins": ["@typescript-eslint"],
     "ignorePatterns": [
         "*.js"
     ],
@@ -9,23 +10,26 @@
         "project": "./tsconfig.json"
     },
     "rules": {
-        "@typescript-eslint/comma-dangle": [
-            "error",
-            "never"
-        ],
+        "comma-dangle": ["error", {
+            "arrays": "never",
+            "objects": "never",
+            "imports": "never",
+            "exports": "never",
+            "functions": "never"
+        }],
         "@typescript-eslint/indent": [
             "error",
             4
         ],
-        "@typescript-eslint/member-delimiter-style": [
-            "error",
-            {
-                "multiline": {
-                    "delimiter": "comma",
-                    "requireLast": false
-                }
-            }
-        ],
+//        "@typescript-eslint/member-delimiter-style": [
+//            "error",
+//            {
+//                "multiline": {
+//                    "delimiter": "comma",
+//                    "requireLast": false
+//                }
+//            }
+//        ],
         "@typescript-eslint/no-shadow": "off",
         "@typescript-eslint/no-unused-vars": [
             "error",
