@@ -41,116 +41,111 @@ var Encrypt = /** @class */ (function () {
     function Encrypt() {
         var _this = this;
         this.pgpKeyPair = {};
-        this.generateKey = function (options) {
-            return new Promise(function (resolve, reject) {
-                var userIds = {
-                    name: options.nickname || "",
-                    email: options.email || ""
-                };
-                var pgpKeyOptions = {
-                    passphrase: options.passphrase || "",
-                    userIds: [userIds],
-                    curve: 'ed25519'
-                };
-                return openpgp.generateKey(pgpKeyOptions).then(function (result) { return __awaiter(_this, void 0, void 0, function () {
-                    var stringKeyPairs;
-                    return __generator(this, function (_a) {
-                        stringKeyPairs = {
-                            publicKey: result.publicKeyArmored,
-                            privateKey: result.privateKeyArmored
-                        };
-                        return [2 /*return*/, resolve(stringKeyPairs)];
-                    });
-                }); })["catch"](reject);
-            });
-        };
-        this.checkPassword = function (keyPair, passphrase) {
-            return new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                var unlocked, _a, _b;
-                var _c;
-                return __generator(this, function (_d) {
-                    switch (_d.label) {
-                        case 0:
-                            if (this.pgpKeyPair.armoredPublicKey && this.pgpKeyPair.armoredPrivateKey) {
-                                if ((this.pgpKeyPair.armoredPrivateKey !== keyPair.privateKey && this.pgpKeyPair.armoredPublicKey !== keyPair.publicKey)) {
-                                    unlocked = (_c = this.pgpKeyPair.readPrivateKey) === null || _c === void 0 ? void 0 : _c.isDecrypted();
-                                    return [2 /*return*/, reject(new Error("This instance contains an " + (unlocked ? "unlocked" : "locked") + " OpenPGP key pair, please start new instance."))];
-                                }
+        this.generateKey = function (options) { return new Promise(function (resolve, reject) {
+            var userIds = {
+                name: options.nickname || '',
+                email: options.email || ''
+            };
+            var pgpKeyOptions = {
+                passphrase: options.passphrase || '',
+                userIds: [userIds],
+                curve: 'ed25519'
+            };
+            return openpgp.generateKey(pgpKeyOptions).then(function (result) { return __awaiter(_this, void 0, void 0, function () {
+                var stringKeyPairs;
+                return __generator(this, function (_a) {
+                    stringKeyPairs = {
+                        publicKey: result.publicKeyArmored,
+                        privateKey: result.privateKeyArmored
+                    };
+                    return [2 /*return*/, resolve(stringKeyPairs)];
+                });
+            }); })["catch"](reject);
+        }); };
+        this.checkPassword = function (keyPair, passphrase) { return (new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+            var unlocked, _a, _b;
+            var _c;
+            return __generator(this, function (_d) {
+                switch (_d.label) {
+                    case 0:
+                        if (this.pgpKeyPair.armoredPublicKey && this.pgpKeyPair.armoredPrivateKey) {
+                            if ((this.pgpKeyPair.armoredPrivateKey !== keyPair.privateKey && this.pgpKeyPair.armoredPublicKey !== keyPair.publicKey)) {
+                                unlocked = (_c = this.pgpKeyPair.readPrivateKey) === null || _c === void 0 ? void 0 : _c.isDecrypted();
+                                return [2 /*return*/, reject(new Error("This instance contains an " + (unlocked ? 'unlocked' : 'locked') + " OpenPGP key pair."))];
                             }
-                            this.pgpKeyPair.armoredPublicKey = keyPair.publicKey;
-                            this.pgpKeyPair.armoredPrivateKey = keyPair.privateKey;
-                            _a = this.pgpKeyPair;
-                            return [4 /*yield*/, openpgp.readKey({ armoredKey: keyPair.publicKey })];
-                        case 1:
-                            _a.readPublicKey = _d.sent();
-                            _b = this.pgpKeyPair;
-                            return [4 /*yield*/, openpgp.readKey({ armoredKey: keyPair.privateKey })];
-                        case 2:
-                            _b.readPrivateKey = _d.sent();
-                            this.pgpKeyPair.readPrivateKey.decrypt(passphrase).then(function (ok) { return resolve(true); })["catch"](function (err) { return reject(false); });
-                            return [2 /*return*/];
-                    }
-                });
-            }); });
-        };
-        this.encryptMessage = function (message) {
-            return new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                var uint8Data, encryptedMsg, err_1;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            _a.trys.push([0, 2, , 3]);
-                            uint8Data = void 0;
-                            typeof message === 'string'
-                                ? uint8Data = new Uint8Array(Buffer.from(message))
-                                : uint8Data = new Uint8Array(message);
-                            return [4 /*yield*/, openpgp.encrypt({
-                                    message: openpgp.Message.fromBinary(uint8Data),
-                                    publicKeys: this.pgpKeyPair.readPublicKey,
-                                    privateKeys: this.pgpKeyPair.readPrivateKey
-                                })];
-                        case 1:
-                            encryptedMsg = _a.sent();
-                            return [2 /*return*/, resolve(encryptedMsg)];
-                        case 2:
-                            err_1 = _a.sent();
-                            reject(err_1);
-                            return [3 /*break*/, 3];
-                        case 3: return [2 /*return*/];
-                    }
-                });
-            }); });
-        };
-        this.decryptMessage = function (encryptedMessage) {
-            return new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                var message, decrypted, err_2;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            _a.trys.push([0, 3, , 4]);
-                            return [4 /*yield*/, openpgp.readMessage({ armoredMessage: encryptedMessage })];
-                        case 1:
-                            message = _a.sent();
-                            return [4 /*yield*/, openpgp.decrypt({
-                                    message: message,
-                                    publicKeys: this.pgpKeyPair.readPublicKey,
-                                    privateKeys: this.pgpKeyPair.readPrivateKey // for decryption
-                                })];
-                        case 2:
-                            decrypted = _a.sent();
-                            return [2 /*return*/, resolve(decrypted.data)];
-                        case 3:
-                            err_2 = _a.sent();
-                            return [2 /*return*/, reject(err_2)];
-                        case 4: return [2 /*return*/];
-                    }
-                });
-            }); });
-        };
+                        }
+                        this.pgpKeyPair.armoredPublicKey = keyPair.publicKey;
+                        this.pgpKeyPair.armoredPrivateKey = keyPair.privateKey;
+                        _a = this.pgpKeyPair;
+                        return [4 /*yield*/, openpgp.readKey({ armoredKey: keyPair.publicKey })];
+                    case 1:
+                        _a.readPublicKey = _d.sent();
+                        _b = this.pgpKeyPair;
+                        return [4 /*yield*/, openpgp.readKey({ armoredKey: keyPair.privateKey })];
+                    case 2:
+                        _b.readPrivateKey = _d.sent();
+                        this.pgpKeyPair.readPrivateKey.decrypt(passphrase).then(function (_) { return resolve(true); })["catch"](function (err) { return reject(err); });
+                        return [2 /*return*/];
+                }
+            });
+        }); })); };
+        this.encryptMessage = function (message) { return (new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+            var uint8Data, encryptedMsg, err_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        uint8Data = void 0;
+                        if (typeof message === 'string') {
+                            // @ts-ignore
+                            uint8Data = new Uint8Array(Buffer.from(message));
+                        }
+                        else {
+                            uint8Data = new Uint8Array(message);
+                        }
+                        return [4 /*yield*/, openpgp.encrypt({
+                                message: openpgp.Message.fromBinary(uint8Data),
+                                publicKeys: this.pgpKeyPair.readPublicKey,
+                                privateKeys: this.pgpKeyPair.readPrivateKey
+                            })];
+                    case 1:
+                        encryptedMsg = _a.sent();
+                        return [2 /*return*/, resolve(encryptedMsg)];
+                    case 2:
+                        err_1 = _a.sent();
+                        reject(err_1);
+                        return [3 /*break*/, 3];
+                    case 3: return [2 /*return*/];
+                }
+            });
+        }); })); };
+        this.decryptMessage = function (encryptedMessage) { return new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+            var message, decrypted, err_2;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 3, , 4]);
+                        return [4 /*yield*/, openpgp.readMessage({ armoredMessage: encryptedMessage })];
+                    case 1:
+                        message = _a.sent();
+                        return [4 /*yield*/, openpgp.decrypt({
+                                message: message,
+                                publicKeys: this.pgpKeyPair.readPublicKey,
+                                privateKeys: this.pgpKeyPair.readPrivateKey // for decryption
+                            })];
+                    case 2:
+                        decrypted = _a.sent();
+                        return [2 /*return*/, resolve(decrypted.data)];
+                    case 3:
+                        err_2 = _a.sent();
+                        return [2 /*return*/, reject(err_2)];
+                    case 4: return [2 /*return*/];
+                }
+            });
+        }); }); };
         openpgp.config.aeadProtect = true;
         openpgp.config.compression = openpgp.enums.compression.zip;
     }
-    ;
     return Encrypt;
 }());
 exports["default"] = Encrypt;

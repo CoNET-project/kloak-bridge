@@ -1,6 +1,7 @@
 {
     "extends": [
-        "airbnb-base"
+        "airbnb-base",
+        "plugin:jest/recommended"
     ],
     "plugins": ["@typescript-eslint"],
     "ignorePatterns": [
@@ -23,6 +24,7 @@
                 "argsIgnorePattern": "^_"
             }
         ],
+        "array-bracket-spacing": "off",
         "comma-dangle": ["error", {
             "arrays": "never",
             "objects": "never",
@@ -35,8 +37,9 @@
         "lines-between-class-members": "off",
         "max-len": [
             "error",
-            120
+            150
         ],
+        "import/newline-after-import": "off",
         "no-trailing-spaces": "off",
         "no-unused-vars": "off",
         "no-new": "off",

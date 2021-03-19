@@ -7,7 +7,7 @@ import { PGPGenerateOptions, StringPGPKeys } from './define';
 class StorageHelper {
     private encrypt: Encrypt = new Encrypt();
     private IDBHelper = new IDBDatabaseHelper();
-    public newKey = (options: PGPGenerateOptions, unlock?: boolean): Promise<StringPGPKeys | boolean> => (
+    public createKey = (options: PGPGenerateOptions, unlock?: boolean): Promise<StringPGPKeys | boolean> => (
         new Promise(async (resolve, reject) => {
             const stringPGPKeys: StringPGPKeys = await this.encrypt.generateKey(options);
             if (unlock) {
@@ -19,6 +19,11 @@ class StorageHelper {
                 return reject(new Error('Unable to unlock your new OpenPGP key.'));
             }
             return resolve(stringPGPKeys);
+        })
+    )
+    public encryptSave = (data: ArrayBuffer | Uint8Array | string): Promise<string> => (
+        new Promise<string>((resolve, reject) => {
+
         })
     )
 

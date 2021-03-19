@@ -38,29 +38,34 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var Encrypt_1 = require("./Encrypt");
 var IDBDatabaseHelper_1 = require("./IDBDatabaseHelper");
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 var StorageHelper = /** @class */ (function () {
     function StorageHelper() {
         var _this = this;
         this.encrypt = new Encrypt_1["default"]();
         this.IDBHelper = new IDBDatabaseHelper_1["default"]();
-        this.newKey = function (options, unlock) {
-            return new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                var stringPGPKeys;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.encrypt.generateKey(options)];
-                        case 1:
-                            stringPGPKeys = _a.sent();
-                            if (!unlock) return [3 /*break*/, 3];
-                            return [4 /*yield*/, this.encrypt.checkPassword(stringPGPKeys, options.passphrase)];
-                        case 2:
-                            _a.sent();
-                            _a.label = 3;
-                        case 3: return [2 /*return*/];
-                    }
-                });
-            }); });
-        };
+        this.createKey = function (options, unlock) { return (new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+            var stringPGPKeys, isUnlocked;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.encrypt.generateKey(options)];
+                    case 1:
+                        stringPGPKeys = _a.sent();
+                        if (!unlock) return [3 /*break*/, 3];
+                        return [4 /*yield*/, this.encrypt.checkPassword(stringPGPKeys, options.passphrase)];
+                    case 2:
+                        isUnlocked = _a.sent();
+                        stringPGPKeys.unlocked = isUnlocked;
+                        if (isUnlocked) {
+                            return [2 /*return*/, resolve(stringPGPKeys)];
+                        }
+                        return [2 /*return*/, reject(new Error('Unable to unlock your new OpenPGP key.'))];
+                    case 3: return [2 /*return*/, resolve(stringPGPKeys)];
+                }
+            });
+        }); })); };
+        this.encryptSave = function (data) { return (new Promise(function (resolve, reject) {
+        })); };
     }
     return StorageHelper;
 }());

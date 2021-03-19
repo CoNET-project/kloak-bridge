@@ -1,3 +1,4 @@
+import 'jest';
 import Encrypt from '../Encrypt';
 import { PGPKeys, StringPGPKeys } from '../define';
 
@@ -8,8 +9,8 @@ const plainText = 'Hello, this is my message.';
 let encryptedMessage = '';
 
 let stringPGPKeys: StringPGPKeys = {
-    privateKey: "",
-    publicKey: ""
+    privateKey: '',
+    publicKey: ''
 };
 
 describe('Encrypt Class', () => {
@@ -20,11 +21,11 @@ describe('Encrypt Class', () => {
     });
 
     test('Should generate an OpenPGP key pair.', async (done) => {
-        stringPGPKeys = Object.assign({}, await encrypt.generateKey({
+        stringPGPKeys = { ...await encrypt.generateKey({
             nickname: 'Bob',
             email: 'bob@gmail.com',
             passphrase
-        }));
+        }) };
         expect(stringPGPKeys.privateKey)
             .toBeTruthy();
         expect(stringPGPKeys.publicKey)
@@ -78,7 +79,7 @@ describe('Encrypt Class', () => {
         done();
     });
 
-    test("Should succeed to decrypt message.", async (done) => {
+    test('Should succeed to decrypt message.', async (done) => {
         try {
             const decryptedMsg = await encrypt.decryptMessage(encryptedMessage);
             expect(decryptedMsg).toBe(plainText);
@@ -86,7 +87,7 @@ describe('Encrypt Class', () => {
             expect(err).toBe(undefined);
         }
         done();
-    })
+    });
 
     // test('Should encrypt message.', async (done) => {
     //     try {
