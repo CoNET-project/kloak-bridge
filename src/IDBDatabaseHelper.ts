@@ -3,71 +3,57 @@ interface IDBDatabaseEventTarget extends EventTarget {
 }
 
 class IDBDatabaseHelper {
-
-    constructor(private databaseName = 'kloak', private version: number = 1) {}
-
-    public init = (callback: (err: any, objectStore: IDBObjectStore | null) => void) => {
+    private databaseName: string = 'kloak';
+    private version: number = 1;
+    constructor(databaseName?: string, version?: number) {
+        if (databaseName) this.databaseName = databaseName;
+        if (version) this.version = version;
+    }
+    public getObjectStore = (): Promise<IDBObjectStore> => new Promise<IDBObjectStore>((resolve, reject) => {
+        // eslint-disable-next-line no-undef
         const req = indexedDB.open(this.databaseName, this.version);
-        req.onupgradeneeded = (evt: IDBVersionChangeEvent): void => {
+        req.onupgradeneeded = async (evt: IDBVersionChangeEvent): Promise<any> => {
             try {
-                const db = (evt.target as IDBDatabaseEventTarget).result;
-                db.createObjectStore('data');
+                const db = await (evt.target as IDBDatabaseEventTarget).result;
+                const objectStore = await db.createObjectStore('data');
+                resolve(objectStore);
             } catch (err: any) {
-                callback(err, null)
-                console.log('IDBDatabaseHelper error:', err)
+                reject(err);
+                console.log('IDBDatabaseHelper error:', err);
             }
-        }
+        };
 
         req.onsuccess = async (evt) => {
             try {
                 const db = await (evt.target as IDBDatabaseEventTarget).result;
                 const tx: IDBTransaction = await db.transaction('data', 'readwrite') as IDBTransaction;
-                const objectStore = await tx.objectStore('data')
-                callback(null, objectStore)
+                const objectStore = await tx.objectStore('data');
+                resolve(objectStore);
             } catch (err: any) {
-                callback(err, null)
-                console.log('IDBDatabaseHelper error:', err);
+                reject(err);
             }
+        };
+    })
+    public save = (uuid: string, data: any): Promise<any> => new Promise(async (resolve, reject) => {
+        try {
+            const objectStore = await this.getObjectStore();
+            const storeAction = await objectStore?.put(JSON.stringify(data), uuid);
+            storeAction.onsuccess = () => resolve(uuid);
+            storeAction.onerror = (evt: Event) => reject(evt);
+        } catch (err) {
+            reject(err);
         }
-    }
-
-    public save = (uuid: string, data: any): Promise<any> => {
-        return new Promise((resolve, reject) => {
-            this.init((err, objectStore) => {
-                if (err) {
-                    return reject(err)
-                }
-                if (objectStore) {
-                    try {
-                        objectStore.put(JSON.stringify(data), uuid).onsuccess = () => {
-                            return resolve(uuid)
-                        }
-                    } catch (err: any) {
-                        return reject(err)
-                    }
-                }
-            })
-        })
-    }
-
-    public delete = (uuid: string): Promise<any> => {
-        return new Promise((resolve, reject) => {
-            this.init((err, objectStore) => {
-                if (err) {
-                    return reject(err);
-                }
-                if (objectStore) {
-                    try {
-                        objectStore.delete(uuid).onsuccess = () => {
-                            return resolve(uuid);
-                        }
-                    } catch (err: any) {
-                        return reject(err);
-                    }
-                }
-            })
-        })
-    }
+    })
+    public delete = (uuid: string): Promise<any> => new Promise(async (resolve, reject) => {
+        try {
+            const objectStore = await this.getObjectStore();
+            const storeAction = await objectStore?.delete(uuid);
+            storeAction.onsuccess = () => resolve(uuid);
+            storeAction.onerror = (evt: Event) => reject(evt);
+        } catch (err) {
+            reject(err);
+        }
+    })
 }
 
-export default IDBDatabaseHelper
+export default IDBDatabaseHelper;
