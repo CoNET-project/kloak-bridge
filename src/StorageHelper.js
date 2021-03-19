@@ -45,7 +45,7 @@ var StorageHelper = /** @class */ (function () {
         this.IDBHelper = new IDBDatabaseHelper_1["default"]();
         this.newKey = function (options, unlock) {
             return new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                var stringPGPKeys;
+                var stringPGPKeys, isUnlocked;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0: return [4 /*yield*/, this.encrypt.generateKey(options)];
@@ -54,9 +54,11 @@ var StorageHelper = /** @class */ (function () {
                             if (!unlock) return [3 /*break*/, 3];
                             return [4 /*yield*/, this.encrypt.checkPassword(stringPGPKeys, options.passphrase)];
                         case 2:
-                            _a.sent();
+                            isUnlocked = _a.sent();
+                            stringPGPKeys['unlocked'] = isUnlocked;
+                            isUnlocked ? resolve(stringPGPKeys) : reject(new Error('Unable to unlock your new OpenPGP key.'));
                             _a.label = 3;
-                        case 3: return [2 /*return*/];
+                        case 3: return [2 /*return*/, resolve(stringPGPKeys)];
                     }
                 });
             }); });
