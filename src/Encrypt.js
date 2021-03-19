@@ -44,11 +44,11 @@ var Encrypt = /** @class */ (function () {
         this.generateKey = function (options) {
             return new Promise(function (resolve, reject) {
                 var userIds = {
-                    name: options.nickname || "",
-                    email: options.email || ""
+                    name: options.nickname || '',
+                    email: options.email || ''
                 };
                 var pgpKeyOptions = {
-                    passphrase: options.passphrase || "",
+                    passphrase: options.passphrase || '',
                     userIds: [userIds],
                     curve: 'ed25519'
                 };
@@ -74,7 +74,7 @@ var Encrypt = /** @class */ (function () {
                             if (this.pgpKeyPair.armoredPublicKey && this.pgpKeyPair.armoredPrivateKey) {
                                 if ((this.pgpKeyPair.armoredPrivateKey !== keyPair.privateKey && this.pgpKeyPair.armoredPublicKey !== keyPair.publicKey)) {
                                     unlocked = (_c = this.pgpKeyPair.readPrivateKey) === null || _c === void 0 ? void 0 : _c.isDecrypted();
-                                    return [2 /*return*/, reject(new Error("This instance contains an " + (unlocked ? "unlocked" : "locked") + " OpenPGP key pair, please start new instance."))];
+                                    return [2 /*return*/, reject(new Error("This instance contains an " + (unlocked ? 'unlocked' : 'locked') + " OpenPGP key pair, please start new instance."))];
                                 }
                             }
                             this.pgpKeyPair.armoredPublicKey = keyPair.publicKey;

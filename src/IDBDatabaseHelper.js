@@ -39,24 +39,36 @@ exports.__esModule = true;
 var IDBDatabaseHelper = /** @class */ (function () {
     function IDBDatabaseHelper(databaseName, version) {
         var _this = this;
-        if (databaseName === void 0) { databaseName = 'kloak'; }
-        if (version === void 0) { version = 1; }
-        this.databaseName = databaseName;
-        this.version = version;
-        this.init = function (callback) {
+        this.databaseName = 'kloak';
+        this.version = 1;
+        this.getObjectStore = function () { return new Promise(function (resolve, reject) {
+            // eslint-disable-next-line no-undef
             var req = indexedDB.open(_this.databaseName, _this.version);
-            req.onupgradeneeded = function (evt) {
-                try {
-                    var db = evt.target.result;
-                    db.createObjectStore("data");
-                }
-                catch (err) {
-                    callback(err, null);
-                    console.log("IDBDatabaseHelper error:", err);
-                }
-            };
+            req.onupgradeneeded = function (evt) { return __awaiter(_this, void 0, void 0, function () {
+                var db, objectStore, err_1;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            _a.trys.push([0, 3, , 4]);
+                            return [4 /*yield*/, evt.target.result];
+                        case 1:
+                            db = _a.sent();
+                            return [4 /*yield*/, db.createObjectStore('data')];
+                        case 2:
+                            objectStore = _a.sent();
+                            resolve(objectStore);
+                            return [3 /*break*/, 4];
+                        case 3:
+                            err_1 = _a.sent();
+                            reject(err_1);
+                            console.log('IDBDatabaseHelper error:', err_1);
+                            return [3 /*break*/, 4];
+                        case 4: return [2 /*return*/];
+                    }
+                });
+            }); };
             req.onsuccess = function (evt) { return __awaiter(_this, void 0, void 0, function () {
-                var db, tx, objectStore, err_1;
+                var db, tx, objectStore, err_2;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -70,56 +82,67 @@ var IDBDatabaseHelper = /** @class */ (function () {
                             return [4 /*yield*/, tx.objectStore('data')];
                         case 3:
                             objectStore = _a.sent();
-                            callback(null, objectStore);
+                            resolve(objectStore);
                             return [3 /*break*/, 5];
                         case 4:
-                            err_1 = _a.sent();
-                            callback(err_1, null);
-                            console.log("IDBDatabaseHelper error:", err_1);
+                            err_2 = _a.sent();
+                            reject(err_2);
                             return [3 /*break*/, 5];
                         case 5: return [2 /*return*/];
                     }
                 });
             }); };
-        };
-        this.save = function (uuid, data) {
-            return new Promise(function (resolve, reject) {
-                _this.init(function (err, objectStore) {
-                    if (err) {
-                        return reject(err);
-                    }
-                    if (objectStore) {
-                        try {
-                            objectStore.put(JSON.stringify(data), uuid).onsuccess = function () {
-                                return resolve(uuid);
-                            };
-                        }
-                        catch (err) {
-                            return reject(err);
-                        }
-                    }
-                });
+        }); };
+        this.save = function (uuid, data) { return new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+            var objectStore, storeAction, err_3;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 3, , 4]);
+                        return [4 /*yield*/, this.getObjectStore()];
+                    case 1:
+                        objectStore = _a.sent();
+                        return [4 /*yield*/, (objectStore === null || objectStore === void 0 ? void 0 : objectStore.put(JSON.stringify(data), uuid))];
+                    case 2:
+                        storeAction = _a.sent();
+                        storeAction.onsuccess = function () { return resolve(uuid); };
+                        storeAction.onerror = function (evt) { return reject(evt); };
+                        return [3 /*break*/, 4];
+                    case 3:
+                        err_3 = _a.sent();
+                        reject(err_3);
+                        return [3 /*break*/, 4];
+                    case 4: return [2 /*return*/];
+                }
             });
-        };
-        this["delete"] = function (uuid) {
-            return new Promise(function (resolve, reject) {
-                _this.init(function (err, objectStore) {
-                    if (err) {
-                        return reject(err);
-                    }
-                    if (objectStore) {
-                        try {
-                            objectStore["delete"](uuid).onsuccess = function () {
-                                return resolve(uuid);
-                            };
-                        }
-                        catch (err) {
-                            return reject(err);
-                        }
-                    }
-                });
+        }); }); };
+        this["delete"] = function (uuid) { return new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+            var objectStore, storeAction, err_4;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 3, , 4]);
+                        return [4 /*yield*/, this.getObjectStore()];
+                    case 1:
+                        objectStore = _a.sent();
+                        return [4 /*yield*/, (objectStore === null || objectStore === void 0 ? void 0 : objectStore["delete"](uuid))];
+                    case 2:
+                        storeAction = _a.sent();
+                        storeAction.onsuccess = function () { return resolve(uuid); };
+                        storeAction.onerror = function (evt) { return reject(evt); };
+                        return [3 /*break*/, 4];
+                    case 3:
+                        err_4 = _a.sent();
+                        reject(err_4);
+                        return [3 /*break*/, 4];
+                    case 4: return [2 /*return*/];
+                }
             });
-        };
+        }); }); };
+        if (databaseName)
+            this.databaseName = databaseName;
+        if (version)
+            this.version = version;
     }
     return IDBDatabaseHelper;
 }());
