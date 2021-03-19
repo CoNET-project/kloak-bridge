@@ -6,30 +6,16 @@
     "ignorePatterns": [
         "*.js"
     ],
+    "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "project": "./tsconfig.json"
     },
     "rules": {
-        "comma-dangle": ["error", {
-            "arrays": "never",
-            "objects": "never",
-            "imports": "never",
-            "exports": "never",
-            "functions": "never"
-        }],
+        "@typescript-eslint/lines-between-class-members": ["error", "never"],
         "@typescript-eslint/indent": [
             "error",
             4
         ],
-//        "@typescript-eslint/member-delimiter-style": [
-//            "error",
-//            {
-//                "multiline": {
-//                    "delimiter": "comma",
-//                    "requireLast": false
-//                }
-//            }
-//        ],
         "@typescript-eslint/no-shadow": "off",
         "@typescript-eslint/no-unused-vars": [
             "error",
@@ -37,11 +23,24 @@
                 "argsIgnorePattern": "^_"
             }
         ],
+        "comma-dangle": ["error", {
+            "arrays": "never",
+            "objects": "never",
+            "imports": "never",
+            "exports": "never",
+            "functions": "never"
+        }],
         "indent": "off",
+        "import/extensions": "off",
+        "lines-between-class-members": "off",
         "max-len": [
             "error",
             120
         ],
+        "no-trailing-spaces": "off",
+        "no-unused-vars": "off",
+        "no-new": "off",
+        "no-async-promise-executor": "off",
         "object-curly-newline": "off",
         "padded-blocks": "off",
         "spaced-comment": "off"
