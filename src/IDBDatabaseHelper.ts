@@ -19,7 +19,6 @@ class IDBDatabaseHelper {
                 resolve(objectStore);
             } catch (err: any) {
                 reject(err);
-                console.log('IDBDatabaseHelper error:', err);
             }
         };
 
@@ -44,6 +43,23 @@ class IDBDatabaseHelper {
             reject(err);
         }
     })
+    public retrieve = (uuid: string): Promise<any> => new Promise(async (resolve, reject) => {
+        try {
+            const objectStore = await this.getObjectStore();
+            const storeAction = await objectStore?.get(uuid);
+            storeAction.onsuccess = (evt: Event) => {
+                const data = (evt.target as IDBDatabaseEventTarget).result;
+                try {
+                    const json = JSON.parse(data);
+                    return resolve(json);
+                } catch (_) {
+                    return resolve(data);
+                }
+            };
+        } catch (err) {
+            return reject(err);
+        }
+    });
     public delete = (uuid: string): Promise<any> => new Promise(async (resolve, reject) => {
         try {
             const objectStore = await this.getObjectStore();

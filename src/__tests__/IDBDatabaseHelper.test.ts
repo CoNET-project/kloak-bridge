@@ -1,5 +1,4 @@
 import IDBDatabaseHelper from '../IDBDatabaseHelper';
-
 require('fake-indexeddb/auto');
 
 describe('IDBDatabaseHelper Class', () => {
@@ -7,7 +6,7 @@ describe('IDBDatabaseHelper Class', () => {
     const testData = {
         filename: 'myfile.txt',
         size: 124,
-        date: new Date()
+        date: (new Date()).toISOString()
     };
 
     test('Should successfully return an object store', async () => {
@@ -20,6 +19,13 @@ describe('IDBDatabaseHelper Class', () => {
         const idb = new IDBDatabaseHelper();
         const uuid = await idb.save(fileUuid, testData);
         expect(uuid).toBe(fileUuid);
+    });
+
+    test('Should retrieve data from IndexedDB', async () => {
+        const idb = new IDBDatabaseHelper();
+        await idb.save(fileUuid, testData);
+        const retrievedData = await idb.retrieve(fileUuid);
+        expect(retrievedData).toStrictEqual(testData);
     });
 
     test('Should delete data from IndexedDB', async () => {
