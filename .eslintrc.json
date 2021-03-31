@@ -4,6 +4,10 @@
         "plugin:jest/recommended",
         "plugin:import/typescript"
     ],
+    "env": {
+        "browser": true,
+        "node": true
+    },
     "plugins": ["@typescript-eslint"],
     "ignorePatterns": [
         "*.js"
@@ -14,7 +18,7 @@
         "project": "./tsconfig.json"
     },
     "rules": {
-        "@typescript-eslint/lines-between-class-members": ["error", "never"],
+        "@typescript-eslint/lines-between-class-members": "off",
         "@typescript-eslint/indent": [
             "error",
             4
@@ -27,6 +31,7 @@
             }
         ],
         "array-bracket-spacing": "off",
+        "consistent-return": "off",
         "comma-dangle": ["error", {
             "arrays": "never",
             "objects": "never",
@@ -39,13 +44,14 @@
         "lines-between-class-members": "off",
         "max-len": [
             "error",
-            150
+            200
         ],
         "import/newline-after-import": "off",
         "no-trailing-spaces": "off",
         "no-unused-vars": "off",
         "no-new": "off",
         "no-async-promise-executor": "off",
+        "no-shadow": "off",
         "object-curly-newline": "off",
         "padded-blocks": "off",
         "spaced-comment": "off"

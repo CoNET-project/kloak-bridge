@@ -1,14 +1,29 @@
 import * as openpgp from 'openpgp';
 import { KeyOptions } from 'openpgp';
+import { Buffer } from 'buffer/';
 import { PGPGenerateOptions, PGPKeys, StringPGPKeys } from './define';
 
-class Encrypt {
+class EncryptHelper {
     private pgpKeyPair: PGPKeys = {};
+
     constructor() {
-        openpgp.config.aeadProtect = true;
         openpgp.config.compression = openpgp.enums.compression.zip;
     }
-    public generateKey = (options: PGPGenerateOptions): Promise<StringPGPKeys> => new Promise((resolve, reject) => {
+
+    private isJSON = (text: string): boolean => {
+        if (typeof text !== 'string') {
+            return false;
+        }
+        try {
+            JSON.parse(text);
+            return true;
+        } catch (error: any) {
+            return false;
+        }
+    }
+
+    public generateKey = (options: PGPGenerateOptions): Promise<StringPGPKeys> => new Promise<StringPGPKeys>(async (resolve, reject) => {
+
         const userIds = {
             name: options.nickname || '',
             email: options.email || ''
@@ -28,13 +43,15 @@ class Encrypt {
             return resolve(stringKeyPairs);
         }).catch(reject);
     })
+
     public isUnlocked = (): boolean => {
         if (this.pgpKeyPair?.readPrivateKey) {
             return this.pgpKeyPair?.readPrivateKey.isDecrypted();
         }
         return false;
     }
-    public checkPassword = (keyPair: StringPGPKeys, passphrase: string): Promise<boolean> => new Promise(async (resolve, reject) => {
+
+    public checkPassword = (keyPair: StringPGPKeys, passphrase: string): Promise<boolean> => new Promise<boolean>(async (resolve, reject) => {
         if (this.pgpKeyPair.armoredPublicKey && this.pgpKeyPair.armoredPrivateKey) {
             if ((this.pgpKeyPair.armoredPrivateKey === keyPair.privateKey && this.pgpKeyPair.armoredPublicKey === keyPair.publicKey)) {
                 const unlocked = await this.isUnlocked();
@@ -50,6 +67,7 @@ class Encrypt {
         this.pgpKeyPair.readPrivateKey = await openpgp.readKey({ armoredKey: keyPair.privateKey });
         return this.pgpKeyPair.readPrivateKey.decrypt(passphrase).then((_: void) => resolve(true)).catch((err: any) => reject(err));
     })
+
     public modifyPGPMessage = (message: string, trim: boolean = false): string => {
         let modified: string;
         const pgpHead = '-----BEGIN PGP MESSAGE-----';
@@ -67,32 +85,26 @@ class Encrypt {
         }
 
         return pgpHead.concat('\r\n\r\n', message, '\r\n\r\n', pgpEnd);
-        return pgpHead.concat(message, pgpEnd);
     }
-    public encryptMessage = (message: ArrayBuffer | Uint8Array | string): Promise<any> => new Promise(async (resolve, reject) => {
-        let encryptedMsg = '';
+
+    public encryptMessage = (originalData: ArrayBuffer | Uint8Array | string): Promise<string> => new Promise<string>(async (resolve, reject) => {
         try {
-            let uint8Data: Uint8Array | null;
+            // @ts-ignore
+            const base64Data = Buffer.from(originalData).toString('base64');
 
-            if (typeof message === 'string') {
-                uint8Data = new Uint8Array(Buffer.from(message as string));
-            } else {
-                uint8Data = new Uint8Array(message);
-            }
-
-            encryptedMsg = await openpgp.encrypt({
-                message: openpgp.Message.fromBinary(uint8Data),
+            const encryptedMsg = await openpgp.encrypt({
+                message: await openpgp.Message.fromText(base64Data),
                 publicKeys: this.pgpKeyPair.readPublicKey,
                 privateKeys: this.pgpKeyPair.readPrivateKey
             });
 
-            encryptedMsg = this.modifyPGPMessage(encryptedMsg, true);
-
+            const modifiedPGP = this.modifyPGPMessage(encryptedMsg, true);
+            return resolve(modifiedPGP);
         } catch (err) { reject(err); }
 
-        return resolve(encryptedMsg);
     })
-    public decryptMessage = (encryptedMessage: string): Promise<any> => new Promise(async (resolve, reject) => {
+
+    public decryptMessage = (encryptedMessage: string, buffer?: boolean): Promise<any> => new Promise(async (resolve, reject) => {
         const cleanEncrypted = this.modifyPGPMessage(encryptedMessage);
         try {
             const message = await openpgp.readMessage({ armoredMessage: cleanEncrypted });
@@ -101,11 +113,20 @@ class Encrypt {
                 publicKeys: this.pgpKeyPair.readPublicKey, // for verification (optional)
                 privateKeys: this.pgpKeyPair.readPrivateKey // for decryption
             });
-            return resolve(decrypted.data);
+            const dataBuffer = Buffer.from(decrypted.data, 'base64');
+
+            if (buffer) {
+                return resolve(dataBuffer);
+            }
+
+            if (!buffer && this.isJSON(dataBuffer.toString())) {
+                return resolve(JSON.parse(dataBuffer.toString()));
+            }
+            return resolve(dataBuffer.toString());
         } catch (err) {
             return reject(err);
         }
     })
 }
 
-export default Encrypt;
+export default EncryptHelper;

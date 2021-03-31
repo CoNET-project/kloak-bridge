@@ -12,6 +12,7 @@ describe('StorageHelper Class', () => {
     };
     let keyPair: StringPGPKeys;
     let storageHelper: StorageHelper;
+
     beforeAll(() => {
         // eslint-disable-next-line global-require
         const textEncoding = require('text-encoding-utf-8');
@@ -19,6 +20,7 @@ describe('StorageHelper Class', () => {
         global.TextDecoder = textEncoding.TextDecoder;
         storageHelper = new StorageHelper();
     });
+
     test('Should create a new key pair and NOT unlock', async () => {
         keyPair = await storageHelper.createKey(encryptTestData.instanceName,
             { passphrase: encryptTestData.passphrase },
@@ -27,6 +29,15 @@ describe('StorageHelper Class', () => {
         expect(keyPair.privateKey).toBeTruthy();
         expect(keyPair.unlocked).toBe(false);
     });
+
+    test('Should unlock a key pair', async () => {
+        keyPair = await storageHelper.createKey(encryptTestData.instanceName,
+            { passphrase: encryptTestData.passphrase },
+            false);
+        const unlocked = await storageHelper.unlockKey(encryptTestData.instanceName, keyPair, encryptTestData.passphrase);
+        expect(unlocked).toBe(true);
+    });
+
     test('Should create a new key pair and unlock', async () => {
         keyPair = await storageHelper.createKey(
             encryptTestData.instanceName,
@@ -37,28 +48,34 @@ describe('StorageHelper Class', () => {
         expect(keyPair.privateKey).toBeTruthy();
         expect(keyPair.unlocked).toBe(true);
     });
+
     test('Should save data', async () => {
         const saveActionUuid = await storageHelper.save(uuid, originalData);
         expect(saveActionUuid).toBe(uuid);
     });
+
     test('Should retrieve data', async () => {
         const data = await storageHelper.retrieve(uuid);
         expect(data).toBe(originalData);
     });
+
     test('Should delete data', async () => {
         const deleteActionUuid = await storageHelper.delete(uuid);
         expect(deleteActionUuid).toBe(uuid);
     });
+
     test('Should encrypt and save data, returning generated UUID', async () => {
         const encryptSaveUuid = await storageHelper.encryptSave(encryptTestData.instanceName, originalData);
         expect(encryptSaveUuid).not.toBeNull();
     });
+
     test('Should encrypt and save data, returning provided UUID', async () => {
         const encryptSaveUuid = await storageHelper.encryptSave(encryptTestData.instanceName, originalData, uuid);
         expect(encryptSaveUuid).toBe(uuid);
     });
+
     test('Should retrieve and decrypt data, with provided UUID', async () => {
-        const retrieveDecryptData = await storageHelper.retrieveDecrypt(encryptTestData.instanceName, uuid);
+        const retrieveDecryptData = await storageHelper.retrieveDecrypt(encryptTestData.instanceName, uuid, false);
         expect(retrieveDecryptData).toBe(originalData);
     });
 });

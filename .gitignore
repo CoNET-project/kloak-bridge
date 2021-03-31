@@ -1,3 +1,7 @@
+dist
 node_modules
+browserTests
 .idea
 yarn-error.log
+*.js
+index.ts

@@ -1,7 +1,7 @@
-import Encrypt from '../Encrypt';
+import EncryptHelper from '../EncryptHelper';
 import { StringPGPKeys } from '../define';
 
-const encrypt = new Encrypt();
+const encrypt = new EncryptHelper();
 const passphrase = '1234';
 
 const plainText = 'Hello, this is my message.';
@@ -64,27 +64,7 @@ describe('Encrypt Class', () => {
 
     test('Should succeed to decrypt message.', async () => {
         const decryptedMsg = await encrypt.decryptMessage(encryptedMessage);
+        console.log(decryptedMsg);
         expect(decryptedMsg).toBe(plainText);
     });
-
-    // test('Should encrypt message.', async (done) => {
-    //     try {
-    //         encryptedMessage = await encrypt.encryptMessage(plainText);
-    //         expect(encryptedMessage)
-    //             .toBeTruthy();
-    //     } catch (err) {
-    //         expect(err).toBe(false);
-    //     }
-    //     done();
-    // });
-
-    // test("Should succeed to decrypt message.", async (done) => {
-    //     try {
-    //         const decryptedMsg = await encrypt.decryptMessage(encryptedMessage);
-    //         expect(decryptedMsg).toBe(plainText);
-    //     } catch (err) {
-    //         expect(err).toBe(undefined);
-    //     }
-    //     done();
-    // })
 });

@@ -3,12 +3,15 @@ interface IDBDatabaseEventTarget extends EventTarget {
 }
 
 class IDBDatabaseHelper {
+
     private databaseName: string = 'kloak';
     private version: number = 1;
+
     constructor(databaseName?: string, version?: number) {
         if (databaseName) this.databaseName = databaseName;
         if (version) this.version = version;
     }
+
     public getObjectStore = (): Promise<IDBObjectStore> => new Promise<IDBObjectStore>((resolve, reject) => {
         // eslint-disable-next-line no-undef
         const req = indexedDB.open(this.databaseName, this.version);
@@ -32,8 +35,9 @@ class IDBDatabaseHelper {
                 reject(err);
             }
         };
-    })
-    public save = (uuid: string, data: any): Promise<any> => new Promise(async (resolve, reject) => {
+    });
+
+    public save = (uuid: string, data: any): Promise<string> => new Promise<string>(async (resolve, reject) => {
         try {
             const objectStore = await this.getObjectStore();
             const storeAction = await objectStore?.put(JSON.stringify(data), uuid);
@@ -42,8 +46,9 @@ class IDBDatabaseHelper {
         } catch (err) {
             reject(err);
         }
-    })
-    public retrieve = (uuid: string): Promise<any> => new Promise(async (resolve, reject) => {
+    });
+
+    public retrieve = (uuid: string): Promise<JSON> => new Promise<JSON>(async (resolve, reject) => {
         try {
             const objectStore = await this.getObjectStore();
             const storeAction = await objectStore?.get(uuid);
@@ -60,7 +65,8 @@ class IDBDatabaseHelper {
             return reject(err);
         }
     });
-    public delete = (uuid: string): Promise<any> => new Promise(async (resolve, reject) => {
+
+    public delete = (uuid: string): Promise<string> => new Promise<string>(async (resolve, reject) => {
         try {
             const objectStore = await this.getObjectStore();
             const storeAction = await objectStore?.delete(uuid);
