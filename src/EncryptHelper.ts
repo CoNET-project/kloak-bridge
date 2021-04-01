@@ -1,28 +1,22 @@
 import * as openpgp from 'openpgp';
 import { KeyOptions } from 'openpgp';
 import { Buffer } from 'buffer/';
-import { PGPGenerateOptions, PGPKeys, StringPGPKeys } from './define';
+import { isJSON } from './utils';
+import { PGPGenerateOptions, PGPKeys } from './define';
 
 class EncryptHelper {
-    private pgpKeyPair: PGPKeys = {};
+    private pgpKeyPair: PGPKeys = {
+        keyID: '',
+        armoredPrivateKey: '',
+        armoredPublicKey: '',
+        unlocked: false
+    };
 
     constructor() {
         openpgp.config.compression = openpgp.enums.compression.zip;
     }
 
-    private isJSON = (text: string): boolean => {
-        if (typeof text !== 'string') {
-            return false;
-        }
-        try {
-            JSON.parse(text);
-            return true;
-        } catch (error: any) {
-            return false;
-        }
-    }
-
-    public generateKey = (options: PGPGenerateOptions): Promise<StringPGPKeys> => new Promise<StringPGPKeys>(async (resolve, reject) => {
+    public generateKey = (options: PGPGenerateOptions): Promise<PGPKeys> => new Promise<PGPKeys>(async (resolve, reject) => {
 
         const userIds = {
             name: options.nickname || '',
@@ -36,11 +30,13 @@ class EncryptHelper {
         };
 
         return openpgp.generateKey(pgpKeyOptions).then(async (result: openpgp.KeyPair) => {
-            const stringKeyPairs: StringPGPKeys = {
-                publicKey: result.publicKeyArmored,
-                privateKey: result.privateKeyArmored
+            const pgpKeys: PGPKeys = {
+                keyID: result.key.getKeyId().toHex(),
+                armoredPublicKey: result.publicKeyArmored,
+                armoredPrivateKey: result.privateKeyArmored,
+                unlocked: false
             };
-            return resolve(stringKeyPairs);
+            return resolve(pgpKeys);
         }).catch(reject);
     })
 
@@ -51,21 +47,24 @@ class EncryptHelper {
         return false;
     }
 
-    public checkPassword = (keyPair: StringPGPKeys, passphrase: string): Promise<boolean> => new Promise<boolean>(async (resolve, reject) => {
+    public checkPassword = (keyPair: PGPKeys, passphrase: string): Promise<boolean> => new Promise<boolean>(async (resolve, reject) => {
         if (this.pgpKeyPair.armoredPublicKey && this.pgpKeyPair.armoredPrivateKey) {
-            if ((this.pgpKeyPair.armoredPrivateKey === keyPair.privateKey && this.pgpKeyPair.armoredPublicKey === keyPair.publicKey)) {
+            if ((this.pgpKeyPair.armoredPrivateKey === keyPair.armoredPrivateKey && this.pgpKeyPair.armoredPublicKey === keyPair.armoredPublicKey)) {
                 const unlocked = await this.isUnlocked();
                 if (unlocked) {
                     return reject(new Error(`This instance contains an ${unlocked ? 'unlocked' : 'locked'} OpenPGP key pair.`));
                 }
             }
         }
+        this.pgpKeyPair = keyPair;
+        this.pgpKeyPair.readPublicKey = await openpgp.readKey({ armoredKey: this.pgpKeyPair.armoredPublicKey });
+        this.pgpKeyPair.readPrivateKey = await openpgp.readKey({ armoredKey: this.pgpKeyPair.armoredPrivateKey });
 
-        this.pgpKeyPair.armoredPublicKey = keyPair.publicKey;
-        this.pgpKeyPair.armoredPrivateKey = keyPair.privateKey;
-        this.pgpKeyPair.readPublicKey = await openpgp.readKey({ armoredKey: keyPair.publicKey });
-        this.pgpKeyPair.readPrivateKey = await openpgp.readKey({ armoredKey: keyPair.privateKey });
-        return this.pgpKeyPair.readPrivateKey.decrypt(passphrase).then((_: void) => resolve(true)).catch((err: any) => reject(err));
+        try {
+            this.pgpKeyPair.readPrivateKey.decrypt(passphrase).then((_: void) => resolve(true)).catch((err: any) => reject(err));
+        } catch (err) {
+            return reject(err);
+        }
     })
 
     public modifyPGPMessage = (message: string, trim: boolean = false): string => {
@@ -119,7 +118,7 @@ class EncryptHelper {
                 return resolve(dataBuffer);
             }
 
-            if (!buffer && this.isJSON(dataBuffer.toString())) {
+            if (!buffer && isJSON(dataBuffer.toString())) {
                 return resolve(JSON.parse(dataBuffer.toString()));
             }
             return resolve(dataBuffer.toString());
