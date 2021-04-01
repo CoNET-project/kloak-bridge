@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import StorageHelper from '../StorageHelper';
-import { StringPGPKeys } from '../define';
+import { PGPKeys } from '../define';
 require('fake-indexeddb/auto');
 
 describe('StorageHelper Class', () => {
@@ -10,7 +10,7 @@ describe('StorageHelper Class', () => {
         instanceName: 'MyImportantKey',
         passphrase: '12345'
     };
-    let keyPair: StringPGPKeys;
+    let keyPair: PGPKeys;
     let storageHelper: StorageHelper;
 
     beforeAll(() => {
@@ -25,8 +25,8 @@ describe('StorageHelper Class', () => {
         keyPair = await storageHelper.createKey(encryptTestData.instanceName,
             { passphrase: encryptTestData.passphrase },
             false);
-        expect(keyPair.publicKey).toBeTruthy();
-        expect(keyPair.privateKey).toBeTruthy();
+        expect(keyPair.armoredPublicKey).toBeTruthy();
+        expect(keyPair.armoredPrivateKey).toBeTruthy();
         expect(keyPair.unlocked).toBe(false);
     });
 
@@ -44,8 +44,8 @@ describe('StorageHelper Class', () => {
             { passphrase: encryptTestData.passphrase },
             true
         );
-        expect(keyPair.publicKey).toBeTruthy();
-        expect(keyPair.privateKey).toBeTruthy();
+        expect(keyPair.armoredPublicKey).toBeTruthy();
+        expect(keyPair.armoredPrivateKey).toBeTruthy();
         expect(keyPair.unlocked).toBe(true);
     });
 
@@ -77,5 +77,19 @@ describe('StorageHelper Class', () => {
     test('Should retrieve and decrypt data, with provided UUID', async () => {
         const retrieveDecryptData = await storageHelper.retrieveDecrypt(encryptTestData.instanceName, uuid, false);
         expect(retrieveDecryptData).toBe(originalData);
+    });
+
+    test('Should check preferences and return no preferences.', async () => {
+        // const preferences = await storageHelper.checkPreferences();
+        await expect(storageHelper.checkPreferences())
+            .rejects
+            .toThrowError();
+    });
+
+    test('Should check preferences and return preferences', async () => {
+        await storageHelper.save('preferences', 'mypreferences');
+        await expect(storageHelper.checkPreferences())
+            .resolves
+            .toBeTruthy();
     });
 });

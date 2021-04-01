@@ -1,22 +1,27 @@
 import * as openpgp from 'openpgp';
 
+export interface PGPKeys {
+    keyID: string,
+    armoredPublicKey: string,
+    armoredPrivateKey: string,
+    readPublicKey?: openpgp.Key,
+    readPrivateKey?: openpgp.Key,
+    unlocked?: boolean
+}
+
+export interface KeyContainer {
+    deviceKey: PGPKeys,
+    accountKey: PGPKeys,
+    storageKey: PGPKeys,
+    messengerKeys: {
+        [keyID: string]: PGPKeys
+    }
+}
+
 export interface PGPGenerateOptions {
     nickname?: string,
     email?: string,
     passphrase: string
-}
-
-export interface StringPGPKeys {
-    publicKey: string,
-    privateKey: string,
-    unlocked?: boolean
-}
-
-export interface PGPKeys {
-    armoredPublicKey?: string,
-    armoredPrivateKey?: string,
-    readPublicKey?: openpgp.Key,
-    readPrivateKey?: openpgp.Key
 }
 
 export type DisassemblySource = File | Blob;

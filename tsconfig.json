@@ -75,5 +75,5 @@
       "es2015.promise"
     ]
   },
-  "exclude": ["./src/__tests__"]
+  "exclude": []
 }

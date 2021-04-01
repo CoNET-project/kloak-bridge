@@ -1,9 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
 import EncryptHelper from './EncryptHelper';
 import IDBDatabaseHelper from './IDBDatabaseHelper';
-import { KloakFileIndex, PGPGenerateOptions, StringPGPKeys } from './define';
+import { KloakFileIndex, PGPGenerateOptions, PGPKeys } from './define';
 import DisassemblyHelper from './DisassemblyHelper';
 import AssemblyHelper from './AssemblyHelper';
+// import { isJSON } from './utils';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class StorageHelper {
@@ -13,36 +14,47 @@ class StorageHelper {
     private encryptHelpers: {[name: string]: EncryptHelper} = {}
     private IDBHelper = new IDBDatabaseHelper();
 
-    public createKey = (instanceName: string, options: PGPGenerateOptions, unlock?: boolean): Promise<StringPGPKeys> => (
+    public checkPreferences = (): Promise<any> => (
+        new Promise<any>(async (resolve, reject) => {
+            const preferences = await this.IDBHelper.retrieve('preferences');
+            if (!preferences) {
+                return reject(new Error('No preferences'));
+            }
+            return resolve(preferences);
+        })
+    );
+
+    public createKey = (instanceName: string, options: PGPGenerateOptions, unlock?: boolean): Promise<PGPKeys> => (
         new Promise(async (resolve, reject) => {
             this.encryptHelpers[instanceName] = await new EncryptHelper();
-            const stringPGPKeys: StringPGPKeys = await this.encryptHelpers[instanceName].generateKey(options);
-            stringPGPKeys.unlocked = false;
+            const pgpKeys: PGPKeys = await this.encryptHelpers[instanceName].generateKey(options);
+            pgpKeys.unlocked = false;
             if (unlock) {
                 try {
-                    const isUnlocked = await this.encryptHelpers[instanceName].checkPassword(stringPGPKeys, options.passphrase);
-                    stringPGPKeys.unlocked = isUnlocked.valueOf();
+                    const isUnlocked = await this.encryptHelpers[instanceName].checkPassword(pgpKeys, options.passphrase);
+                    pgpKeys.unlocked = isUnlocked.valueOf();
                 } catch (err) {
                     reject(err);
                 }
             }
-            return resolve(stringPGPKeys);
+            return resolve(pgpKeys);
         })
     )
 
-    public unlockKey = (instanceName: string, keyPair: StringPGPKeys, passphrase: string): Promise<boolean> => (
+    public unlockKey = (instanceName: string, pgpKeys: PGPKeys, passphrase: string): Promise<boolean> => (
         new Promise<boolean>(async (resolve, reject) => {
             try {
                 if (!this.encryptHelpers[instanceName]) {
                     this.encryptHelpers[instanceName] = await new EncryptHelper();
                 }
-                const unlocked = await this.encryptHelpers[instanceName].checkPassword(keyPair, passphrase);
+                const unlocked = await this.encryptHelpers[instanceName].checkPassword(pgpKeys, passphrase);
                 resolve(unlocked.valueOf());
             } catch (err) {
                 reject(err);
             }
         })
     )
+
     public retrieve = (uuid: string): Promise<any> => this.IDBHelper.retrieve(uuid);
 
     public save = (uuid: string, data: any): Promise<any> => this.IDBHelper.save(uuid, data);
