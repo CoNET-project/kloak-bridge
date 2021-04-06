@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "transpile": "tsc -p tsconfig.json",
+    "transpile": "tsc -p tsconfig.transpile.json",
     "browser": "yarn lint && yarn transpile && npx webpack --mode='development' && serve ./dist",
     "lint": "eslint './*.{js,ts}' --quiet",
     "test": "jest --silent=false"

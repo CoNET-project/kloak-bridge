@@ -7,6 +7,7 @@ import {
     KloakFileMetadata,
     KloakFileIndex
 } from './define';
+import { getUUIDv4 } from './utils';
 
 class DisassemblyHelper {
     private fileUUID: string
@@ -33,7 +34,7 @@ class DisassemblyHelper {
     constructor(source: DisassemblySource, callback: DisassemblyCallback, options?: DisassemblyOptions) {
         this.source = source;
         this.callback = callback;
-        this.fileUUID = this.getUUID();
+        this.fileUUID = getUUIDv4();
         this.metadata.uuid = this.fileUUID;
         if (options) {
             if (options.chunkSize) {
@@ -45,8 +46,6 @@ class DisassemblyHelper {
         }
         this.start().then((_) => {});
     }
-
-    private getUUID = () => uuidv4();
 
     private start = async () => {
         try {
@@ -72,7 +71,7 @@ class DisassemblyHelper {
             };
             switch (true) {
                 case this.source instanceof Blob:
-                    metadata.name = this.getUUID();
+                    metadata.name = getUUIDv4();
                     metadata.extension = (this.source as Blob).type.split('/').pop() || '';
                 // eslint-disable-next-line no-fallthrough
                 case this.source instanceof File:
@@ -89,7 +88,7 @@ class DisassemblyHelper {
     )
 
     private disassemble = async (): Promise<any> => {
-        const chunkUUID = this.getUUID();
+        const chunkUUID = getUUIDv4();
         const startOffset = this.index.lastOffset;
         const endOffset = startOffset + this.options.chunkSize;
         this.index.chunks[this.index.lastOffset] = chunkUUID;
