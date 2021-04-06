@@ -1,3 +1,5 @@
+import crypto from 'crypto';
+
 export const isJSON = (text: string): boolean => {
     if (typeof text !== 'string') {
         return false;
@@ -10,6 +12,11 @@ export const isJSON = (text: string): boolean => {
     }
 };
 
-export const test = () => {
-
-};
+export const createRandomValues = (): Promise<string> => (
+    new Promise<string>((resolve, _) => {
+        if (typeof window !== 'undefined' && window.crypto) {
+            return resolve(window.crypto.getRandomValues(new Uint32Array(1)).toString());
+        }
+        return resolve(crypto.randomInt(1000000).toString());
+    })
+);

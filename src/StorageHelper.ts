@@ -1,9 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
 import EncryptHelper from './EncryptHelper';
 import IDBDatabaseHelper from './IDBDatabaseHelper';
-import { KloakFileIndex, PGPGenerateOptions, PGPKeys } from './define';
+import { Container, KeyChain, KloakFileIndex, PGPGenerateOptions, PGPKeys } from './define';
 import DisassemblyHelper from './DisassemblyHelper';
 import AssemblyHelper from './AssemblyHelper';
+import { createRandomValues } from './utils';
 // import { isJSON } from './utils';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -14,15 +15,47 @@ class StorageHelper {
     private encryptHelpers: {[name: string]: EncryptHelper} = {}
     private IDBHelper = new IDBDatabaseHelper();
 
-    public checkPreferences = (): Promise<any> => (
+    public checkKeyChain = (): Promise<any> => (
         new Promise<any>(async (resolve, reject) => {
-            const preferences = await this.IDBHelper.retrieve('preferences');
-            if (!preferences) {
-                return reject(new Error('No preferences'));
+            const keyChain = await this.IDBHelper.retrieve('keychain');
+            if (!keyChain) {
+                return reject(new Error('No key chain!'));
             }
-            return resolve(preferences);
+            return resolve(keyChain);
         })
     );
+
+    public createContainer = (passphrase: string): Promise<Container> => (
+        new Promise<Container>(async (resolve, reject) => {
+            try {
+                const tempEncrypt = await new EncryptHelper();
+                const containerKey: PGPKeys = await tempEncrypt.generateKey({ passphrase });
+                await tempEncrypt.checkPassword(containerKey, passphrase);
+                const keyChain: KeyChain = {
+                    deviceKey: {},
+                    kloakAccountKey: {},
+                    storageKey: {},
+                    messengerKeys: {},
+                    applicationKeys: {}
+                };
+                keyChain.deviceKey = await tempEncrypt.generateKey({ passphrase: await createRandomValues() });
+                keyChain.kloakAccountKey = await tempEncrypt.generateKey({ passphrase: await createRandomValues() });
+                keyChain.storageKey = await tempEncrypt.generateKey({ passphrase: await createRandomValues() });
+                const encryptedKeyChain = await tempEncrypt.encryptMessage(JSON.stringify(keyChain));
+                const container: Container = {
+                    pgpKeys: {
+                        keyID: containerKey.keyID,
+                        armoredPrivateKey: containerKey.armoredPrivateKey,
+                        armoredPublicKey: containerKey.armoredPublicKey
+                    },
+                    keyChain: encryptedKeyChain
+                };
+                return resolve(container);
+            } catch (err) {
+                return reject(err);
+            }
+        })
+    )
 
     public createKey = (instanceName: string, options: PGPGenerateOptions, unlock?: boolean): Promise<PGPKeys> => (
         new Promise(async (resolve, reject) => {
