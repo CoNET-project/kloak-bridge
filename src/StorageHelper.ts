@@ -29,7 +29,7 @@ class StorageHelper {
     public createContainer = (passphrase: string): Promise<Container> => (
         new Promise<Container>(async (resolve, reject) => {
             try {
-                const tempEncrypt = await new EncryptHelper();
+                const tempEncrypt = new EncryptHelper();
                 const containerKey: PGPKeys = await tempEncrypt.generateKey({ passphrase });
                 await tempEncrypt.checkPassword(containerKey, passphrase);
                 const keyChain: KeyChain = {
