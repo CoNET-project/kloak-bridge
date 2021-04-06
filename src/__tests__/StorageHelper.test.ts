@@ -137,7 +137,6 @@ describe('StorageHelper Class', () => {
         await keyContainer?.addApplicationKey('GAME', pgpKeys);
         const key = await keyContainer?.getKey('application', pgpKeys.keyID, 'GAME');
         expect(JSON.stringify(key)).toBe(JSON.stringify(pgpKeys));
-
     });
 
     test('Should switch KeyContainers class', async () => {
