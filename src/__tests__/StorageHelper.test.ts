@@ -139,4 +139,13 @@ describe('StorageHelper Class', () => {
         expect(JSON.stringify(key)).toBe(JSON.stringify(pgpKeys));
 
     });
+
+    test('Should switch KeyContainers class', async () => {
+        const { pgpKeys, keyChain } = await storageHelper.changeContainer('mynewsuperpassword', await keyContainer?.getKeyChain() as KeyChain);
+        const tempEncrypt = new EncryptHelper();
+        await tempEncrypt.checkPassword(pgpKeys, 'mynewsuperpassword');
+        const decryptedKeyChain = await tempEncrypt.decryptMessage(keyChain);
+        const newKeyContainer = new KeyContainer(decryptedKeyChain);
+        expect(JSON.stringify(newKeyContainer.getKeyChain())).toBe(JSON.stringify(keyContainer?.getKeyChain()));
+    });
 });

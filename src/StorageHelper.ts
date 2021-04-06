@@ -5,6 +5,7 @@ import { Container, KeyChain, KloakFileIndex, PGPGenerateOptions, PGPKeys } from
 import DisassemblyHelper from './DisassemblyHelper';
 import AssemblyHelper from './AssemblyHelper';
 import { createRandomValues } from './utils';
+import KeyContainer from './KeyContainer';
 // import { isJSON } from './utils';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -54,6 +55,25 @@ class StorageHelper {
             } catch (err) {
                 return reject(err);
             }
+        })
+    );
+
+    public changeContainer = (newPassphrase: string, keyChain: KeyChain): Promise<Container> => (
+        new Promise<Container>(async (resolve, _) => {
+            const tempEncrypt = new EncryptHelper();
+            const { keyID, armoredPrivateKey, armoredPublicKey } = await tempEncrypt.generateKey({ passphrase: newPassphrase });
+
+            await tempEncrypt.checkPassword({ keyID, armoredPublicKey, armoredPrivateKey }, newPassphrase);
+            const encryptedKeyChain = await tempEncrypt.encryptMessage(JSON.stringify(keyChain));
+            const newContainer: Container = {
+                pgpKeys: {
+                    keyID,
+                    armoredPrivateKey,
+                    armoredPublicKey
+                },
+                keyChain: encryptedKeyChain
+            };
+            return resolve(newContainer);
         })
     )
 
