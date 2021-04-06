@@ -4,4 +4,4 @@ browserTests
 .idea
 yarn-error.log
 *.js
-index.ts
+!webpack.config.js
