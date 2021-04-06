@@ -1,6 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import StorageHelper from '../StorageHelper';
-import { PGPKeys } from '../define';
+import { Container, KeyChain, PGPKeys } from '../define';
+import EncryptHelper from '../EncryptHelper';
+import KeyContainer from '../KeyContainer';
 require('fake-indexeddb/auto');
 
 describe('StorageHelper Class', () => {
@@ -12,6 +14,15 @@ describe('StorageHelper Class', () => {
     };
     let keyPair: PGPKeys;
     let storageHelper: StorageHelper;
+    const keyChain: KeyChain = {
+        deviceKey: {},
+        kloakAccountKey: {},
+        storageKey: {},
+        messengerKeys: {},
+        applicationKeys: {}
+    };
+
+    let keyContainer: KeyContainer | null;
 
     beforeAll(() => {
         // eslint-disable-next-line global-require
@@ -79,17 +90,53 @@ describe('StorageHelper Class', () => {
         expect(retrieveDecryptData).toBe(originalData);
     });
 
-    test('Should check preferences and return no preferences.', async () => {
+    test('Should check keychain and return no keychain.', async () => {
         // const preferences = await storageHelper.checkPreferences();
-        await expect(storageHelper.checkPreferences())
+        await expect(storageHelper.checkKeyChain())
             .rejects
             .toThrowError();
     });
 
-    test('Should check preferences and return preferences', async () => {
-        await storageHelper.save('preferences', 'mypreferences');
-        await expect(storageHelper.checkPreferences())
+    test('Should check keychain and return keychain', async () => {
+        await storageHelper.save('keychain', keyChain);
+        await expect(storageHelper.checkKeyChain())
             .resolves
             .toBeTruthy();
+    });
+
+    test('Should create new container with encrypted keychain', async () => {
+        const container: Container = await storageHelper.createContainer('mysecretpassword');
+        const { keyID, armoredPublicKey, armoredPrivateKey } = container.pgpKeys;
+        expect(keyID).toBeTruthy();
+        expect(armoredPublicKey).toBeTruthy();
+        expect(armoredPrivateKey).toBeTruthy();
+    });
+
+    test('Should create new container and be able to decrypt keychain.', async () => {
+        const container: Container = await storageHelper.createContainer('mysupersecretpassword');
+        const { keyID, armoredPublicKey, armoredPrivateKey } = container.pgpKeys;
+        const tempEncrypt = new EncryptHelper();
+        await tempEncrypt.checkPassword({ keyID, armoredPublicKey, armoredPrivateKey }, 'mysupersecretpassword');
+        await expect(tempEncrypt.decryptMessage(container.keyChain)).resolves.toBeTruthy();
+    });
+
+    test('Should create new container, decrypt keychain and create new KeyContainer class', async () => {
+        const container: Container = await storageHelper.createContainer('mysupersecretpassword');
+        const { keyID, armoredPublicKey, armoredPrivateKey } = container.pgpKeys;
+        const tempEncrypt = new EncryptHelper();
+        await tempEncrypt.checkPassword({ keyID, armoredPublicKey, armoredPrivateKey }, 'mysupersecretpassword');
+        const keychain = await tempEncrypt.decryptMessage(container.keyChain);
+        keyContainer = new KeyContainer(keychain);
+        const tempKey = JSON.stringify(await keyContainer.getKeyChain());
+        expect(tempKey).toBe(JSON.stringify(keychain));
+    });
+
+    test('Should add new key to KeyContainer class', async () => {
+        const tempEncrypt = new EncryptHelper();
+        const pgpKeys: PGPKeys = await tempEncrypt.generateKey({ passphrase: 'supersecretpassword' });
+        await keyContainer?.addApplicationKey('GAME', pgpKeys);
+        const key = await keyContainer?.getKey('application', pgpKeys.keyID, 'GAME');
+        expect(JSON.stringify(key)).toBe(JSON.stringify(pgpKeys));
+
     });
 });

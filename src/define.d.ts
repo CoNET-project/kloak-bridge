@@ -4,18 +4,35 @@ export interface PGPKeys {
     keyID: string,
     armoredPublicKey: string,
     armoredPrivateKey: string,
+    passphrase?: string,
     readPublicKey?: openpgp.Key,
     readPrivateKey?: openpgp.Key,
     unlocked?: boolean
 }
 
-export interface KeyContainer {
-    deviceKey: PGPKeys,
-    accountKey: PGPKeys,
-    storageKey: PGPKeys,
-    messengerKeys: {
+export interface ApplicationKeys {
+    [appID: string]: {
         [keyID: string]: PGPKeys
     }
+}
+
+export interface KeyChain {
+    deviceKey: PGPKeys | {},
+    kloakAccountKey: PGPKeys | {},
+    storageKey: PGPKeys | {},
+    messengerKeys: {
+        [keyID: string]: PGPKeys
+    } | {},
+    applicationKeys: ApplicationKeys | {}
+}
+
+export interface Container {
+    pgpKeys: {
+        keyID: string,
+        armoredPublicKey: string,
+        armoredPrivateKey: string,
+    },
+    keyChain: string
 }
 
 export interface PGPGenerateOptions {

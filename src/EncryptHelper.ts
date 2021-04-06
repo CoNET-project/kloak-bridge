@@ -32,6 +32,7 @@ class EncryptHelper {
         return openpgp.generateKey(pgpKeyOptions).then(async (result: openpgp.KeyPair) => {
             const pgpKeys: PGPKeys = {
                 keyID: result.key.getKeyId().toHex(),
+                passphrase: options.passphrase,
                 armoredPublicKey: result.publicKeyArmored,
                 armoredPrivateKey: result.privateKeyArmored,
                 unlocked: false
