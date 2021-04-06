@@ -1,3 +1,5 @@
+import crypto from 'crypto';
+
 export const isJSON = (text: string): boolean => {
     if (typeof text !== 'string') {
         return false;
@@ -17,5 +19,6 @@ export const createRandomValues = (): Promise<string> => (
         }
         // eslint-disable-next-line global-require
         // return resolve(require('crypto').randomInt(1000000).toString());
+        return resolve(crypto.randomInt(1000000).toString());
     })
 );
