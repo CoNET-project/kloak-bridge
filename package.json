@@ -1,11 +1,18 @@
 {
   "name": "customevents",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/node/index.js",
+  "types": "./src/define.d.ts",
+  "browser": {
+    "./dist/node/index.js": "./dist/index.browser.js"
+  },
   "license": "MIT",
   "scripts": {
-    "transpile": "tsc -p tsconfig.transpile.json",
-    "browser": "yarn lint && yarn transpile && npx webpack --mode='development' && serve ./dist",
+    "babel": "./node_modules/.bin/babel build-tsc --out-dir build-babel --source-maps",
+    "clean": "yarn run clean-build-steps && rm -rf dist",
+    "clean-build-steps": "rm -rf build-tsc build-babel",
+    "build:node": "yarn run tsc -p tsconfig.node.json",
+    "build": "yarn run clean && yarn run tsc -p tsconfig.browser.json && yarn run babel && yarn run webpack && yarn run clean-build-steps && yarn run build:node",
     "lint": "eslint './*.{js,ts}' --quiet",
     "test": "jest --silent=false"
   },
@@ -16,6 +23,8 @@
     "@types/uuid": "^8.3.0",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
     "eslint": "^7.22.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-config-prettier": "^8.1.0",
@@ -25,14 +34,16 @@
     "jest": "^26.6.3",
     "text-encoding-utf-8": "^1.0.2",
     "ts-node": "^9.1.1",
-    "webpack": "^5.28.0",
+    "webpack": "^5.31.0",
     "webpack-cli": "^4.5.0"
   },
   "dependencies": {
     "buffer": "^6.0.3",
+    "core-js": "^3.10.0",
     "openpgp": "^5.0.0-1",
+    "regenerator-runtime": "^0.13.7",
     "ts-jest": "^26.5.3",
-    "typescript": "^4.2.2",
+    "typescript": "^4.2.3",
     "uuid": "^8.3.2"
   },
   "jest": {
