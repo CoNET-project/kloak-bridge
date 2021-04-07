@@ -1,12 +1,9 @@
-import { v4 as uuidv4 } from 'uuid';
 import EncryptHelper from './EncryptHelper';
 import IDBDatabaseHelper from './IDBDatabaseHelper';
 import { Container, KeyChain, KloakFileIndex, PGPGenerateOptions, PGPKeys } from './define';
 import DisassemblyHelper from './DisassemblyHelper';
 import AssemblyHelper from './AssemblyHelper';
-import { createRandomValues } from './utils';
-import KeyContainer from './KeyContainer';
-// import { isJSON } from './utils';
+import { createRandomValues, getUUIDv4 } from './utils';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class StorageHelper {
@@ -124,7 +121,7 @@ class StorageHelper {
             }
             try {
                 const encryptedMsg = await this.encryptHelpers[instanceName].encryptMessage(data);
-                const savedUuid = await this.save(uuid || uuidv4(), encryptedMsg);
+                const savedUuid = await this.save(uuid || getUUIDv4(), encryptedMsg);
                 return resolve(savedUuid);
             } catch (err) {
                 return reject(err);
@@ -153,7 +150,7 @@ class StorageHelper {
 
     public upload = (encryptInstance: string, source: File | Blob, callback: (err: Error | null, progress: number, done: boolean) => void): Promise<string> => (
         new Promise<string>((resolve, _) => {
-            const uuid = uuidv4();
+            const uuid = getUUIDv4();
             const disassemblyHelper = new DisassemblyHelper(source, async (err, current, next) => {
                 if (err) {
                     return callback(err, 0, !next);
