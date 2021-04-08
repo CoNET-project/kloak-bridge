@@ -4,4 +4,5 @@ browserTests
 .idea
 yarn-error.log
 *.js
+!rollup.config.js
 .DS_Store
