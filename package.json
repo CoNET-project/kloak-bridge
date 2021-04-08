@@ -1,6 +1,6 @@
 {
   "name": "@conet-project/kloak-bridge",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "main": "dist/index.js",
   "types": "dist/src/index.d.ts",
   "license": "UNLICENSED",
