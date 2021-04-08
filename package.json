@@ -2,7 +2,7 @@
   "name": "@conet-project/kloak-bridge",
   "version": "1.4.0",
   "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "types": "dist/src/index.d.ts",
   "license": "UNLICENSED",
   "scripts": {
     "build": "rollup --config",
