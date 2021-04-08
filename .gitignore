@@ -4,4 +4,4 @@ browserTests
 .idea
 yarn-error.log
 *.js
-!webpack.config.js
+.DS_Store
