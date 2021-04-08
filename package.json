@@ -6,7 +6,7 @@
   "browser": {
     "./dist/node/index.js": "./dist/index.browser.js"
   },
-  "license": "MIT",
+  "license": "UNLICENSED",
   "scripts": {
     "babel": "./node_modules/.bin/babel build-tsc --out-dir build-babel --source-maps",
     "clean": "yarn run clean-build-steps && rm -rf dist",
