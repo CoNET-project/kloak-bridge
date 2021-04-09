@@ -1,30 +1,58 @@
 import EncryptHelper from './EncryptHelper';
 import IDBDatabaseHelper from './IDBDatabaseHelper';
-import { Container, KeyChain, KloakFileIndex, PGPGenerateOptions, PGPKeys } from './define';
+import { KeyChainContainer, KeyChain, KeyPairType, KloakFileIndex, PGPGenerateOptions, PGPKeys } from './define';
 import DisassemblyHelper from './DisassemblyHelper';
 import AssemblyHelper from './AssemblyHelper';
 import { createRandomValues, getUUIDv4 } from './utils';
+import KeyContainer from './KeyContainer';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 class StorageHelper {
 
     private uploadHelpers: {[name: string]: DisassemblyHelper} = {};
     private assemblyHelpers: {[name: string]: AssemblyHelper} = {};
     private encryptHelpers: {[name: string]: EncryptHelper} = {}
+    private keyContainer: KeyContainer | undefined
     private IDBHelper = new IDBDatabaseHelper();
 
-    public checkKeyChain = (): Promise<any> => (
+    /**
+     * Check if IndexedDB contains a "KeyChainContainer".
+     */
+    public checkKeyContainer = (): Promise<KeyChainContainer> => (
         new Promise<any>(async (resolve, reject) => {
-            const keyChain = await this.IDBHelper.retrieve('keychain');
-            if (!keyChain) {
-                return reject(new Error('No key chain!'));
+            const keyChainContainer = await this.IDBHelper.retrieve('KeyContainer');
+            if (!keyChainContainer) {
+                return reject(new Error('No key container.'));
             }
-            return resolve(keyChain);
+            return resolve(keyChainContainer);
         })
     );
 
-    public createContainer = (passphrase: string): Promise<Container> => (
-        new Promise<Container>(async (resolve, reject) => {
+    /**
+     * Unlock a "KeyChainContainer".
+     * If no KeyChainContainer exists in IndexedDB, return error.
+     */
+    public unlockContainer = (passphrase: string): Promise<boolean> => (
+        new Promise<boolean>(async (resolve, reject) => {
+            try {
+                const { pgpKeys, keyChain } = await this.checkKeyContainer();
+                if (pgpKeys && keyChain) {
+                    const tempEncrypt = new EncryptHelper();
+                    await tempEncrypt.checkPassword(pgpKeys, passphrase);
+                    const decryptedKeyChain = await tempEncrypt.decryptMessage(keyChain);
+                    this.keyContainer = new KeyContainer(tempEncrypt, decryptedKeyChain);
+                    return resolve(true);
+                }
+            } catch (err) {
+                return reject(err);
+            }
+        })
+    )
+
+    /**
+     * Create a KeyChainContainer and save into IndexedDB.
+     */
+    public createKeyContainer = (passphrase: string): Promise<KeyChainContainer> => (
+        new Promise<KeyChainContainer>(async (resolve, reject) => {
             try {
                 const tempEncrypt = new EncryptHelper();
                 const containerKey: PGPKeys = await tempEncrypt.generateKey({ passphrase });
@@ -40,7 +68,7 @@ class StorageHelper {
                 keyChain.kloakAccountKey = await tempEncrypt.generateKey({ passphrase: await createRandomValues() });
                 keyChain.storageKey = await tempEncrypt.generateKey({ passphrase: await createRandomValues() });
                 const encryptedKeyChain = await tempEncrypt.encryptMessage(JSON.stringify(keyChain));
-                const container: Container = {
+                const container: KeyChainContainer = {
                     pgpKeys: {
                         keyID: containerKey.keyID,
                         armoredPrivateKey: containerKey.armoredPrivateKey,
@@ -48,6 +76,8 @@ class StorageHelper {
                     },
                     keyChain: encryptedKeyChain
                 };
+                this.keyContainer = new KeyContainer(tempEncrypt, keyChain);
+                await this.IDBHelper.save('KeyContainer', container);
                 return resolve(container);
             } catch (err) {
                 return reject(err);
@@ -55,14 +85,39 @@ class StorageHelper {
         })
     );
 
-    public changeContainer = (newPassphrase: string, keyChain: KeyChain): Promise<Container> => (
-        new Promise<Container>(async (resolve, _) => {
+    /**
+     * Delete KeyChainContainer from IndexedDB.
+     */
+    public deleteKeyContainer = (): Promise<boolean> => (
+        new Promise<boolean>(async (resolve, reject) => {
+            try {
+                await this.IDBHelper.delete('KeyContainer');
+                return resolve(true);
+            } catch (err) {
+                return reject(err);
+            }
+        })
+    )
+
+    public getKeyChain = () => this.keyContainer?.getKeyChain()
+
+    public addApplicationKey = async (appID: string, pgpKeys: PGPKeys) => this.keyContainer?.addApplicationKey(appID, pgpKeys);
+
+    public setKey = async (keyType: 'device' | 'kloak' | 'storage' | 'messenger', pgpKeys: PGPKeys): Promise<boolean | undefined> => this.keyContainer?.setKey(keyType, pgpKeys)
+
+    public getKey = (keyType: KeyPairType, keyID?: string, appID?: string): Promise<PGPKeys | {}> | undefined => this.keyContainer?.getKey(keyType, keyID, appID)
+
+    /**
+     * Change password from KeyChainContainer.
+     */
+    public changeContainer = (newPassphrase: string, keyChain: KeyChain): Promise<KeyChainContainer> => (
+        new Promise<KeyChainContainer>(async (resolve, _) => {
             const tempEncrypt = new EncryptHelper();
             const { keyID, armoredPrivateKey, armoredPublicKey } = await tempEncrypt.generateKey({ passphrase: newPassphrase });
 
             await tempEncrypt.checkPassword({ keyID, armoredPublicKey, armoredPrivateKey }, newPassphrase);
             const encryptedKeyChain = await tempEncrypt.encryptMessage(JSON.stringify(keyChain));
-            const newContainer: Container = {
+            const newContainer: KeyChainContainer = {
                 pgpKeys: {
                     keyID,
                     armoredPrivateKey,
@@ -74,6 +129,9 @@ class StorageHelper {
         })
     )
 
+    /**
+     * Create an OpenPGP key pair.
+     */
     public createKey = (instanceName: string, options: PGPGenerateOptions, unlock?: boolean): Promise<PGPKeys> => (
         new Promise(async (resolve, reject) => {
             this.encryptHelpers[instanceName] = await new EncryptHelper();
@@ -91,6 +149,9 @@ class StorageHelper {
         })
     )
 
+    /**
+     * Unlock an OpenPGP key pair.
+     */
     public unlockKey = (instanceName: string, pgpKeys: PGPKeys, passphrase: string): Promise<boolean> => (
         new Promise<boolean>(async (resolve, reject) => {
             try {

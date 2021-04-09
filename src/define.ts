@@ -26,7 +26,7 @@ export interface KeyChain {
     applicationKeys: ApplicationKeys | {}
 }
 
-export interface Container {
+export interface KeyChainContainer {
     pgpKeys: {
         keyID: string,
         armoredPublicKey: string,
@@ -78,3 +78,5 @@ export interface DisassemblyOptions {
 }
 
 export type AssemblyCallback = (error: any, progress: number, nextChunk?: string, data?: ArrayBuffer) => void;
+
+export type KeyPairType = 'device' | 'kloak' | 'storage' | 'messenger' | 'application'

@@ -1,8 +1,10 @@
-import { ApplicationKeys, KeyChain, PGPKeys } from './define';
-
-type KeyPairType = 'device' | 'kloak' | 'storage' | 'messenger' | 'application'
+import { ApplicationKeys, KeyChain, PGPKeys, KeyPairType } from './define';
+import EncryptHelper from './EncryptHelper';
+import IDBDatabaseHelper from './IDBDatabaseHelper';
 
 class KeyContainer {
+    private IDBHelper: IDBDatabaseHelper = new IDBDatabaseHelper();
+    private keyContainerEncrypt: EncryptHelper;
     private deviceKey: PGPKeys | {};
     private kloakAccountKey: PGPKeys | {};
     private storageKey: PGPKeys | {};
@@ -11,13 +13,26 @@ class KeyContainer {
     }
     private applicationKeys: ApplicationKeys
 
-    constructor(keyContainer: KeyChain) {
+    constructor(encryptHelper: EncryptHelper, keyContainer: KeyChain) {
+        this.keyContainerEncrypt = encryptHelper;
         this.deviceKey = keyContainer.deviceKey;
         this.kloakAccountKey = keyContainer.kloakAccountKey;
         this.storageKey = keyContainer.storageKey;
         this.messengerKeys = keyContainer.messengerKeys;
         this.applicationKeys = keyContainer.applicationKeys;
     }
+
+    private saveKeyContainer = (): Promise<boolean> => (
+        new Promise<boolean>(async (resolve, reject) => {
+            try {
+                const encryptedMessage = await this.keyContainerEncrypt.encryptMessage(JSON.stringify(this.getKeyChain()));
+                await this.IDBHelper.save('KeyContainer', encryptedMessage);
+                return resolve(true);
+            } catch (err) {
+                return reject(err);
+            }
+        })
+    )
 
     public getKeyChain = (): Promise<KeyChain> => (
         new Promise<KeyChain>((resolve, _) => {
@@ -56,8 +71,8 @@ class KeyContainer {
         })
     )
 
-    public setKey = (keyType: 'device' | 'kloak' | 'storage' | 'messenger', pgpKeys: PGPKeys): Promise<void> => (
-        new Promise<void>((resolve, reject) => {
+    public setKey = (keyType: 'device' | 'kloak' | 'storage' | 'messenger', pgpKeys: PGPKeys): Promise<boolean> => (
+        new Promise<boolean>(async (resolve, reject) => {
             if (keyType === 'device') this.deviceKey = pgpKeys;
             if (keyType === 'kloak') this.kloakAccountKey = pgpKeys;
             if (keyType === 'storage') this.storageKey = pgpKeys;
@@ -67,12 +82,17 @@ class KeyContainer {
                 }
                 this.messengerKeys[pgpKeys.keyID] = pgpKeys;
             }
-            return resolve();
+            try {
+                const saved = await this.saveKeyContainer();
+                return resolve(saved);
+            } catch (err) {
+                return reject(err);
+            }
         })
     )
 
     public addApplicationKey = (appID: string, pgpKeys: PGPKeys): Promise<boolean> => (
-        new Promise<boolean>((resolve, _) => {
+        new Promise<boolean>(async (resolve, reject) => {
             if (this.applicationKeys) {
                 const tempAppKeys = {
                     ...this.applicationKeys,
@@ -88,8 +108,13 @@ class KeyContainer {
                     [pgpKeys.keyID]: pgpKeys
                 }
             };
-            return resolve(true);
 
+            try {
+                const saved = await this.saveKeyContainer();
+                return resolve(saved);
+            } catch (err) {
+                return reject(err);
+            }
         })
     )
 }

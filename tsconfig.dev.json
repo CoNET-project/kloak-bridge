@@ -75,6 +75,6 @@
       "es2015.promise"
     ]
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "src/__tests__"]
+  "include": ["src", "jest.config.ts"],
+  "exclude": ["node_modules"]
 }
