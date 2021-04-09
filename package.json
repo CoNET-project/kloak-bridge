@@ -5,6 +5,7 @@
   "types": "dist/src/index.d.ts",
   "license": "UNLICENSED",
   "scripts": {
+    "docs": "yarn run typedoc --name 'Kloak Bridge'",
     "build": "rollup --config",
     "lint": "eslint './*.{js,ts}' --quiet",
     "test": "jest --silent=false"
@@ -27,7 +28,9 @@
     "rollup-plugin-typescript2": "^0.30.0",
     "text-encoding-utf-8": "^1.0.2",
     "ts-node": "^9.1.1",
-    "tslib": "^2.2.0"
+    "tslib": "^2.2.0",
+    "typedoc": "^0.20.35",
+    "typedoc-plugin-markdown": "^3.6.1"
   },
   "dependencies": {
     "buffer": "^6.0.3",

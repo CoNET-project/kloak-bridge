@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import StorageHelper from '../StorageHelper';
-import { Container, KeyChain, PGPKeys } from '../define';
+import { KeyChainContainer, KeyChain, PGPKeys } from '../define';
 import EncryptHelper from '../EncryptHelper';
 import KeyContainer from '../KeyContainer';
 require('fake-indexeddb/auto');
@@ -92,20 +92,20 @@ describe('StorageHelper Class', () => {
 
     test('Should check keychain and return no keychain.', async () => {
         // const preferences = await storageHelper.checkPreferences();
-        await expect(storageHelper.checkKeyChain())
+        await expect(storageHelper.checkKeyContainer())
             .rejects
             .toThrowError();
     });
 
     test('Should check keychain and return keychain', async () => {
-        await storageHelper.save('keychain', keyChain);
-        await expect(storageHelper.checkKeyChain())
+        await storageHelper.save('KeyContainer', keyChain);
+        await expect(storageHelper.checkKeyContainer())
             .resolves
             .toBeTruthy();
     });
 
     test('Should create new container with encrypted keychain', async () => {
-        const container: Container = await storageHelper.createContainer('mysecretpassword');
+        const container: KeyChainContainer = await storageHelper.createKeyContainer('mysecretpassword');
         const { keyID, armoredPublicKey, armoredPrivateKey } = container.pgpKeys;
         expect(keyID).toBeTruthy();
         expect(armoredPublicKey).toBeTruthy();
@@ -113,7 +113,7 @@ describe('StorageHelper Class', () => {
     });
 
     test('Should create new container and be able to decrypt keychain.', async () => {
-        const container: Container = await storageHelper.createContainer('mysupersecretpassword');
+        const container: KeyChainContainer = await storageHelper.createKeyContainer('mysupersecretpassword');
         const { keyID, armoredPublicKey, armoredPrivateKey } = container.pgpKeys;
         const tempEncrypt = new EncryptHelper();
         await tempEncrypt.checkPassword({ keyID, armoredPublicKey, armoredPrivateKey }, 'mysupersecretpassword');
@@ -121,12 +121,12 @@ describe('StorageHelper Class', () => {
     });
 
     test('Should create new container, decrypt keychain and create new KeyContainer class', async () => {
-        const container: Container = await storageHelper.createContainer('mysupersecretpassword');
+        const container: KeyChainContainer = await storageHelper.createKeyContainer('mysupersecretpassword');
         const { keyID, armoredPublicKey, armoredPrivateKey } = container.pgpKeys;
         const tempEncrypt = new EncryptHelper();
         await tempEncrypt.checkPassword({ keyID, armoredPublicKey, armoredPrivateKey }, 'mysupersecretpassword');
         const keychain = await tempEncrypt.decryptMessage(container.keyChain);
-        keyContainer = new KeyContainer(keychain);
+        keyContainer = new KeyContainer(tempEncrypt, keychain);
         const tempKey = JSON.stringify(await keyContainer.getKeyChain());
         expect(tempKey).toBe(JSON.stringify(keychain));
     });
@@ -144,7 +144,19 @@ describe('StorageHelper Class', () => {
         const tempEncrypt = new EncryptHelper();
         await tempEncrypt.checkPassword(pgpKeys, 'mynewsuperpassword');
         const decryptedKeyChain = await tempEncrypt.decryptMessage(keyChain);
-        const newKeyContainer = new KeyContainer(decryptedKeyChain);
+        const newKeyContainer = new KeyContainer(tempEncrypt, decryptedKeyChain);
         expect(JSON.stringify(newKeyContainer.getKeyChain())).toBe(JSON.stringify(keyContainer?.getKeyChain()));
+    });
+
+    test('Should create new container, save into IndexedDB.', async () => {
+        await storageHelper.createKeyContainer('mypassword');
+        const unlocked = await storageHelper.unlockContainer('mypassword');
+        expect(unlocked).toBe(true);
+    });
+
+    test('Should create new container, save into IndexedDB and delete container', async () => {
+        await storageHelper.createKeyContainer('mypassword');
+        await storageHelper.deleteKeyContainer();
+        await expect(storageHelper.checkKeyContainer()).rejects.toThrowError();
     });
 });
