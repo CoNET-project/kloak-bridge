@@ -1,4 +1,4 @@
-[@conet-project/kloak-bridge](../README.md) / [Exports](../modules.md) / KloakFileIndex
+[Kloak Bridge](../README.md) / [Exports](../modules.md) / KloakFileIndex
 
 # Interface: KloakFileIndex
 
@@ -18,7 +18,7 @@
 
 #### Type declaration:
 
-Defined in: [define.ts:47](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/define.ts#L47)
+Defined in: [define.ts:47](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/define.ts#L47)
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **eof**: *boolean*
 
-Defined in: [define.ts:51](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/define.ts#L51)
+Defined in: [define.ts:51](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/define.ts#L51)
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 • **lastOffset**: *number*
 
-Defined in: [define.ts:50](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/define.ts#L50)
+Defined in: [define.ts:50](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/define.ts#L50)

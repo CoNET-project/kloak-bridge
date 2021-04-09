@@ -1,4 +1,4 @@
-[@conet-project/kloak-bridge](../README.md) / [Exports](../modules.md) / DisassemblyOptions
+[Kloak Bridge](../README.md) / [Exports](../modules.md) / DisassemblyOptions
 
 # Interface: DisassemblyOptions
 
@@ -15,7 +15,7 @@
 
 • **chunkSize**: *number*
 
-Defined in: [define.ts:76](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/define.ts#L76)
+Defined in: [define.ts:76](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/define.ts#L76)
 
 ___
 
@@ -23,4 +23,4 @@ ___
 
 • **noEncrypt**: *boolean*
 
-Defined in: [define.ts:77](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/define.ts#L77)
+Defined in: [define.ts:77](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/define.ts#L77)

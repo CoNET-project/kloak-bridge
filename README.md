@@ -1,5 +1,3 @@
-Kloak Bridge / [Exports](modules.md)
-
 # Kloak Bridge
 
 The Kloak Bridge library.
@@ -42,3 +40,4 @@ Unlock a KeyContainer from IndexedDB. (Will perform a check before).
 ```typescript
 const unlocked = await storageHelper.unlockContainer('mysupersecretpassword');
 ```
+

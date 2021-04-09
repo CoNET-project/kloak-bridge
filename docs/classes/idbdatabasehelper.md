@@ -1,4 +1,4 @@
-[@conet-project/kloak-bridge](../README.md) / [Exports](../modules.md) / IDBDatabaseHelper
+[Kloak Bridge](../README.md) / [Exports](../modules.md) / IDBDatabaseHelper
 
 # Class: IDBDatabaseHelper
 
@@ -35,7 +35,7 @@ Name | Type |
 
 **Returns:** [*IDBDatabaseHelper*](idbdatabasehelper.md)
 
-Defined in: [IDBDatabaseHelper.ts:8](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/IDBDatabaseHelper.ts#L8)
+Defined in: [IDBDatabaseHelper.ts:8](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/IDBDatabaseHelper.ts#L8)
 
 ## Properties
 
@@ -43,7 +43,7 @@ Defined in: [IDBDatabaseHelper.ts:8](https://github.com/CoNET-project/kloak-brid
 
 • `Private` **databaseName**: *string*= 'kloak'
 
-Defined in: [IDBDatabaseHelper.ts:7](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/IDBDatabaseHelper.ts#L7)
+Defined in: [IDBDatabaseHelper.ts:7](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/IDBDatabaseHelper.ts#L7)
 
 ___
 
@@ -51,7 +51,7 @@ ___
 
 • `Private` **version**: *number*= 1
 
-Defined in: [IDBDatabaseHelper.ts:8](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/IDBDatabaseHelper.ts#L8)
+Defined in: [IDBDatabaseHelper.ts:8](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/IDBDatabaseHelper.ts#L8)
 
 ## Methods
 
@@ -67,7 +67,7 @@ Name | Type |
 
 **Returns:** *Promise*<string\>
 
-Defined in: [IDBDatabaseHelper.ts:69](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/IDBDatabaseHelper.ts#L69)
+Defined in: [IDBDatabaseHelper.ts:69](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/IDBDatabaseHelper.ts#L69)
 
 ___
 
@@ -77,7 +77,7 @@ ___
 
 **Returns:** *Promise*<IDBObjectStore\>
 
-Defined in: [IDBDatabaseHelper.ts:15](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/IDBDatabaseHelper.ts#L15)
+Defined in: [IDBDatabaseHelper.ts:15](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/IDBDatabaseHelper.ts#L15)
 
 ___
 
@@ -93,7 +93,7 @@ Name | Type |
 
 **Returns:** *Promise*<JSON\>
 
-Defined in: [IDBDatabaseHelper.ts:51](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/IDBDatabaseHelper.ts#L51)
+Defined in: [IDBDatabaseHelper.ts:51](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/IDBDatabaseHelper.ts#L51)
 
 ___
 
@@ -110,4 +110,4 @@ Name | Type |
 
 **Returns:** *Promise*<string\>
 
-Defined in: [IDBDatabaseHelper.ts:40](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/IDBDatabaseHelper.ts#L40)
+Defined in: [IDBDatabaseHelper.ts:40](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/IDBDatabaseHelper.ts#L40)

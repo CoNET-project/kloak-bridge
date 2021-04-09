@@ -1,4 +1,4 @@
-[@conet-project/kloak-bridge](../README.md) / [Exports](../modules.md) / PGPKeys
+[Kloak Bridge](../README.md) / [Exports](../modules.md) / PGPKeys
 
 # Interface: PGPKeys
 
@@ -20,7 +20,7 @@
 
 • **armoredPrivateKey**: *string*
 
-Defined in: [define.ts:6](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/define.ts#L6)
+Defined in: [define.ts:6](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/define.ts#L6)
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 • **armoredPublicKey**: *string*
 
-Defined in: [define.ts:5](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/define.ts#L5)
+Defined in: [define.ts:5](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/define.ts#L5)
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 • **keyID**: *string*
 
-Defined in: [define.ts:4](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/define.ts#L4)
+Defined in: [define.ts:4](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/define.ts#L4)
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 • `Optional` **passphrase**: *string*
 
-Defined in: [define.ts:7](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/define.ts#L7)
+Defined in: [define.ts:7](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/define.ts#L7)
 
 ___
 
@@ -52,7 +52,7 @@ ___
 
 • `Optional` **readPrivateKey**: *Key*
 
-Defined in: [define.ts:9](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/define.ts#L9)
+Defined in: [define.ts:9](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/define.ts#L9)
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 • `Optional` **readPublicKey**: *Key*
 
-Defined in: [define.ts:8](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/define.ts#L8)
+Defined in: [define.ts:8](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/define.ts#L8)
 
 ___
 
@@ -68,4 +68,4 @@ ___
 
 • `Optional` **unlocked**: *boolean*
 
-Defined in: [define.ts:10](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/define.ts#L10)
+Defined in: [define.ts:10](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/define.ts#L10)

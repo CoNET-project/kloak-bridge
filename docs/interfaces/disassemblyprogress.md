@@ -1,4 +1,4 @@
-[@conet-project/kloak-bridge](../README.md) / [Exports](../modules.md) / DisassemblyProgress
+[Kloak Bridge](../README.md) / [Exports](../modules.md) / DisassemblyProgress
 
 # Interface: DisassemblyProgress
 
@@ -24,7 +24,7 @@ Name | Type |
 `data` | ArrayBuffer \| *Uint8Array* |
 `uuid` | *string* |
 
-Defined in: [define.ts:64](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/define.ts#L64)
+Defined in: [define.ts:64](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/define.ts#L64)
 
 ___
 
@@ -32,7 +32,7 @@ ___
 
 • `Optional` **index**: [*KloakFileIndex*](kloakfileindex.md)
 
-Defined in: [define.ts:70](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/define.ts#L70)
+Defined in: [define.ts:70](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/define.ts#L70)
 
 ___
 
@@ -40,7 +40,7 @@ ___
 
 • `Optional` **metadata**: [*KloakFileMetadata*](kloakfilemetadata.md)
 
-Defined in: [define.ts:69](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/define.ts#L69)
+Defined in: [define.ts:69](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/define.ts#L69)
 
 ___
 
@@ -48,4 +48,4 @@ ___
 
 • `Optional` **progress**: *number*
 
-Defined in: [define.ts:68](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/define.ts#L68)
+Defined in: [define.ts:68](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/define.ts#L68)

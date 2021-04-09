@@ -1,4 +1,4 @@
-[@conet-project/kloak-bridge](../README.md) / [Exports](../modules.md) / StorageHelper
+[Kloak Bridge](../README.md) / [Exports](../modules.md) / StorageHelper
 
 # Class: StorageHelper
 
@@ -51,7 +51,7 @@
 
 • `Private` **IDBHelper**: [*IDBDatabaseHelper*](idbdatabasehelper.md)
 
-Defined in: [StorageHelper.ts:15](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/StorageHelper.ts#L15)
+Defined in: [StorageHelper.ts:15](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/StorageHelper.ts#L15)
 
 ___
 
@@ -61,7 +61,7 @@ ___
 
 #### Type declaration:
 
-Defined in: [StorageHelper.ts:12](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/StorageHelper.ts#L12)
+Defined in: [StorageHelper.ts:12](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/StorageHelper.ts#L12)
 
 ___
 
@@ -71,7 +71,7 @@ ___
 
 #### Type declaration:
 
-Defined in: [StorageHelper.ts:13](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/StorageHelper.ts#L13)
+Defined in: [StorageHelper.ts:13](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/StorageHelper.ts#L13)
 
 ___
 
@@ -79,7 +79,7 @@ ___
 
 • `Private` **keyContainer**: *undefined* \| [*KeyContainer*](keycontainer.md)
 
-Defined in: [StorageHelper.ts:14](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/StorageHelper.ts#L14)
+Defined in: [StorageHelper.ts:14](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/StorageHelper.ts#L14)
 
 ___
 
@@ -89,7 +89,7 @@ ___
 
 #### Type declaration:
 
-Defined in: [StorageHelper.ts:11](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/StorageHelper.ts#L11)
+Defined in: [StorageHelper.ts:11](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/StorageHelper.ts#L11)
 
 ## Methods
 
@@ -106,7 +106,7 @@ Name | Type |
 
 **Returns:** *Promise*<undefined \| boolean\>
 
-Defined in: [StorageHelper.ts:104](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/StorageHelper.ts#L104)
+Defined in: [StorageHelper.ts:104](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/StorageHelper.ts#L104)
 
 ___
 
@@ -125,7 +125,7 @@ Name | Type |
 
 **Returns:** *Promise*<[*KeyChainContainer*](../interfaces/keychaincontainer.md)\>
 
-Defined in: [StorageHelper.ts:113](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/StorageHelper.ts#L113)
+Defined in: [StorageHelper.ts:113](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/StorageHelper.ts#L113)
 
 ___
 
@@ -137,7 +137,7 @@ Check if IndexedDB contains a "KeyChainContainer".
 
 **Returns:** *Promise*<[*KeyChainContainer*](../interfaces/keychaincontainer.md)\>
 
-Defined in: [StorageHelper.ts:20](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/StorageHelper.ts#L20)
+Defined in: [StorageHelper.ts:20](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/StorageHelper.ts#L20)
 
 ___
 
@@ -157,7 +157,7 @@ Name | Type |
 
 **Returns:** *Promise*<[*PGPKeys*](../interfaces/pgpkeys.md)\>
 
-Defined in: [StorageHelper.ts:135](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/StorageHelper.ts#L135)
+Defined in: [StorageHelper.ts:135](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/StorageHelper.ts#L135)
 
 ___
 
@@ -175,7 +175,7 @@ Name | Type |
 
 **Returns:** *Promise*<[*KeyChainContainer*](../interfaces/keychaincontainer.md)\>
 
-Defined in: [StorageHelper.ts:54](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/StorageHelper.ts#L54)
+Defined in: [StorageHelper.ts:54](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/StorageHelper.ts#L54)
 
 ___
 
@@ -191,7 +191,7 @@ Name | Type |
 
 **Returns:** *Promise*<any\>
 
-Defined in: [StorageHelper.ts:173](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/StorageHelper.ts#L173)
+Defined in: [StorageHelper.ts:173](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/StorageHelper.ts#L173)
 
 ___
 
@@ -203,7 +203,7 @@ Delete KeyChainContainer from IndexedDB.
 
 **Returns:** *Promise*<boolean\>
 
-Defined in: [StorageHelper.ts:91](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/StorageHelper.ts#L91)
+Defined in: [StorageHelper.ts:91](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/StorageHelper.ts#L91)
 
 ___
 
@@ -221,7 +221,7 @@ Name | Type |
 
 **Returns:** *Promise*<unknown\>
 
-Defined in: [StorageHelper.ts:243](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/StorageHelper.ts#L243)
+Defined in: [StorageHelper.ts:243](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/StorageHelper.ts#L243)
 
 ___
 
@@ -239,7 +239,7 @@ Name | Type |
 
 **Returns:** *Promise*<string\>
 
-Defined in: [StorageHelper.ts:175](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/StorageHelper.ts#L175)
+Defined in: [StorageHelper.ts:175](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/StorageHelper.ts#L175)
 
 ___
 
@@ -257,7 +257,7 @@ Name | Type |
 
 **Returns:** *undefined* \| *Promise*<{} \| [*PGPKeys*](../interfaces/pgpkeys.md)\>
 
-Defined in: [StorageHelper.ts:108](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/StorageHelper.ts#L108)
+Defined in: [StorageHelper.ts:108](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/StorageHelper.ts#L108)
 
 ___
 
@@ -267,7 +267,7 @@ ___
 
 **Returns:** *undefined* \| *Promise*<[*KeyChain*](../interfaces/keychain.md)\>
 
-Defined in: [StorageHelper.ts:102](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/StorageHelper.ts#L102)
+Defined in: [StorageHelper.ts:102](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/StorageHelper.ts#L102)
 
 ___
 
@@ -283,7 +283,7 @@ Name | Type |
 
 **Returns:** *Promise*<any\>
 
-Defined in: [StorageHelper.ts:169](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/StorageHelper.ts#L169)
+Defined in: [StorageHelper.ts:169](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/StorageHelper.ts#L169)
 
 ___
 
@@ -301,7 +301,7 @@ Name | Type |
 
 **Returns:** *Promise*<any\>
 
-Defined in: [StorageHelper.ts:193](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/StorageHelper.ts#L193)
+Defined in: [StorageHelper.ts:193](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/StorageHelper.ts#L193)
 
 ___
 
@@ -318,7 +318,7 @@ Name | Type |
 
 **Returns:** *Promise*<any\>
 
-Defined in: [StorageHelper.ts:171](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/StorageHelper.ts#L171)
+Defined in: [StorageHelper.ts:171](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/StorageHelper.ts#L171)
 
 ___
 
@@ -335,7 +335,7 @@ Name | Type |
 
 **Returns:** *Promise*<undefined \| boolean\>
 
-Defined in: [StorageHelper.ts:106](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/StorageHelper.ts#L106)
+Defined in: [StorageHelper.ts:106](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/StorageHelper.ts#L106)
 
 ___
 
@@ -354,7 +354,7 @@ Name | Type |
 
 **Returns:** *Promise*<boolean\>
 
-Defined in: [StorageHelper.ts:34](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/StorageHelper.ts#L34)
+Defined in: [StorageHelper.ts:34](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/StorageHelper.ts#L34)
 
 ___
 
@@ -374,7 +374,7 @@ Name | Type |
 
 **Returns:** *Promise*<boolean\>
 
-Defined in: [StorageHelper.ts:155](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/StorageHelper.ts#L155)
+Defined in: [StorageHelper.ts:155](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/StorageHelper.ts#L155)
 
 ___
 
@@ -392,4 +392,4 @@ Name | Type |
 
 **Returns:** *Promise*<string\>
 
-Defined in: [StorageHelper.ts:212](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/StorageHelper.ts#L212)
+Defined in: [StorageHelper.ts:212](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/StorageHelper.ts#L212)

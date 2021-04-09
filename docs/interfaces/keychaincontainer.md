@@ -1,4 +1,4 @@
-[@conet-project/kloak-bridge](../README.md) / [Exports](../modules.md) / KeyChainContainer
+[Kloak Bridge](../README.md) / [Exports](../modules.md) / KeyChainContainer
 
 # Interface: KeyChainContainer
 
@@ -15,7 +15,7 @@
 
 • **keyChain**: *string*
 
-Defined in: [define.ts:35](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/define.ts#L35)
+Defined in: [define.ts:35](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/define.ts#L35)
 
 ___
 
@@ -31,4 +31,4 @@ Name | Type |
 `armoredPublicKey` | *string* |
 `keyID` | *string* |
 
-Defined in: [define.ts:30](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/define.ts#L30)
+Defined in: [define.ts:30](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/define.ts#L30)

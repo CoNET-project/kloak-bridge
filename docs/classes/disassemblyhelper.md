@@ -1,4 +1,4 @@
-[@conet-project/kloak-bridge](../README.md) / [Exports](../modules.md) / DisassemblyHelper
+[Kloak Bridge](../README.md) / [Exports](../modules.md) / DisassemblyHelper
 
 # Class: DisassemblyHelper
 
@@ -39,7 +39,7 @@ Name | Type |
 
 **Returns:** [*DisassemblyHelper*](disassemblyhelper.md)
 
-Defined in: [DisassemblyHelper.ts:32](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/DisassemblyHelper.ts#L32)
+Defined in: [DisassemblyHelper.ts:32](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/DisassemblyHelper.ts#L32)
 
 ## Properties
 
@@ -47,7 +47,7 @@ Defined in: [DisassemblyHelper.ts:32](https://github.com/CoNET-project/kloak-bri
 
 • `Private` **callback**: [*DisassemblyCallback*](../modules.md#disassemblycallback)
 
-Defined in: [DisassemblyHelper.ts:15](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/DisassemblyHelper.ts#L15)
+Defined in: [DisassemblyHelper.ts:15](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/DisassemblyHelper.ts#L15)
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 • `Private` **fileUUID**: *string*
 
-Defined in: [DisassemblyHelper.ts:13](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/DisassemblyHelper.ts#L13)
+Defined in: [DisassemblyHelper.ts:13](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/DisassemblyHelper.ts#L13)
 
 ___
 
@@ -63,7 +63,7 @@ ___
 
 • `Private` **index**: [*KloakFileIndex*](../interfaces/kloakfileindex.md)
 
-Defined in: [DisassemblyHelper.ts:24](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/DisassemblyHelper.ts#L24)
+Defined in: [DisassemblyHelper.ts:24](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/DisassemblyHelper.ts#L24)
 
 ___
 
@@ -71,7 +71,7 @@ ___
 
 • `Private` **metadata**: [*KloakFileMetadata*](../interfaces/kloakfilemetadata.md)
 
-Defined in: [DisassemblyHelper.ts:16](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/DisassemblyHelper.ts#L16)
+Defined in: [DisassemblyHelper.ts:16](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/DisassemblyHelper.ts#L16)
 
 ___
 
@@ -79,7 +79,7 @@ ___
 
 • `Private` **options**: [*DisassemblyOptions*](../interfaces/disassemblyoptions.md)
 
-Defined in: [DisassemblyHelper.ts:29](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/DisassemblyHelper.ts#L29)
+Defined in: [DisassemblyHelper.ts:29](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/DisassemblyHelper.ts#L29)
 
 ___
 
@@ -87,7 +87,7 @@ ___
 
 • `Private` **source**: [*DisassemblySource*](../modules.md#disassemblysource)
 
-Defined in: [DisassemblyHelper.ts:14](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/DisassemblyHelper.ts#L14)
+Defined in: [DisassemblyHelper.ts:14](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/DisassemblyHelper.ts#L14)
 
 ## Methods
 
@@ -97,7 +97,7 @@ Defined in: [DisassemblyHelper.ts:14](https://github.com/CoNET-project/kloak-bri
 
 **Returns:** *Promise*<any\>
 
-Defined in: [DisassemblyHelper.ts:90](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/DisassemblyHelper.ts#L90)
+Defined in: [DisassemblyHelper.ts:90](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/DisassemblyHelper.ts#L90)
 
 ___
 
@@ -107,7 +107,7 @@ ___
 
 **Returns:** *Promise*<[*KloakFileMetadata*](../interfaces/kloakfilemetadata.md)\>
 
-Defined in: [DisassemblyHelper.ts:59](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/DisassemblyHelper.ts#L59)
+Defined in: [DisassemblyHelper.ts:59](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/DisassemblyHelper.ts#L59)
 
 ___
 
@@ -117,4 +117,4 @@ ___
 
 **Returns:** *Promise*<void\>
 
-Defined in: [DisassemblyHelper.ts:50](https://github.com/CoNET-project/kloak-bridge/blob/24232a1/src/DisassemblyHelper.ts#L50)
+Defined in: [DisassemblyHelper.ts:50](https://github.com/CoNET-project/kloak-bridge/blob/8b4497c/src/DisassemblyHelper.ts#L50)

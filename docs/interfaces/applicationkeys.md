@@ -1,4 +1,4 @@
-[@conet-project/kloak-bridge](../README.md) / [Exports](../modules.md) / ApplicationKeys
+[Kloak Bridge](../README.md) / [Exports](../modules.md) / ApplicationKeys
 
 # Interface: ApplicationKeys
 
