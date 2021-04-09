@@ -5,7 +5,7 @@
   "types": "dist/src/index.d.ts",
   "license": "UNLICENSED",
   "scripts": {
-    "docs": "yarn run typedoc --name 'Kloak Bridge'",
+    "docs": "yarn run typedoc --name 'Kloak Bridge' --readme ./README-Template.md",
     "build": "rollup --config",
     "lint": "eslint './*.{js,ts}' --quiet",
     "test": "jest --silent=false"
