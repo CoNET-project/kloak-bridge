@@ -21,22 +21,22 @@ yarn add @conet-project/kloak-bridge
 Import StorageHelper from package and initialize new instance.
 
 ```typescript
-import { StorageHelper} from '@conet-project/kloak-bridge';
-const storageHelper = new StorageHelper();
+import { KloakBridge } from '@conet-project/kloak-bridge';
+const kloakBridge = new KloakBridge();
 ```
 
 Create a KeyContainer using StorageHelper and save into IndexedDB.
 
 ```typescript
-const keyChainContainer = await storageHelper.createKeyContainer('mysupersecretpassword')
+const keyChainContainer = await kloakBridge.createKeyContainer('mysupersecretpassword')
 ```
 
 Check if a KeyContainer exists in IndexedDB.
 ```typescript
-const hasKeyContainer = await storageHelper.checkKeyContainer();
+const hasKeyContainer = await kloakBridge.checkKeyContainer();
 ```
 
 Unlock a KeyContainer from IndexedDB. (Will perform a check before).
 ```typescript
-const unlocked = await storageHelper.unlockContainer('mysupersecretpassword');
+const unlocked = await kloakBridge.unlockContainer('mysupersecretpassword');
 ```
