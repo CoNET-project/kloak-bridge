@@ -11,7 +11,7 @@
 - [EncryptHelper](classes/encrypthelper.md)
 - [IDBDatabaseHelper](classes/idbdatabasehelper.md)
 - [KeyContainer](classes/keycontainer.md)
-- [StorageHelper](classes/storagehelper.md)
+- [KloakBridge](classes/kloakbridge.md)
 
 ### Interfaces
 
@@ -58,7 +58,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [define.ts:80](https://github.com/CoNET-project/kloak-bridge/blob/85d5fd4/src/define.ts#L80)
+Defined in: [define.ts:80](https://github.com/CoNET-project/kloak-bridge/blob/3273c65/src/define.ts#L80)
 
 ___
 
@@ -80,7 +80,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [define.ts:73](https://github.com/CoNET-project/kloak-bridge/blob/85d5fd4/src/define.ts#L73)
+Defined in: [define.ts:73](https://github.com/CoNET-project/kloak-bridge/blob/3273c65/src/define.ts#L73)
 
 ___
 
@@ -88,7 +88,7 @@ ___
 
 Ƭ **DisassemblySource**: File \| Blob
 
-Defined in: [define.ts:44](https://github.com/CoNET-project/kloak-bridge/blob/85d5fd4/src/define.ts#L44)
+Defined in: [define.ts:44](https://github.com/CoNET-project/kloak-bridge/blob/3273c65/src/define.ts#L44)
 
 ___
 
@@ -96,7 +96,7 @@ ___
 
 Ƭ **KeyPairType**: *device* \| *kloak* \| *storage* \| *messenger* \| *application*
 
-Defined in: [define.ts:82](https://github.com/CoNET-project/kloak-bridge/blob/85d5fd4/src/define.ts#L82)
+Defined in: [define.ts:82](https://github.com/CoNET-project/kloak-bridge/blob/3273c65/src/define.ts#L82)
 
 ## Functions
 
@@ -106,7 +106,7 @@ Defined in: [define.ts:82](https://github.com/CoNET-project/kloak-bridge/blob/85
 
 **Returns:** *Promise*<string\>
 
-Defined in: [utils.ts:17](https://github.com/CoNET-project/kloak-bridge/blob/85d5fd4/src/utils.ts#L17)
+Defined in: [utils.ts:17](https://github.com/CoNET-project/kloak-bridge/blob/3273c65/src/utils.ts#L17)
 
 ___
 
@@ -116,4 +116,4 @@ ___
 
 **Returns:** *string*
 
-Defined in: [utils.ts:3](https://github.com/CoNET-project/kloak-bridge/blob/85d5fd4/src/utils.ts#L3)
+Defined in: [utils.ts:3](https://github.com/CoNET-project/kloak-bridge/blob/3273c65/src/utils.ts#L3)
