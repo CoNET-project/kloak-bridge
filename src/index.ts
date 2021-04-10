@@ -1,4 +1,4 @@
-export { default as StorageHelper } from './StorageHelper';
+export { default as KloakBridge } from './KloakBridge';
 export { default as AssemblyHelper } from './AssemblyHelper';
 export { default as DisassemblyHelper } from './DisassemblyHelper';
 export { default as IDBDatabaseHelper } from './IDBDatabaseHelper';

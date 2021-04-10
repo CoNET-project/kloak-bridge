@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import StorageHelper from '../StorageHelper';
+import KloakBridge from '../KloakBridge';
 import { KeyChainContainer, KeyChain, PGPKeys } from '../define';
 import EncryptHelper from '../EncryptHelper';
 import KeyContainer from '../KeyContainer';
@@ -13,7 +13,7 @@ describe('StorageHelper Class', () => {
         passphrase: '12345'
     };
     let keyPair: PGPKeys;
-    let storageHelper: StorageHelper;
+    let storageHelper: KloakBridge;
     const keyChain: KeyChain = {
         deviceKey: {},
         kloakAccountKey: {},
@@ -29,7 +29,7 @@ describe('StorageHelper Class', () => {
         const textEncoding = require('text-encoding-utf-8');
         global.TextEncoder = textEncoding.TextEncoder;
         global.TextDecoder = textEncoding.TextDecoder;
-        storageHelper = new StorageHelper();
+        storageHelper = new KloakBridge();
     });
 
     test('Should create a new key pair and NOT unlock', async () => {
