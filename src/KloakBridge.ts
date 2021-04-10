@@ -6,7 +6,7 @@ import AssemblyHelper from './AssemblyHelper';
 import { createRandomValues, getUUIDv4 } from './utils';
 import KeyContainer from './KeyContainer';
 
-class StorageHelper {
+class KloakBridge {
 
     private uploadHelpers: {[name: string]: DisassemblyHelper} = {};
     private assemblyHelpers: {[name: string]: AssemblyHelper} = {};
@@ -265,4 +265,4 @@ class StorageHelper {
     )
 }
 
-export default StorageHelper;
+export default KloakBridge;
