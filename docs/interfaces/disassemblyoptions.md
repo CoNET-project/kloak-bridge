@@ -15,7 +15,7 @@
 
 • **chunkSize**: *number*
 
-Defined in: [define.ts:76](https://github.com/CoNET-project/kloak-bridge/blob/3273c65/src/define.ts#L76)
+Defined in: [define.ts:83](https://github.com/CoNET-project/kloak-bridge/blob/ced2477/src/define.ts#L83)
 
 ___
 
@@ -23,4 +23,4 @@ ___
 
 • **noEncrypt**: *boolean*
 
-Defined in: [define.ts:77](https://github.com/CoNET-project/kloak-bridge/blob/3273c65/src/define.ts#L77)
+Defined in: [define.ts:84](https://github.com/CoNET-project/kloak-bridge/blob/ced2477/src/define.ts#L84)
