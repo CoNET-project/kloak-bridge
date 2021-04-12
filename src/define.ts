@@ -2,10 +2,7 @@ import * as openpgp from 'openpgp';
 
 export type BridgeResolveStatus = 'NO_CONTAINER' | 'INVALID_PASSWORD' | 'SUCCESS'
 
-export interface BridgeResolves {
-    status: BridgeResolveStatus,
-    payload?: any
-}
+export type BridgeResolves = [status: BridgeResolveStatus, payload?: any]
 
 export interface PGPKeys {
     keyID: string,
