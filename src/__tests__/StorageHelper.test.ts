@@ -45,8 +45,8 @@ describe('StorageHelper Class', () => {
         keyPair = await storageHelper.createKey(encryptTestData.instanceName,
             { passphrase: encryptTestData.passphrase },
             false);
-        const unlocked = await storageHelper.unlockKey(encryptTestData.instanceName, keyPair, encryptTestData.passphrase);
-        expect(unlocked).toBe(true);
+        const { status } = await storageHelper.unlockKey(encryptTestData.instanceName, keyPair, encryptTestData.passphrase);
+        expect(status).toBe('SUCCESS');
     });
 
     test('Should create a new key pair and unlock', async () => {
@@ -92,9 +92,8 @@ describe('StorageHelper Class', () => {
 
     test('Should check keychain and return no keychain.', async () => {
         // const preferences = await storageHelper.checkPreferences();
-        await expect(storageHelper.checkKeyContainer())
-            .rejects
-            .toThrowError();
+        const { status } = await storageHelper.checkKeyContainer();
+        expect(status).toBe('NO_CONTAINER');
     });
 
     test('Should check keychain and return keychain', async () => {
@@ -150,13 +149,14 @@ describe('StorageHelper Class', () => {
 
     test('Should create new container, save into IndexedDB.', async () => {
         await storageHelper.createKeyContainer('mypassword');
-        const unlocked = await storageHelper.unlockContainer('mypassword');
-        expect(unlocked).toBe(true);
+        const { status } = await storageHelper.unlockContainer('mypassword');
+        expect(status).toBe('SUCCESS');
     });
 
     test('Should create new container, save into IndexedDB and delete container', async () => {
         await storageHelper.createKeyContainer('mypassword');
         await storageHelper.deleteKeyContainer();
-        await expect(storageHelper.checkKeyContainer()).rejects.toThrowError();
+        const { status } = await storageHelper.checkKeyContainer();
+        expect(status).toBe('NO_CONTAINER');
     });
 });

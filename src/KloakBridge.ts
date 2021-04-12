@@ -17,7 +17,7 @@ class KloakBridge {
     /**
      * Check if IndexedDB contains a "KeyChainContainer".
      */
-    public checkKeyContainer = (): Promise<KeyChainContainer> => (
+    public checkKeyContainer = (): Promise<BridgeResolves> => (
         new Promise<any>(async (resolve, _) => {
             const keyChainContainer = await this.IDBHelper.retrieve('KeyContainer');
             if (!keyChainContainer) {
@@ -26,7 +26,7 @@ class KloakBridge {
                 });
             }
             return resolve(<BridgeResolves>{
-                status: 'NO_CONTAINER',
+                status: 'SUCCESS',
                 payload: keyChainContainer
             });
         })
@@ -39,7 +39,7 @@ class KloakBridge {
     public unlockContainer = (passphrase: string): Promise<BridgeResolves> => (
         new Promise<BridgeResolves>(async (resolve, reject) => {
             try {
-                const { pgpKeys, keyChain } = await this.checkKeyContainer();
+                const { pgpKeys, keyChain } = (await this.checkKeyContainer()).payload;
                 if (pgpKeys && keyChain) {
                     const tempEncrypt = new EncryptHelper();
                     const unlocked = await tempEncrypt.checkPassword(pgpKeys, passphrase);
@@ -175,11 +175,11 @@ class KloakBridge {
                     return resolve(<BridgeResolves>{
                         status: 'SUCCESS'
                     });
-                } 
+                }
                 return resolve(<BridgeResolves>{
                     status: 'INVALID_PASSWORD'
                 });
-                
+
             } catch (err) {
                 reject(err);
             }
