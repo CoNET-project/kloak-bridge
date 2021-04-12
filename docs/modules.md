@@ -28,6 +28,8 @@
 ### Type aliases
 
 - [AssemblyCallback](modules.md#assemblycallback)
+- [BridgeResolveStatus](modules.md#bridgeresolvestatus)
+- [BridgeResolves](modules.md#bridgeresolves)
 - [DisassemblyCallback](modules.md#disassemblycallback)
 - [DisassemblySource](modules.md#disassemblysource)
 - [KeyPairType](modules.md#keypairtype)
@@ -58,7 +60,23 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [define.ts:80](https://github.com/CoNET-project/kloak-bridge/blob/3273c65/src/define.ts#L80)
+Defined in: [define.ts:84](https://github.com/CoNET-project/kloak-bridge/blob/985ebb2/src/define.ts#L84)
+
+___
+
+### BridgeResolveStatus
+
+Ƭ **BridgeResolveStatus**: *NO_CONTAINER* \| *INVALID_PASSWORD* \| *SUCCESS*
+
+Defined in: [define.ts:3](https://github.com/CoNET-project/kloak-bridge/blob/985ebb2/src/define.ts#L3)
+
+___
+
+### BridgeResolves
+
+Ƭ **BridgeResolves**: [status: BridgeResolveStatus, payload?: any]
+
+Defined in: [define.ts:5](https://github.com/CoNET-project/kloak-bridge/blob/985ebb2/src/define.ts#L5)
 
 ___
 
@@ -80,7 +98,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [define.ts:73](https://github.com/CoNET-project/kloak-bridge/blob/3273c65/src/define.ts#L73)
+Defined in: [define.ts:77](https://github.com/CoNET-project/kloak-bridge/blob/985ebb2/src/define.ts#L77)
 
 ___
 
@@ -88,7 +106,7 @@ ___
 
 Ƭ **DisassemblySource**: File \| Blob
 
-Defined in: [define.ts:44](https://github.com/CoNET-project/kloak-bridge/blob/3273c65/src/define.ts#L44)
+Defined in: [define.ts:48](https://github.com/CoNET-project/kloak-bridge/blob/985ebb2/src/define.ts#L48)
 
 ___
 
@@ -96,7 +114,7 @@ ___
 
 Ƭ **KeyPairType**: *device* \| *kloak* \| *storage* \| *messenger* \| *application*
 
-Defined in: [define.ts:82](https://github.com/CoNET-project/kloak-bridge/blob/3273c65/src/define.ts#L82)
+Defined in: [define.ts:86](https://github.com/CoNET-project/kloak-bridge/blob/985ebb2/src/define.ts#L86)
 
 ## Functions
 
@@ -106,7 +124,7 @@ Defined in: [define.ts:82](https://github.com/CoNET-project/kloak-bridge/blob/32
 
 **Returns:** *Promise*<string\>
 
-Defined in: [utils.ts:17](https://github.com/CoNET-project/kloak-bridge/blob/3273c65/src/utils.ts#L17)
+Defined in: [utils.ts:17](https://github.com/CoNET-project/kloak-bridge/blob/985ebb2/src/utils.ts#L17)
 
 ___
 
@@ -116,4 +134,4 @@ ___
 
 **Returns:** *string*
 
-Defined in: [utils.ts:3](https://github.com/CoNET-project/kloak-bridge/blob/3273c65/src/utils.ts#L3)
+Defined in: [utils.ts:3](https://github.com/CoNET-project/kloak-bridge/blob/985ebb2/src/utils.ts#L3)
