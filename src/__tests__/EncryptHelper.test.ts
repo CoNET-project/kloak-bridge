@@ -64,7 +64,6 @@ describe('Encrypt Class', () => {
 
     test('Should succeed to decrypt message.', async () => {
         const decryptedMsg = await encrypt.decryptMessage(encryptedMessage);
-        console.log(decryptedMsg);
         expect(decryptedMsg).toBe(plainText);
     });
 });
