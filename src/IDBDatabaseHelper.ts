@@ -48,7 +48,7 @@ class IDBDatabaseHelper {
         }
     });
 
-    public retrieve = (uuid: string): Promise<JSON> => new Promise<JSON>(async (resolve, reject) => {
+    public retrieve = (uuid: string): Promise<any> => new Promise<any>(async (resolve, reject) => {
         try {
             const objectStore = await this.getObjectStore();
             const storeAction = await objectStore?.get(uuid);
