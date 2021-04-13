@@ -1,6 +1,12 @@
 import EncryptHelper from './EncryptHelper';
 import IDBDatabaseHelper from './IDBDatabaseHelper';
-import { KeyChainContainer, KeyChain, KeyPairType, KloakFileIndex, PGPGenerateOptions, PGPKeys, BridgeResolves } from './define';
+import { KeyChainContainer, KeyChain,
+    KeyPairType, KloakFileIndex,
+    PGPGenerateOptions, PGPKeys,
+    KeyResolve, CreateContainerResolve,
+    UnlockContainerResolve, CheckContainerResolve,
+    LockContainerResolve, ChangeKeyContainerResolve,
+    DeleteKeychainResolve } from './define';
 import DisassemblyHelper from './DisassemblyHelper';
 import AssemblyHelper from './AssemblyHelper';
 import { createRandomValues, getUUIDv4 } from './utils';
@@ -14,16 +20,23 @@ class KloakBridge {
     private keyContainer: KeyContainer | undefined
     private IDBHelper = new IDBDatabaseHelper();
 
+    public lockKeyContainer = (): Promise<LockContainerResolve> => (
+        new Promise<LockContainerResolve>((resolve, _) => {
+            this.keyContainer = undefined;
+            return resolve(<LockContainerResolve>['SUCCESS']);
+        })
+    )
+
     /**
      * Check if IndexedDB contains a "KeyChainContainer".
      */
-    public checkKeyContainer = (): Promise<BridgeResolves> => (
-        new Promise<any>(async (resolve, _) => {
-            const keyChainContainer = await this.IDBHelper.retrieve('KeyContainer');
+    public checkKeyContainer = (): Promise<CheckContainerResolve> => (
+        new Promise<CheckContainerResolve>(async (resolve, _) => {
+            const keyChainContainer: KeyChainContainer = await this.IDBHelper.retrieve('KeyContainer');
             if (!keyChainContainer) {
-                return resolve(<BridgeResolves>['NO_CONTAINER']);
+                return resolve(<CheckContainerResolve>['DOES_NOT_EXIST']);
             }
-            return resolve(<BridgeResolves>['SUCCESS', keyChainContainer]);
+            return resolve(<CheckContainerResolve>['EXISTS', keyChainContainer]);
         })
     );
 
@@ -31,22 +44,22 @@ class KloakBridge {
      * Unlock a "KeyChainContainer".
      * If no KeyChainContainer exists in IndexedDB, return error.
      */
-    public unlockContainer = (passphrase: string): Promise<BridgeResolves> => (
-        new Promise<BridgeResolves>(async (resolve, reject) => {
+    public unlockKeyContainer = (passphrase: string): Promise<UnlockContainerResolve> => (
+        new Promise<UnlockContainerResolve>(async (resolve, _) => {
             try {
-                const { pgpKeys, keyChain } = (await this.checkKeyContainer())[1];
-                if (pgpKeys && keyChain) {
+                const keyChainContainer = (await this.checkKeyContainer())[1];
+                if (keyChainContainer?.pgpKeys && keyChainContainer?.keyChain) {
                     const tempEncrypt = new EncryptHelper();
-                    const unlocked = await tempEncrypt.checkPassword(pgpKeys, passphrase);
+                    const unlocked = await tempEncrypt.checkPassword(keyChainContainer?.pgpKeys, passphrase);
                     if (!unlocked) {
-                        return resolve(<BridgeResolves>['INVALID_PASSWORD']);
+                        return resolve(<UnlockContainerResolve>['INVALID_PASSPHRASE']);
                     }
-                    const decryptedKeyChain = await tempEncrypt.decryptMessage(keyChain);
+                    const decryptedKeyChain = await tempEncrypt.decryptMessage(keyChainContainer?.keyChain);
                     this.keyContainer = new KeyContainer(tempEncrypt, decryptedKeyChain);
-                    return resolve(<BridgeResolves>['SUCCESS']);
+                    return resolve(<UnlockContainerResolve>['SUCCESS']);
                 }
             } catch (err) {
-                return reject(err);
+                return resolve(<UnlockContainerResolve>['FAILURE']);
             }
         })
     )
@@ -54,8 +67,8 @@ class KloakBridge {
     /**
      * Create a KeyChainContainer and save into IndexedDB.
      */
-    public createKeyContainer = (passphrase: string): Promise<BridgeResolves> => (
-        new Promise<BridgeResolves>(async (resolve, reject) => {
+    public createKeyContainer = (passphrase: string): Promise<CreateContainerResolve> => (
+        new Promise<CreateContainerResolve>(async (resolve, _) => {
             try {
                 const tempEncrypt = new EncryptHelper();
                 const containerKey: PGPKeys = await tempEncrypt.generateKey({ passphrase });
@@ -71,7 +84,7 @@ class KloakBridge {
                 keyChain.kloakAccountKey = await tempEncrypt.generateKey({ passphrase: await createRandomValues() });
                 keyChain.storageKey = await tempEncrypt.generateKey({ passphrase: await createRandomValues() });
                 const encryptedKeyChain = await tempEncrypt.encryptMessage(JSON.stringify(keyChain));
-                const container: KeyChainContainer = {
+                const keyContainer: KeyChainContainer = {
                     pgpKeys: {
                         keyID: containerKey.keyID,
                         armoredPrivateKey: containerKey.armoredPrivateKey,
@@ -80,10 +93,10 @@ class KloakBridge {
                     keyChain: encryptedKeyChain
                 };
                 this.keyContainer = new KeyContainer(tempEncrypt, keyChain);
-                await this.IDBHelper.save('KeyContainer', container);
-                return resolve(<BridgeResolves>['SUCCESS', container]);
+                await this.IDBHelper.save('KeyContainer', keyContainer);
+                return resolve(<CreateContainerResolve>['SUCCESS', keyContainer]);
             } catch (err) {
-                return reject(err);
+                return resolve(<CreateContainerResolve>['FAILURE']);
             }
         })
     );
@@ -91,13 +104,13 @@ class KloakBridge {
     /**
      * Delete KeyChainContainer from IndexedDB.
      */
-    public deleteKeyContainer = (): Promise<BridgeResolves> => (
-        new Promise<BridgeResolves>(async (resolve, reject) => {
+    public deleteKeyContainer = (): Promise<DeleteKeychainResolve> => (
+        new Promise<DeleteKeychainResolve>(async (resolve, _) => {
             try {
                 await this.IDBHelper.delete('KeyContainer');
-                return resolve(<BridgeResolves>['SUCCESS']);
+                return resolve(<DeleteKeychainResolve>['SUCCESS']);
             } catch (err) {
-                return reject(err);
+                return resolve(<DeleteKeychainResolve>['FAILURE']);
             }
         })
     )
@@ -113,8 +126,8 @@ class KloakBridge {
     /**
      * Change password from KeyChainContainer.
      */
-    public changeContainer = (newPassphrase: string, keyChain: KeyChain): Promise<BridgeResolves> => (
-        new Promise<BridgeResolves>(async (resolve, _) => {
+    public changeKeyContainer = (newPassphrase: string, keyChain: KeyChain): Promise<ChangeKeyContainerResolve> => (
+        new Promise<ChangeKeyContainerResolve>(async (resolve, _) => {
             const tempEncrypt = new EncryptHelper();
             const { keyID, armoredPrivateKey, armoredPublicKey } = await tempEncrypt.generateKey({ passphrase: newPassphrase });
 
@@ -128,15 +141,15 @@ class KloakBridge {
                 },
                 keyChain: encryptedKeyChain
             };
-            return resolve(<BridgeResolves>['SUCCESS', newContainer]);
+            return resolve(<ChangeKeyContainerResolve>['SUCCESS', newContainer]);
         })
     )
 
     /**
      * Create an OpenPGP key pair.
      */
-    public createKey = (instanceName: string, options: PGPGenerateOptions, unlock?: boolean): Promise<BridgeResolves> => (
-        new Promise(async (resolve, reject) => {
+    public createKey = (instanceName: string, options: PGPGenerateOptions, unlock?: boolean): Promise<KeyResolve> => (
+        new Promise<KeyResolve>(async (resolve, _) => {
             this.encryptHelpers[instanceName] = await new EncryptHelper();
             const pgpKeys: PGPKeys = await this.encryptHelpers[instanceName].generateKey(options);
             pgpKeys.unlocked = false;
@@ -145,30 +158,30 @@ class KloakBridge {
                     const isUnlocked = await this.encryptHelpers[instanceName].checkPassword(pgpKeys, options.passphrase);
                     pgpKeys.unlocked = isUnlocked.valueOf();
                 } catch (err) {
-                    reject(err);
+                    return resolve(<KeyResolve><unknown>['FAILURE', null]);
                 }
             }
-            return resolve(<BridgeResolves>['SUCCESS', pgpKeys]);
+            return resolve(<KeyResolve>['SUCCESS', pgpKeys]);
         })
     )
 
     /**
      * Unlock an OpenPGP key pair.
      */
-    public unlockKey = (instanceName: string, pgpKeys: PGPKeys, passphrase: string): Promise<BridgeResolves> => (
-        new Promise<BridgeResolves>(async (resolve, reject) => {
+    public unlockKey = (instanceName: string, pgpKeys: PGPKeys, passphrase: string): Promise<KeyResolve> => (
+        new Promise<KeyResolve>(async (resolve, _) => {
             try {
                 if (!this.encryptHelpers[instanceName]) {
                     this.encryptHelpers[instanceName] = await new EncryptHelper();
                 }
                 const unlocked = await this.encryptHelpers[instanceName].checkPassword(pgpKeys, passphrase);
                 if (unlocked) {
-                    return resolve(<BridgeResolves>['SUCCESS']);
+                    return resolve(<KeyResolve>['SUCCESS']);
                 }
-                return resolve(<BridgeResolves>['INVALID_PASSWORD']);
+                return resolve(<KeyResolve>['INVALID_PASSPHRASE']);
 
             } catch (err) {
-                reject(err);
+                return resolve(<KeyResolve>['FAILURE']);
             }
         })
     )
