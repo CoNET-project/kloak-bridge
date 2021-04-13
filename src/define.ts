@@ -1,9 +1,5 @@
 import * as openpgp from 'openpgp';
 
-export type BridgeResolveStatus = 'NO_CONTAINER' | 'INVALID_PASSWORD' | 'SUCCESS'
-
-export type BridgeResolves = [status: BridgeResolveStatus, payload?: any]
-
 export interface PGPKeys {
     keyID: string,
     armoredPublicKey: string,
@@ -84,3 +80,35 @@ export interface DisassemblyOptions {
 export type AssemblyCallback = (error: any, progress: number, nextChunk?: string, data?: ArrayBuffer) => void;
 
 export type KeyPairType = 'device' | 'kloak' | 'storage' | 'messenger' | 'application'
+
+export type KeyStatus = 'SUCCESS' | 'FAILURE' | 'INVALID_PASSPHRASE'
+
+export type KeyResolve = [status: KeyStatus, payload?: PGPKeys]
+
+export type DeleteKeychainStatus = 'SUCCESS' | 'FAILURE';
+
+export type DeleteKeychainResolve = [status: DeleteKeychainStatus]
+
+export type ChangeKeyContainerStatus = 'SUCCESS' | 'FAILURE' | 'NO_PASSPHRASE';
+
+export type ChangeKeyContainerResolve = [status: ChangeKeyContainerStatus, payload?: KeyChainContainer]
+
+export type CreateContainerStatus = 'SUCCESS' | 'FAILURE' | 'INVALID_PASSPHRASE';
+
+export type CreateContainerResolve = [status: CreateContainerStatus, payload?: KeyChainContainer]
+
+export type UnlockContainerStatus = 'SUCCESS' | 'FAILURE' | 'INVALID_PASSPHRASE' | 'MISSING_CONTAINER';
+
+export type UnlockContainerResolve = [status: UnlockContainerStatus]
+
+export type CheckContainerStatus = 'EXISTS' | 'DOES_NOT_EXIST';
+
+export type CheckContainerResolve = [status: CheckContainerStatus, payload?: KeyChainContainer]
+
+export type LockContainerStatus = 'SUCCESS' | 'FAILURE';
+
+export type LockContainerResolve = [status: LockContainerStatus]
+
+// export type KeyContainerStatus = 'SUCCESS' | 'INVALID_PASSWORD' | 'DOES_NOT_EXIST' | 'FAILURE'
+//
+// export type KeyContainerResolve = [status: KeyContainerStatus, payload?: KeyChainContainer]

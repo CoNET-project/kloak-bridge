@@ -39,10 +39,10 @@ describe('StorageHelper Class', () => {
     });
 
     test('Should unlock a key pair', async () => {
-        const [, payload] = await storageHelper.createKey(encryptTestData.instanceName,
+        const [, pgpKeys] = await storageHelper.createKey(encryptTestData.instanceName,
             { passphrase: encryptTestData.passphrase },
             false);
-        const [ status ] = await storageHelper.unlockKey(encryptTestData.instanceName, payload, encryptTestData.passphrase);
+        const [ status ] = await storageHelper.unlockKey(encryptTestData.instanceName, pgpKeys as PGPKeys, encryptTestData.passphrase);
         expect(status).toBe('SUCCESS');
     });
 
@@ -52,8 +52,8 @@ describe('StorageHelper Class', () => {
             { passphrase: encryptTestData.passphrase },
             true
         );
-        expect(payload.armoredPublicKey).toBeTruthy();
-        expect(payload.armoredPrivateKey).toBeTruthy();
+        expect(payload?.armoredPublicKey).toBeTruthy();
+        expect(payload?.armoredPrivateKey).toBeTruthy();
         expect(status).toBe('SUCCESS');
     });
 
@@ -90,7 +90,7 @@ describe('StorageHelper Class', () => {
     test('Should check keychain and return no keychain.', async () => {
         // const preferences = await storageHelper.checkPreferences();
         const [ status ] = await storageHelper.checkKeyContainer();
-        expect(status).toBe('NO_CONTAINER');
+        expect(status).toBe('DOES_NOT_EXIST');
     });
 
     test('Should check keychain and return keychain', async () => {
@@ -102,7 +102,7 @@ describe('StorageHelper Class', () => {
 
     test('Should create new container with encrypted keychain', async () => {
         const [, container ] = await storageHelper.createKeyContainer('mysecretpassword');
-        const { keyID, armoredPublicKey, armoredPrivateKey } = container.pgpKeys;
+        const { keyID, armoredPublicKey, armoredPrivateKey } = container!!.pgpKeys;
         expect(keyID).toBeTruthy();
         expect(armoredPublicKey).toBeTruthy();
         expect(armoredPrivateKey).toBeTruthy();
@@ -110,18 +110,18 @@ describe('StorageHelper Class', () => {
 
     test('Should create new container and be able to decrypt keychain.', async () => {
         const [, container ] = await storageHelper.createKeyContainer('mysupersecretpassword');
-        const { keyID, armoredPublicKey, armoredPrivateKey } = container.pgpKeys;
+        const { keyID, armoredPublicKey, armoredPrivateKey } = container!!.pgpKeys;
         const tempEncrypt = new EncryptHelper();
         await tempEncrypt.checkPassword({ keyID, armoredPublicKey, armoredPrivateKey }, 'mysupersecretpassword');
-        await expect(tempEncrypt.decryptMessage(container.keyChain)).resolves.toBeTruthy();
+        await expect(tempEncrypt.decryptMessage(container!!.keyChain)).resolves.toBeTruthy();
     });
 
     test('Should create new container, decrypt keychain and create new KeyContainer class', async () => {
         const [, container] = await storageHelper.createKeyContainer('mysupersecretpassword');
-        const { keyID, armoredPublicKey, armoredPrivateKey } = container.pgpKeys;
+        const { keyID, armoredPublicKey, armoredPrivateKey } = container!!.pgpKeys;
         const tempEncrypt = new EncryptHelper();
         await tempEncrypt.checkPassword({ keyID, armoredPublicKey, armoredPrivateKey }, 'mysupersecretpassword');
-        const keychain = await tempEncrypt.decryptMessage(container.keyChain);
+        const keychain = await tempEncrypt.decryptMessage(container!!.keyChain);
         keyContainer = new KeyContainer(tempEncrypt, keychain);
         const tempKey = JSON.stringify(await keyContainer.getKeyChain());
         expect(tempKey).toBe(JSON.stringify(keychain));
@@ -136,17 +136,17 @@ describe('StorageHelper Class', () => {
     });
 
     test('Should switch KeyContainers class', async () => {
-        const { pgpKeys, keyChain } = (await storageHelper.changeContainer('mynewsuperpassword', await keyContainer?.getKeyChain() as KeyChain))[1];
+        const [ , keyChainContainer ] = await storageHelper.changeKeyContainer('mynewsuperpassword', await keyContainer!!.getKeyChain());
         const tempEncrypt = new EncryptHelper();
-        await tempEncrypt.checkPassword(pgpKeys, 'mynewsuperpassword');
-        const decryptedKeyChain = await tempEncrypt.decryptMessage(keyChain);
+        await tempEncrypt.checkPassword(keyChainContainer!!.pgpKeys, 'mynewsuperpassword');
+        const decryptedKeyChain = await tempEncrypt.decryptMessage(keyChainContainer!!.keyChain);
         const newKeyContainer = new KeyContainer(tempEncrypt, decryptedKeyChain);
         expect(JSON.stringify(newKeyContainer.getKeyChain())).toBe(JSON.stringify(keyContainer?.getKeyChain()));
     });
 
     test('Should create new container, save into IndexedDB.', async () => {
         await storageHelper.createKeyContainer('mypassword');
-        const [ status ] = await storageHelper.unlockContainer('mypassword');
+        const [ status ] = await storageHelper.unlockKeyContainer('mypassword');
         expect(status).toBe('SUCCESS');
     });
 
@@ -154,6 +154,6 @@ describe('StorageHelper Class', () => {
         await storageHelper.createKeyContainer('mypassword');
         await storageHelper.deleteKeyContainer();
         const [ status ] = await storageHelper.checkKeyContainer();
-        expect(status).toBe('NO_CONTAINER');
+        expect(status).toBe('DOES_NOT_EXIST');
     });
 });
