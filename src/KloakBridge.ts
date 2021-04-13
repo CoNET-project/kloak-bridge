@@ -50,16 +50,13 @@ class KloakBridge {
                 const keyChainContainer = (await this.checkKeyContainer())[1];
                 if (keyChainContainer?.pgpKeys && keyChainContainer?.keyChain) {
                     const tempEncrypt = new EncryptHelper();
-                    const unlocked = await tempEncrypt.checkPassword(keyChainContainer?.pgpKeys, passphrase);
-                    if (!unlocked) {
-                        return resolve(<UnlockContainerResolve>['INVALID_PASSPHRASE']);
-                    }
+                    await tempEncrypt.checkPassword(keyChainContainer?.pgpKeys, passphrase);
                     const decryptedKeyChain = await tempEncrypt.decryptMessage(keyChainContainer?.keyChain);
                     this.keyContainer = new KeyContainer(tempEncrypt, decryptedKeyChain);
                     return resolve(<UnlockContainerResolve>['SUCCESS']);
                 }
             } catch (err) {
-                return resolve(<UnlockContainerResolve>['FAILURE']);
+                return resolve(<UnlockContainerResolve>['INVALID_PASSPHRASE']);
             }
         })
     )
