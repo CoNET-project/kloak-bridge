@@ -2,7 +2,7 @@ import * as openpgp from 'openpgp';
 import { KeyOptions } from 'openpgp';
 import { Buffer } from 'buffer/';
 import { isJSON } from './utils';
-import { PGPGenerateOptions, PGPKeys } from './define';
+import { DecryptResolve, EncryptResolve, KeyResolve, PGPGenerateOptions, PGPKeys } from './define';
 
 class EncryptHelper {
     private pgpKeyPair: PGPKeys = {
@@ -16,7 +16,7 @@ class EncryptHelper {
         openpgp.config.compression = openpgp.enums.compression.zip;
     }
 
-    public generateKey = (options: PGPGenerateOptions): Promise<PGPKeys> => new Promise<PGPKeys>(async (resolve, reject) => {
+    public generateKey = (options: PGPGenerateOptions): Promise<KeyResolve> => new Promise<KeyResolve>(async (resolve, reject) => {
 
         const userIds = {
             name: options.nickname || '',
@@ -37,8 +37,8 @@ class EncryptHelper {
                 armoredPrivateKey: result.privateKeyArmored,
                 unlocked: false
             };
-            return resolve(pgpKeys);
-        }).catch(reject);
+            return resolve(['SUCCESS', pgpKeys]);
+        }).catch((err) => resolve(['FAILURE', err]));
     })
 
     public isUnlocked = (): boolean => {
@@ -48,7 +48,7 @@ class EncryptHelper {
         return false;
     }
 
-    public checkPassword = (keyPair: PGPKeys, passphrase: string): Promise<boolean> => new Promise<boolean>(async (resolve, reject) => {
+    public checkPassword = (keyPair: PGPKeys, passphrase: string): Promise<KeyResolve> => new Promise<KeyResolve>(async (resolve, reject) => {
         if (this.pgpKeyPair.armoredPublicKey && this.pgpKeyPair.armoredPrivateKey) {
             if ((this.pgpKeyPair.armoredPrivateKey === keyPair.armoredPrivateKey && this.pgpKeyPair.armoredPublicKey === keyPair.armoredPublicKey)) {
                 const unlocked = await this.isUnlocked();
@@ -62,9 +62,9 @@ class EncryptHelper {
         this.pgpKeyPair.readPrivateKey = await openpgp.readKey({ armoredKey: this.pgpKeyPair.armoredPrivateKey });
 
         try {
-            this.pgpKeyPair.readPrivateKey.decrypt(passphrase).then((_: void) => resolve(true)).catch((err: any) => reject(err));
+            this.pgpKeyPair.readPrivateKey.decrypt(passphrase).then((_: void) => resolve(['SUCCESS'])).catch((_: any) => resolve(['INVALID_PASSPHRASE']));
         } catch (err) {
-            return reject(err);
+            return resolve(['FAILURE', err]);
         }
     })
 
@@ -87,7 +87,7 @@ class EncryptHelper {
         return pgpHead.concat('\r\n\r\n', message, '\r\n\r\n', pgpEnd);
     }
 
-    public encryptMessage = (originalData: ArrayBuffer | Uint8Array | string): Promise<string> => new Promise<string>(async (resolve, reject) => {
+    public encryptMessage = (originalData: ArrayBuffer | Uint8Array | string): Promise<EncryptResolve> => new Promise<EncryptResolve>(async (resolve, reject) => {
         try {
             // @ts-ignore
             const base64Data = Buffer.from(originalData).toString('base64');
@@ -99,12 +99,12 @@ class EncryptHelper {
             });
 
             const modifiedPGP = this.modifyPGPMessage(encryptedMsg, true);
-            return resolve(modifiedPGP);
-        } catch (err) { reject(err); }
+            return resolve(['SUCCESS', modifiedPGP]);
+        } catch (err) { resolve(['FAILURE', err]); }
 
     })
 
-    public decryptMessage = (encryptedMessage: string, buffer?: boolean): Promise<any> => new Promise(async (resolve, reject) => {
+    public decryptMessage = (encryptedMessage: string, buffer?: boolean): Promise<DecryptResolve> => new Promise(async (resolve, reject) => {
         const cleanEncrypted = this.modifyPGPMessage(encryptedMessage);
         try {
             const message = await openpgp.readMessage({ armoredMessage: cleanEncrypted });
@@ -116,15 +116,15 @@ class EncryptHelper {
             const dataBuffer = Buffer.from(decrypted.data, 'base64');
 
             if (buffer) {
-                return resolve(dataBuffer);
+                return resolve(['SUCCESS', dataBuffer]);
             }
 
             if (!buffer && isJSON(dataBuffer.toString())) {
-                return resolve(JSON.parse(dataBuffer.toString()));
+                return resolve(['SUCCESS', JSON.parse(dataBuffer.toString())]);
             }
-            return resolve(dataBuffer.toString());
+            return resolve(['SUCCESS', dataBuffer.toString()]);
         } catch (err) {
-            return reject(err);
+            return resolve(['FAILURE', err]);
         }
     })
 }

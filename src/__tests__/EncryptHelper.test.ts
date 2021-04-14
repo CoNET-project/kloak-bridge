@@ -23,19 +23,21 @@ describe('Encrypt Class', () => {
     });
 
     test('Should generate an OpenPGP key pair.', async () => {
-        pgpKeys = await encrypt.generateKey({
+        const [, newPGPKeys] = await encrypt.generateKey({
             nickname: 'Bob',
             email: 'bob@gmail.com',
             passphrase
         });
-        expect(pgpKeys.armoredPublicKey).toBeTruthy();
-        expect(pgpKeys.armoredPrivateKey).toBeTruthy();
+
+        pgpKeys = newPGPKeys as PGPKeys;
+
+        expect(pgpKeys?.armoredPublicKey).toBeTruthy();
+        expect(pgpKeys?.armoredPrivateKey).toBeTruthy();
     });
 
     test('Should fail to unlock with INCORRECT passphrase.', async () => {
-        await expect(async () => encrypt.checkPassword(pgpKeys, 'wrongPassphrase'))
-            .rejects
-            .toThrow(Error);
+        const [status] = await encrypt.checkPassword(pgpKeys, 'wrongPassphrase');
+        expect(status).toBe('INVALID_PASSPHRASE');
         // try {
         //     const isCorrect = await encrypt.checkPassword(stringPGPKeys, 'wrongPassphrase');
         // } catch (err) {
@@ -47,23 +49,17 @@ describe('Encrypt Class', () => {
     });
 
     test('Should succeed to unlock with CORRECT passphrase.', async () => {
-        const isCorrect = await encrypt.checkPassword(pgpKeys, passphrase);
-        expect(isCorrect).toBe(true);
-    });
-
-    test('Should NOT unlock an unlocked key instance.', async () => {
-        await expect(async () => encrypt.checkPassword(pgpKeys, passphrase))
-            .rejects
-            .toThrow();
+        const [status] = await encrypt.checkPassword(pgpKeys, passphrase);
+        expect(status).toBe('SUCCESS');
     });
 
     test('Should encrypt message.', async () => {
-        encryptedMessage = await encrypt.encryptMessage(plainText);
-        expect(encryptedMessage).toBeTruthy();
+        encryptedMessage = (await encrypt.encryptMessage(plainText))[1] as string;
+        expect(encryptedMessage).not.toBeFalsy();
     });
 
     test('Should succeed to decrypt message.', async () => {
-        const decryptedMsg = await encrypt.decryptMessage(encryptedMessage);
+        const [, decryptedMsg] = await encrypt.decryptMessage(encryptedMessage);
         console.log(decryptedMsg);
         expect(decryptedMsg).toBe(plainText);
     });
