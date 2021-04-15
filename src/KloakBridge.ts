@@ -1,12 +1,14 @@
 import EncryptHelper from './EncryptHelper';
 import IDBDatabaseHelper from './IDBDatabaseHelper';
-import { KeyChainContainer, KeyChain,
-    KeyPairType, KloakFileIndex,
+import {
+    KeyChainContainer, KeyChain,
+    KeyPairType,
     PGPGenerateOptions, PGPKeys,
     KeyResolve, CreateContainerResolve,
     UnlockContainerResolve, CheckContainerResolve,
     LockContainerResolve, ChangeKeyContainerResolve,
-    DeleteKeychainResolve } from './define';
+    DeleteKeychainResolve, EncryptSaveResolve, RetrieveDecryptResolve, UnlockKeyResolve
+} from './define';
 import DisassemblyHelper from './DisassemblyHelper';
 import AssemblyHelper from './AssemblyHelper';
 import { createRandomValues, getUUIDv4 } from './utils';
@@ -16,7 +18,6 @@ class KloakBridge {
 
     private uploadHelpers: {[name: string]: DisassemblyHelper} = {};
     private assemblyHelpers: {[name: string]: AssemblyHelper} = {};
-    private encryptHelpers: {[name: string]: EncryptHelper} = {}
     private keyContainer: KeyContainer | undefined
     private IDBHelper = new IDBDatabaseHelper();
 
@@ -46,17 +47,25 @@ class KloakBridge {
      */
     public unlockKeyContainer = (passphrase: string): Promise<UnlockContainerResolve> => (
         new Promise<UnlockContainerResolve>(async (resolve, _) => {
-            try {
-                const keyChainContainer = (await this.checkKeyContainer())[1];
-                if (keyChainContainer?.pgpKeys && keyChainContainer?.keyChain) {
-                    const tempEncrypt = new EncryptHelper();
-                    await tempEncrypt.checkPassword(keyChainContainer?.pgpKeys, passphrase);
-                    const decryptedKeyChain = await tempEncrypt.decryptMessage(keyChainContainer?.keyChain);
-                    this.keyContainer = new KeyContainer(tempEncrypt, decryptedKeyChain);
-                    return resolve(<UnlockContainerResolve>['SUCCESS']);
-                }
-            } catch (err) {
-                return resolve(<UnlockContainerResolve>['INVALID_PASSPHRASE']);
+            const [status, keyChainContainer] = await this.checkKeyContainer();
+            switch (status) {
+                case 'EXISTS':
+                    if (keyChainContainer?.pgpKeys && keyChainContainer?.keyChain) {
+                        const tempEncrypt = new EncryptHelper();
+                        const [checkStatus] = await tempEncrypt.checkPassword(keyChainContainer?.pgpKeys, passphrase);
+                        if (checkStatus === 'SUCCESS') {
+                            const [, decryptedKeyChain] = await tempEncrypt.decryptMessage(keyChainContainer?.keyChain);
+                            this.keyContainer = new KeyContainer(tempEncrypt, decryptedKeyChain as unknown as KeyChain);
+                            return resolve(['SUCCESS']);
+                        }
+                        return resolve(['INVALID_PASSPHRASE']);
+                    }
+                    return resolve(['MISSING_KEYCHAIN']);
+
+                case 'DOES_NOT_EXIST':
+                    return resolve(['MISSING_CONTAINER']);
+                default:
+                    break;
             }
         })
     )
@@ -68,8 +77,8 @@ class KloakBridge {
         new Promise<CreateContainerResolve>(async (resolve, _) => {
             try {
                 const tempEncrypt = new EncryptHelper();
-                const containerKey: PGPKeys = await tempEncrypt.generateKey({ passphrase });
-                await tempEncrypt.checkPassword(containerKey, passphrase);
+                const [, pgpKeys] = await tempEncrypt.generateKey({ passphrase });
+                await tempEncrypt.checkPassword(pgpKeys as PGPKeys, passphrase);
                 const keyChain: KeyChain = {
                     deviceKey: {},
                     kloakAccountKey: {},
@@ -80,14 +89,14 @@ class KloakBridge {
                 keyChain.deviceKey = await tempEncrypt.generateKey({ passphrase: await createRandomValues() });
                 keyChain.kloakAccountKey = await tempEncrypt.generateKey({ passphrase: await createRandomValues() });
                 keyChain.storageKey = await tempEncrypt.generateKey({ passphrase: await createRandomValues() });
-                const encryptedKeyChain = await tempEncrypt.encryptMessage(JSON.stringify(keyChain));
+                const [, encryptedKeyChain] = await tempEncrypt.encryptMessage(JSON.stringify(keyChain));
                 const keyContainer: KeyChainContainer = {
                     pgpKeys: {
-                        keyID: containerKey.keyID,
-                        armoredPrivateKey: containerKey.armoredPrivateKey,
-                        armoredPublicKey: containerKey.armoredPublicKey
+                        keyID: pgpKeys?.keyID as string,
+                        armoredPrivateKey: pgpKeys?.armoredPrivateKey as string,
+                        armoredPublicKey: pgpKeys?.armoredPublicKey as string
                     },
-                    keyChain: encryptedKeyChain
+                    keyChain: encryptedKeyChain as string
                 };
                 this.keyContainer = new KeyContainer(tempEncrypt, keyChain);
                 await this.IDBHelper.save('KeyContainer', keyContainer);
@@ -126,17 +135,17 @@ class KloakBridge {
     public changeKeyContainer = (newPassphrase: string, keyChain: KeyChain): Promise<ChangeKeyContainerResolve> => (
         new Promise<ChangeKeyContainerResolve>(async (resolve, _) => {
             const tempEncrypt = new EncryptHelper();
-            const { keyID, armoredPrivateKey, armoredPublicKey } = await tempEncrypt.generateKey({ passphrase: newPassphrase });
+            const { keyID, armoredPrivateKey, armoredPublicKey } = (await tempEncrypt.generateKey({ passphrase: newPassphrase }))[1] as PGPKeys;
 
             await tempEncrypt.checkPassword({ keyID, armoredPublicKey, armoredPrivateKey }, newPassphrase);
-            const encryptedKeyChain = await tempEncrypt.encryptMessage(JSON.stringify(keyChain));
+            const [, encryptedKeyChain] = await tempEncrypt.encryptMessage(JSON.stringify(keyChain));
             const newContainer: KeyChainContainer = {
                 pgpKeys: {
                     keyID,
                     armoredPrivateKey,
                     armoredPublicKey
                 },
-                keyChain: encryptedKeyChain
+                keyChain: encryptedKeyChain as string
             };
             return resolve(<ChangeKeyContainerResolve>['SUCCESS', newContainer]);
         })
@@ -145,15 +154,14 @@ class KloakBridge {
     /**
      * Create an OpenPGP key pair.
      */
-    public createKey = (instanceName: string, options: PGPGenerateOptions, unlock?: boolean): Promise<KeyResolve> => (
+    public createKey = (options: PGPGenerateOptions, unlock?: boolean): Promise<KeyResolve> => (
         new Promise<KeyResolve>(async (resolve, _) => {
-            this.encryptHelpers[instanceName] = await new EncryptHelper();
-            const pgpKeys: PGPKeys = await this.encryptHelpers[instanceName].generateKey(options);
-            pgpKeys.unlocked = false;
+            const tempEncrypt = await new EncryptHelper();
+            const [, pgpKeys] = await tempEncrypt.generateKey(options);
             if (unlock) {
                 try {
-                    const isUnlocked = await this.encryptHelpers[instanceName].checkPassword(pgpKeys, options.passphrase);
-                    pgpKeys.unlocked = isUnlocked.valueOf();
+                    const [status] = await tempEncrypt.checkPassword(pgpKeys as PGPKeys, options.passphrase);
+                    (pgpKeys as PGPKeys).unlocked = status === 'SUCCESS';
                 } catch (err) {
                     return resolve(<KeyResolve><unknown>['FAILURE', null]);
                 }
@@ -165,20 +173,18 @@ class KloakBridge {
     /**
      * Unlock an OpenPGP key pair.
      */
-    public unlockKey = (instanceName: string, pgpKeys: PGPKeys, passphrase: string): Promise<KeyResolve> => (
-        new Promise<KeyResolve>(async (resolve, _) => {
+    public unlockKey = (pgpKeys: PGPKeys, passphrase: string): Promise<UnlockKeyResolve> => (
+        new Promise<UnlockKeyResolve>(async (resolve, _) => {
             try {
-                if (!this.encryptHelpers[instanceName]) {
-                    this.encryptHelpers[instanceName] = await new EncryptHelper();
+                const tempEncrypt = await new EncryptHelper();
+                const [status] = await tempEncrypt.checkPassword(pgpKeys, passphrase);
+                if (status === 'SUCCESS') {
+                    return resolve(<UnlockKeyResolve>['SUCCESS', tempEncrypt]);
                 }
-                const unlocked = await this.encryptHelpers[instanceName].checkPassword(pgpKeys, passphrase);
-                if (unlocked) {
-                    return resolve(<KeyResolve>['SUCCESS']);
-                }
-                return resolve(<KeyResolve>['INVALID_PASSPHRASE']);
+                return resolve(<UnlockKeyResolve>['INVALID_PASSPHRASE']);
 
             } catch (err) {
-                return resolve(<KeyResolve>['FAILURE']);
+                return resolve(<UnlockKeyResolve>['FAILURE']);
             }
         })
     )
@@ -189,97 +195,90 @@ class KloakBridge {
 
     public delete = (uuid: string): Promise<any> => this.IDBHelper.delete(uuid);
 
-    public encryptSave = (instanceName: string, data: ArrayBuffer | Uint8Array | string, uuid?: string): Promise<string> => (
-        new Promise<string>(async (resolve, reject) => {
-            if (!this.encryptHelpers[instanceName]) {
-                return reject(new Error(`No Encrypt instance with ${instanceName}`));
-            }
-            if (!this.encryptHelpers[instanceName].isUnlocked()) {
-                return reject(new Error(`${instanceName} EncryptHelper is locked.`));
+    public encryptSave = (encryptHelper: EncryptHelper, data: ArrayBuffer | Uint8Array | string, uuid?: string): Promise<EncryptSaveResolve> => (
+        new Promise<EncryptSaveResolve>(async (resolve, _) => {
+            if (!encryptHelper.isUnlocked()) {
+                return resolve(['FAILURE']);
             }
             try {
-                const encryptedMsg = await this.encryptHelpers[instanceName].encryptMessage(data);
-                const savedUuid = await this.save(uuid || getUUIDv4(), encryptedMsg);
-                return resolve(savedUuid);
+                const [, encryptedMessage] = await encryptHelper.encryptMessage(data);
+                await this.save(uuid || getUUIDv4(), encryptedMessage);
+                return resolve(['SUCCESS']);
             } catch (err) {
-                return reject(err);
+                return resolve(['FAILURE', err]);
             }
         })
     )
 
-    public retrieveDecrypt = (instanceName: string, uuid: string, buffer?: boolean): Promise<any> => (
-        new Promise<any>(async (resolve, reject) => {
-            let decryptedMsg = '';
-            if (!this.encryptHelpers[instanceName]) {
-                return reject(new Error(`No Encrypt instance with ${instanceName}`));
-            }
-            if (!this.encryptHelpers[instanceName].isUnlocked()) {
-                return reject(new Error(`${instanceName} EncryptHelper is locked.`));
+    public retrieveDecrypt = (encryptHelper: EncryptHelper, uuid: string, buffer?: boolean): Promise<RetrieveDecryptResolve> => (
+        new Promise<RetrieveDecryptResolve>(async (resolve, reject) => {
+            if (!encryptHelper.isUnlocked()) {
+                return resolve(['FAILURE']);
             }
             try {
                 const encryptedMsg = await this.retrieve(uuid);
-                decryptedMsg = await this.encryptHelpers[instanceName].decryptMessage(encryptedMsg, buffer);
+                const [, decryptedMsg] = await encryptHelper.decryptMessage(encryptedMsg, buffer);
+                return resolve(['SUCCESS', decryptedMsg as string]);
             } catch (err) {
                 return reject(err);
             }
-            return resolve(decryptedMsg);
         })
     )
 
-    public upload = (encryptInstance: string, source: File | Blob, callback: (err: Error | null, progress: number, done: boolean) => void): Promise<string> => (
-        new Promise<string>((resolve, _) => {
-            const uuid = getUUIDv4();
-            const disassemblyHelper = new DisassemblyHelper(source, async (err, current, next) => {
-                if (err) {
-                    return callback(err, 0, !next);
-                }
-                if (current && current.progress && current.chunk) {
-                    try {
-                        this.encryptSave(encryptInstance, current.chunk.data, current.chunk.uuid).then(() => {
-                            if (next) {
-                                next();
-                            }
-                            callback(null, current.progress as number, !next);
-                        });
-                        if (current.metadata && current.index) {
-                            await this.encryptSave(encryptInstance, JSON.stringify(current.index), uuid);
-                            // SHOULD STORE THIS METADATA INTO A MASTER STORAGE LIST
-                            console.log(current.metadata, current.index);
-                            return resolve(uuid);
-
-                        }
-                    } catch (error) {
-                        return callback(err, 0, !next);
-                    }
-                }
-            });
-            this.uploadHelpers[uuid] = disassemblyHelper;
-        })
-    )
-
-    public download = (encryptInstance: string, uuid: string, callback: (err: Error | null, progress: number) => void): Promise<unknown> => (
-        new Promise<unknown>(async (resolve, reject) => {
-            const index: KloakFileIndex = await this.retrieveDecrypt(encryptInstance, uuid);
-            const assemblyHelper: AssemblyHelper = new AssemblyHelper(index, async (error, progress, nextChunk, data) => {
-                if (error) {
-                    return reject(new Error(error));
-                }
-                if (progress) {
-                    callback(null, progress);
-                }
-                if (nextChunk) {
-                    const data = await this.retrieveDecrypt(encryptInstance, nextChunk, true);
-                    console.log(data);
-                    return assemblyHelper.append(nextChunk, data);
-                }
-                if (data) {
-                    callback(null, 100);
-                    return resolve(uuid);
-                }
-            });
-            this.assemblyHelpers[uuid] = assemblyHelper;
-        })
-    )
+    // public upload = (encryptInstance: string, source: File | Blob, callback: (err: Error | null, progress: number, done: boolean) => void): Promise<string> => (
+    //     new Promise<string>((resolve, _) => {
+    //         const uuid = getUUIDv4();
+    //         const disassemblyHelper = new DisassemblyHelper(source, async (err, current, next) => {
+    //             if (err) {
+    //                 return callback(err, 0, !next);
+    //             }
+    //             if (current && current.progress && current.chunk) {
+    //                 try {
+    //                     this.encryptSave(encryptInstance, current.chunk.data, current.chunk.uuid).then(() => {
+    //                         if (next) {
+    //                             next();
+    //                         }
+    //                         callback(null, current.progress as number, !next);
+    //                     });
+    //                     if (current.metadata && current.index) {
+    //                         await this.encryptSave(encryptInstance, JSON.stringify(current.index), uuid);
+    //                         // SHOULD STORE THIS METADATA INTO A MASTER STORAGE LIST
+    //                         console.log(current.metadata, current.index);
+    //                         return resolve(uuid);
+    //
+    //                     }
+    //                 } catch (error) {
+    //                     return callback(err, 0, !next);
+    //                 }
+    //             }
+    //         });
+    //         this.uploadHelpers[uuid] = disassemblyHelper;
+    //     })
+    // )
+    //
+    // public download = (encryptInstance: string, uuid: string, callback: (err: Error | null, progress: number) => void): Promise<unknown> => (
+    //     new Promise<unknown>(async (resolve, reject) => {
+    //         const index: KloakFileIndex = await this.retrieveDecrypt(encryptInstance, uuid);
+    //         const assemblyHelper: AssemblyHelper = new AssemblyHelper(index, async (error, progress, nextChunk, data) => {
+    //             if (error) {
+    //                 return reject(new Error(error));
+    //             }
+    //             if (progress) {
+    //                 callback(null, progress);
+    //             }
+    //             if (nextChunk) {
+    //                 const data = await this.retrieveDecrypt(encryptInstance, nextChunk, true);
+    //                 console.log(data);
+    //                 return assemblyHelper.append(nextChunk, data);
+    //             }
+    //             if (data) {
+    //                 callback(null, 100);
+    //                 return resolve(uuid);
+    //             }
+    //         });
+    //         this.assemblyHelpers[uuid] = assemblyHelper;
+    //     })
+    // )
 }
 
 export default KloakBridge;

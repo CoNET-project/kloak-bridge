@@ -12,7 +12,6 @@
 
 - [IDBHelper](kloakbridge.md#idbhelper)
 - [assemblyHelpers](kloakbridge.md#assemblyhelpers)
-- [encryptHelpers](kloakbridge.md#encrypthelpers)
 - [keyContainer](kloakbridge.md#keycontainer)
 - [uploadHelpers](kloakbridge.md#uploadhelpers)
 
@@ -25,7 +24,6 @@
 - [createKeyContainer](kloakbridge.md#createkeycontainer)
 - [delete](kloakbridge.md#delete)
 - [deleteKeyContainer](kloakbridge.md#deletekeycontainer)
-- [download](kloakbridge.md#download)
 - [encryptSave](kloakbridge.md#encryptsave)
 - [getKey](kloakbridge.md#getkey)
 - [getKeyChain](kloakbridge.md#getkeychain)
@@ -36,7 +34,6 @@
 - [setKey](kloakbridge.md#setkey)
 - [unlockKey](kloakbridge.md#unlockkey)
 - [unlockKeyContainer](kloakbridge.md#unlockkeycontainer)
-- [upload](kloakbridge.md#upload)
 
 ## Constructors
 
@@ -52,7 +49,7 @@
 
 • `Private` **IDBHelper**: [*IDBDatabaseHelper*](idbdatabasehelper.md)
 
-Defined in: [KloakBridge.ts:21](https://github.com/CoNET-project/kloak-bridge/blob/fd9d775/src/KloakBridge.ts#L21)
+Defined in: [KloakBridge.ts:22](https://github.com/CoNET-project/kloak-bridge/blob/9f1dfc9/src/KloakBridge.ts#L22)
 
 ___
 
@@ -62,17 +59,7 @@ ___
 
 #### Type declaration:
 
-Defined in: [KloakBridge.ts:18](https://github.com/CoNET-project/kloak-bridge/blob/fd9d775/src/KloakBridge.ts#L18)
-
-___
-
-### encryptHelpers
-
-• `Private` **encryptHelpers**: *object*= {}
-
-#### Type declaration:
-
-Defined in: [KloakBridge.ts:19](https://github.com/CoNET-project/kloak-bridge/blob/fd9d775/src/KloakBridge.ts#L19)
+Defined in: [KloakBridge.ts:20](https://github.com/CoNET-project/kloak-bridge/blob/9f1dfc9/src/KloakBridge.ts#L20)
 
 ___
 
@@ -80,7 +67,7 @@ ___
 
 • `Private` **keyContainer**: *undefined* \| [*KeyContainer*](keycontainer.md)
 
-Defined in: [KloakBridge.ts:20](https://github.com/CoNET-project/kloak-bridge/blob/fd9d775/src/KloakBridge.ts#L20)
+Defined in: [KloakBridge.ts:21](https://github.com/CoNET-project/kloak-bridge/blob/9f1dfc9/src/KloakBridge.ts#L21)
 
 ___
 
@@ -90,7 +77,7 @@ ___
 
 #### Type declaration:
 
-Defined in: [KloakBridge.ts:17](https://github.com/CoNET-project/kloak-bridge/blob/fd9d775/src/KloakBridge.ts#L17)
+Defined in: [KloakBridge.ts:19](https://github.com/CoNET-project/kloak-bridge/blob/9f1dfc9/src/KloakBridge.ts#L19)
 
 ## Methods
 
@@ -107,7 +94,7 @@ Name | Type |
 
 **Returns:** *Promise*<undefined \| boolean\>
 
-Defined in: [KloakBridge.ts:120](https://github.com/CoNET-project/kloak-bridge/blob/fd9d775/src/KloakBridge.ts#L120)
+Defined in: [KloakBridge.ts:126](https://github.com/CoNET-project/kloak-bridge/blob/9f1dfc9/src/KloakBridge.ts#L126)
 
 ___
 
@@ -126,7 +113,7 @@ Name | Type |
 
 **Returns:** *Promise*<[*ChangeKeyContainerResolve*](../modules.md#changekeycontainerresolve)\>
 
-Defined in: [KloakBridge.ts:129](https://github.com/CoNET-project/kloak-bridge/blob/fd9d775/src/KloakBridge.ts#L129)
+Defined in: [KloakBridge.ts:135](https://github.com/CoNET-project/kloak-bridge/blob/9f1dfc9/src/KloakBridge.ts#L135)
 
 ___
 
@@ -138,13 +125,13 @@ Check if IndexedDB contains a "KeyChainContainer".
 
 **Returns:** *Promise*<[*CheckContainerResolve*](../modules.md#checkcontainerresolve)\>
 
-Defined in: [KloakBridge.ts:33](https://github.com/CoNET-project/kloak-bridge/blob/fd9d775/src/KloakBridge.ts#L33)
+Defined in: [KloakBridge.ts:34](https://github.com/CoNET-project/kloak-bridge/blob/9f1dfc9/src/KloakBridge.ts#L34)
 
 ___
 
 ### createKey
 
-▸ **createKey**(`instanceName`: *string*, `options`: [*PGPGenerateOptions*](../interfaces/pgpgenerateoptions.md), `unlock?`: *boolean*): *Promise*<[*KeyResolve*](../modules.md#keyresolve)\>
+▸ **createKey**(`options`: [*PGPGenerateOptions*](../interfaces/pgpgenerateoptions.md), `unlock?`: *boolean*): *Promise*<[*KeyResolve*](../modules.md#keyresolve)\>
 
 Create an OpenPGP key pair.
 
@@ -152,13 +139,12 @@ Create an OpenPGP key pair.
 
 Name | Type |
 :------ | :------ |
-`instanceName` | *string* |
 `options` | [*PGPGenerateOptions*](../interfaces/pgpgenerateoptions.md) |
 `unlock?` | *boolean* |
 
 **Returns:** *Promise*<[*KeyResolve*](../modules.md#keyresolve)\>
 
-Defined in: [KloakBridge.ts:151](https://github.com/CoNET-project/kloak-bridge/blob/fd9d775/src/KloakBridge.ts#L151)
+Defined in: [KloakBridge.ts:157](https://github.com/CoNET-project/kloak-bridge/blob/9f1dfc9/src/KloakBridge.ts#L157)
 
 ___
 
@@ -176,7 +162,7 @@ Name | Type |
 
 **Returns:** *Promise*<[*CreateContainerResolve*](../modules.md#createcontainerresolve)\>
 
-Defined in: [KloakBridge.ts:70](https://github.com/CoNET-project/kloak-bridge/blob/fd9d775/src/KloakBridge.ts#L70)
+Defined in: [KloakBridge.ts:76](https://github.com/CoNET-project/kloak-bridge/blob/9f1dfc9/src/KloakBridge.ts#L76)
 
 ___
 
@@ -192,7 +178,7 @@ Name | Type |
 
 **Returns:** *Promise*<any\>
 
-Defined in: [KloakBridge.ts:193](https://github.com/CoNET-project/kloak-bridge/blob/fd9d775/src/KloakBridge.ts#L193)
+Defined in: [KloakBridge.ts:196](https://github.com/CoNET-project/kloak-bridge/blob/9f1dfc9/src/KloakBridge.ts#L196)
 
 ___
 
@@ -204,43 +190,25 @@ Delete KeyChainContainer from IndexedDB.
 
 **Returns:** *Promise*<[*DeleteKeychainResolve*](../modules.md#deletekeychainresolve)\>
 
-Defined in: [KloakBridge.ts:107](https://github.com/CoNET-project/kloak-bridge/blob/fd9d775/src/KloakBridge.ts#L107)
-
-___
-
-### download
-
-▸ **download**(`encryptInstance`: *string*, `uuid`: *string*, `callback`: (`err`: *null* \| Error, `progress`: *number*) => *void*): *Promise*<unknown\>
-
-#### Parameters:
-
-Name | Type |
-:------ | :------ |
-`encryptInstance` | *string* |
-`uuid` | *string* |
-`callback` | (`err`: *null* \| Error, `progress`: *number*) => *void* |
-
-**Returns:** *Promise*<unknown\>
-
-Defined in: [KloakBridge.ts:263](https://github.com/CoNET-project/kloak-bridge/blob/fd9d775/src/KloakBridge.ts#L263)
+Defined in: [KloakBridge.ts:113](https://github.com/CoNET-project/kloak-bridge/blob/9f1dfc9/src/KloakBridge.ts#L113)
 
 ___
 
 ### encryptSave
 
-▸ **encryptSave**(`instanceName`: *string*, `data`: *string* \| ArrayBuffer \| *Uint8Array*, `uuid?`: *string*): *Promise*<string\>
+▸ **encryptSave**(`encryptHelper`: [*EncryptHelper*](encrypthelper.md), `data`: *string* \| ArrayBuffer \| *Uint8Array*, `uuid?`: *string*): *Promise*<[*EncryptSaveResolve*](../modules.md#encryptsaveresolve)\>
 
 #### Parameters:
 
 Name | Type |
 :------ | :------ |
-`instanceName` | *string* |
+`encryptHelper` | [*EncryptHelper*](encrypthelper.md) |
 `data` | *string* \| ArrayBuffer \| *Uint8Array* |
 `uuid?` | *string* |
 
-**Returns:** *Promise*<string\>
+**Returns:** *Promise*<[*EncryptSaveResolve*](../modules.md#encryptsaveresolve)\>
 
-Defined in: [KloakBridge.ts:195](https://github.com/CoNET-project/kloak-bridge/blob/fd9d775/src/KloakBridge.ts#L195)
+Defined in: [KloakBridge.ts:198](https://github.com/CoNET-project/kloak-bridge/blob/9f1dfc9/src/KloakBridge.ts#L198)
 
 ___
 
@@ -258,7 +226,7 @@ Name | Type |
 
 **Returns:** *undefined* \| *Promise*<{} \| [*PGPKeys*](../interfaces/pgpkeys.md)\>
 
-Defined in: [KloakBridge.ts:124](https://github.com/CoNET-project/kloak-bridge/blob/fd9d775/src/KloakBridge.ts#L124)
+Defined in: [KloakBridge.ts:130](https://github.com/CoNET-project/kloak-bridge/blob/9f1dfc9/src/KloakBridge.ts#L130)
 
 ___
 
@@ -268,7 +236,7 @@ ___
 
 **Returns:** *undefined* \| *Promise*<[*KeyChain*](../interfaces/keychain.md)\>
 
-Defined in: [KloakBridge.ts:118](https://github.com/CoNET-project/kloak-bridge/blob/fd9d775/src/KloakBridge.ts#L118)
+Defined in: [KloakBridge.ts:124](https://github.com/CoNET-project/kloak-bridge/blob/9f1dfc9/src/KloakBridge.ts#L124)
 
 ___
 
@@ -278,7 +246,7 @@ ___
 
 **Returns:** *Promise*<[*LockContainerResolve*](../modules.md#lockcontainerresolve)\>
 
-Defined in: [KloakBridge.ts:23](https://github.com/CoNET-project/kloak-bridge/blob/fd9d775/src/KloakBridge.ts#L23)
+Defined in: [KloakBridge.ts:24](https://github.com/CoNET-project/kloak-bridge/blob/9f1dfc9/src/KloakBridge.ts#L24)
 
 ___
 
@@ -294,25 +262,25 @@ Name | Type |
 
 **Returns:** *Promise*<any\>
 
-Defined in: [KloakBridge.ts:189](https://github.com/CoNET-project/kloak-bridge/blob/fd9d775/src/KloakBridge.ts#L189)
+Defined in: [KloakBridge.ts:192](https://github.com/CoNET-project/kloak-bridge/blob/9f1dfc9/src/KloakBridge.ts#L192)
 
 ___
 
 ### retrieveDecrypt
 
-▸ **retrieveDecrypt**(`instanceName`: *string*, `uuid`: *string*, `buffer?`: *boolean*): *Promise*<any\>
+▸ **retrieveDecrypt**(`encryptHelper`: [*EncryptHelper*](encrypthelper.md), `uuid`: *string*, `buffer?`: *boolean*): *Promise*<[*RetrieveDecryptResolve*](../modules.md#retrievedecryptresolve)\>
 
 #### Parameters:
 
 Name | Type |
 :------ | :------ |
-`instanceName` | *string* |
+`encryptHelper` | [*EncryptHelper*](encrypthelper.md) |
 `uuid` | *string* |
 `buffer?` | *boolean* |
 
-**Returns:** *Promise*<any\>
+**Returns:** *Promise*<[*RetrieveDecryptResolve*](../modules.md#retrievedecryptresolve)\>
 
-Defined in: [KloakBridge.ts:213](https://github.com/CoNET-project/kloak-bridge/blob/fd9d775/src/KloakBridge.ts#L213)
+Defined in: [KloakBridge.ts:213](https://github.com/CoNET-project/kloak-bridge/blob/9f1dfc9/src/KloakBridge.ts#L213)
 
 ___
 
@@ -329,7 +297,7 @@ Name | Type |
 
 **Returns:** *Promise*<any\>
 
-Defined in: [KloakBridge.ts:191](https://github.com/CoNET-project/kloak-bridge/blob/fd9d775/src/KloakBridge.ts#L191)
+Defined in: [KloakBridge.ts:194](https://github.com/CoNET-project/kloak-bridge/blob/9f1dfc9/src/KloakBridge.ts#L194)
 
 ___
 
@@ -346,13 +314,13 @@ Name | Type |
 
 **Returns:** *Promise*<undefined \| boolean\>
 
-Defined in: [KloakBridge.ts:122](https://github.com/CoNET-project/kloak-bridge/blob/fd9d775/src/KloakBridge.ts#L122)
+Defined in: [KloakBridge.ts:128](https://github.com/CoNET-project/kloak-bridge/blob/9f1dfc9/src/KloakBridge.ts#L128)
 
 ___
 
 ### unlockKey
 
-▸ **unlockKey**(`instanceName`: *string*, `pgpKeys`: [*PGPKeys*](../interfaces/pgpkeys.md), `passphrase`: *string*): *Promise*<[*KeyResolve*](../modules.md#keyresolve)\>
+▸ **unlockKey**(`pgpKeys`: [*PGPKeys*](../interfaces/pgpkeys.md), `passphrase`: *string*): *Promise*<[*UnlockKeyResolve*](../modules.md#unlockkeyresolve)\>
 
 Unlock an OpenPGP key pair.
 
@@ -360,13 +328,12 @@ Unlock an OpenPGP key pair.
 
 Name | Type |
 :------ | :------ |
-`instanceName` | *string* |
 `pgpKeys` | [*PGPKeys*](../interfaces/pgpkeys.md) |
 `passphrase` | *string* |
 
-**Returns:** *Promise*<[*KeyResolve*](../modules.md#keyresolve)\>
+**Returns:** *Promise*<[*UnlockKeyResolve*](../modules.md#unlockkeyresolve)\>
 
-Defined in: [KloakBridge.ts:171](https://github.com/CoNET-project/kloak-bridge/blob/fd9d775/src/KloakBridge.ts#L171)
+Defined in: [KloakBridge.ts:176](https://github.com/CoNET-project/kloak-bridge/blob/9f1dfc9/src/KloakBridge.ts#L176)
 
 ___
 
@@ -385,22 +352,4 @@ Name | Type |
 
 **Returns:** *Promise*<[*UnlockContainerResolve*](../modules.md#unlockcontainerresolve)\>
 
-Defined in: [KloakBridge.ts:47](https://github.com/CoNET-project/kloak-bridge/blob/fd9d775/src/KloakBridge.ts#L47)
-
-___
-
-### upload
-
-▸ **upload**(`encryptInstance`: *string*, `source`: File \| Blob, `callback`: (`err`: *null* \| Error, `progress`: *number*, `done`: *boolean*) => *void*): *Promise*<string\>
-
-#### Parameters:
-
-Name | Type |
-:------ | :------ |
-`encryptInstance` | *string* |
-`source` | File \| Blob |
-`callback` | (`err`: *null* \| Error, `progress`: *number*, `done`: *boolean*) => *void* |
-
-**Returns:** *Promise*<string\>
-
-Defined in: [KloakBridge.ts:232](https://github.com/CoNET-project/kloak-bridge/blob/fd9d775/src/KloakBridge.ts#L232)
+Defined in: [KloakBridge.ts:48](https://github.com/CoNET-project/kloak-bridge/blob/9f1dfc9/src/KloakBridge.ts#L48)
