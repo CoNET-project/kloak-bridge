@@ -1,5 +1,6 @@
 import * as openpgp from 'openpgp';
 import { Buffer } from 'buffer/';
+// eslint-disable-next-line import/no-cycle
 import EncryptHelper from './EncryptHelper';
 
 export interface PGPKeys {
