@@ -1,4 +1,6 @@
 import * as openpgp from 'openpgp';
+import { Buffer } from 'buffer/';
+import EncryptHelper from './EncryptHelper';
 
 export interface PGPKeys {
     keyID: string,
@@ -85,6 +87,8 @@ export type KeyStatus = 'SUCCESS' | 'FAILURE' | 'INVALID_PASSPHRASE'
 
 export type KeyResolve = [status: KeyStatus, payload?: PGPKeys]
 
+export type UnlockKeyResolve = [status: KeyStatus, payload?: EncryptHelper]
+
 export type DeleteKeychainStatus = 'SUCCESS' | 'FAILURE';
 
 export type DeleteKeychainResolve = [status: DeleteKeychainStatus]
@@ -97,7 +101,7 @@ export type CreateContainerStatus = 'SUCCESS' | 'FAILURE' | 'INVALID_PASSPHRASE'
 
 export type CreateContainerResolve = [status: CreateContainerStatus, payload?: KeyChainContainer]
 
-export type UnlockContainerStatus = 'SUCCESS' | 'FAILURE' | 'INVALID_PASSPHRASE' | 'MISSING_CONTAINER';
+export type UnlockContainerStatus = 'SUCCESS' | 'FAILURE' | 'INVALID_PASSPHRASE' | 'MISSING_KEYCHAIN' | 'MISSING_CONTAINER';
 
 export type UnlockContainerResolve = [status: UnlockContainerStatus]
 
@@ -107,8 +111,15 @@ export type CheckContainerResolve = [status: CheckContainerStatus, payload?: Key
 
 export type LockContainerStatus = 'SUCCESS' | 'FAILURE';
 
-export type LockContainerResolve = [status: LockContainerStatus]
+export type LockContainerResolve = [status: LockContainerStatus];
 
+export type EncryptResolve = [status: 'SUCCESS' | 'FAILURE', payload?: string]
+
+export type DecryptResolve = [status: 'SUCCESS' | 'FAILURE', payload?: string | Buffer]
+
+export type EncryptSaveResolve = [status: 'SUCCESS' | 'FAILURE', payload?: string]
+
+export type RetrieveDecryptResolve = [status: 'SUCCESS' | 'FAILURE', payload?: string]
 // export type KeyContainerStatus = 'SUCCESS' | 'INVALID_PASSWORD' | 'DOES_NOT_EXIST' | 'FAILURE'
 //
 // export type KeyContainerResolve = [status: KeyContainerStatus, payload?: KeyChainContainer]
