@@ -2,6 +2,7 @@ import * as openpgp from 'openpgp';
 import { KeyOptions } from 'openpgp';
 import { Buffer } from 'buffer/';
 import { isJSON } from './utils';
+// eslint-disable-next-line import/no-cycle
 import { DecryptResolve, EncryptResolve, KeyResolve, PGPGenerateOptions, PGPKeys } from './define';
 
 class EncryptHelper {
@@ -16,7 +17,7 @@ class EncryptHelper {
         openpgp.config.compression = openpgp.enums.compression.zip;
     }
 
-    public generateKey = (options: PGPGenerateOptions): Promise<KeyResolve> => new Promise<KeyResolve>(async (resolve, reject) => {
+    public generateKey = (options: PGPGenerateOptions): Promise<KeyResolve> => new Promise<KeyResolve>(async (resolve, _) => {
 
         const userIds = {
             name: options.nickname || '',
@@ -87,7 +88,7 @@ class EncryptHelper {
         return pgpHead.concat('\r\n\r\n', message, '\r\n\r\n', pgpEnd);
     }
 
-    public encryptMessage = (originalData: ArrayBuffer | Uint8Array | string): Promise<EncryptResolve> => new Promise<EncryptResolve>(async (resolve, reject) => {
+    public encryptMessage = (originalData: ArrayBuffer | Uint8Array | string): Promise<EncryptResolve> => new Promise<EncryptResolve>(async (resolve, _) => {
         try {
             // @ts-ignore
             const base64Data = Buffer.from(originalData).toString('base64');
@@ -104,7 +105,7 @@ class EncryptHelper {
 
     })
 
-    public decryptMessage = (encryptedMessage: string, buffer?: boolean): Promise<DecryptResolve> => new Promise(async (resolve, reject) => {
+    public decryptMessage = (encryptedMessage: string, buffer?: boolean): Promise<DecryptResolve> => new Promise(async (resolve, _) => {
         const cleanEncrypted = this.modifyPGPMessage(encryptedMessage);
         try {
             const message = await openpgp.readMessage({ armoredMessage: cleanEncrypted });
