@@ -24,6 +24,10 @@ export interface MessengerKey {
     profileUUID: string
 }
 
+export interface MessengerKeys {
+    [keyID: string]: MessengerKey
+}
+
 export interface KeyChain {
     deviceKey: PGPKeys | {},
     kloakAccountKey: PGPKeys | {},

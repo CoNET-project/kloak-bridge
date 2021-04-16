@@ -1,4 +1,4 @@
-import { ApplicationKeys, KeyChain, PGPKeys, KeyPairType, MessengerKey } from './define';
+import { ApplicationKeys, KeyChain, PGPKeys, KeyPairType, MessengerKeys } from './define';
 import EncryptHelper from './EncryptHelper';
 import IDBDatabaseHelper from './IDBDatabaseHelper';
 
@@ -8,9 +8,7 @@ class KeyContainer {
     private deviceKey: PGPKeys | {};
     private kloakAccountKey: PGPKeys | {};
     private storageKey: PGPKeys | {};
-    private messengerKeys: {
-        [keyID: string]: MessengerKey
-    }
+    private messengerKeys: MessengerKeys
     private applicationKeys: ApplicationKeys
 
     constructor(encryptHelper: EncryptHelper, keyContainer: KeyChain) {
