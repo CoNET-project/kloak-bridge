@@ -1,4 +1,4 @@
-import { ApplicationKeys, KeyChain, PGPKeys, KeyPairType } from './define';
+import { ApplicationKeys, KeyChain, PGPKeys, KeyPairType, MessengerKey } from './define';
 import EncryptHelper from './EncryptHelper';
 import IDBDatabaseHelper from './IDBDatabaseHelper';
 
@@ -9,7 +9,7 @@ class KeyContainer {
     private kloakAccountKey: PGPKeys | {};
     private storageKey: PGPKeys | {};
     private messengerKeys: {
-        [keyID: string]: PGPKeys
+        [keyID: string]: MessengerKey
     }
     private applicationKeys: ApplicationKeys
 
@@ -80,7 +80,7 @@ class KeyContainer {
                 if (this.messengerKeys[pgpKeys.keyID]) {
                     return reject(new Error('This keyID already exists in preferences.'));
                 }
-                this.messengerKeys[pgpKeys.keyID] = pgpKeys;
+                this.messengerKeys[pgpKeys.keyID].pgpKeys = pgpKeys;
             }
             try {
                 const saved = await this.saveKeyContainer();
