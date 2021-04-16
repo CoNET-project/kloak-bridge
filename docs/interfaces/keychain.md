@@ -18,7 +18,7 @@
 
 • **applicationKeys**: {} \| [*ApplicationKeys*](applicationkeys.md)
 
-Defined in: [define.ts:29](https://github.com/CoNET-project/kloak-bridge/blob/3ef3646/src/define.ts#L29)
+Defined in: [define.ts:34](https://github.com/CoNET-project/kloak-bridge/blob/8c6827d/src/define.ts#L34)
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **deviceKey**: {} \| [*PGPKeys*](pgpkeys.md)
 
-Defined in: [define.ts:23](https://github.com/CoNET-project/kloak-bridge/blob/3ef3646/src/define.ts#L23)
+Defined in: [define.ts:28](https://github.com/CoNET-project/kloak-bridge/blob/8c6827d/src/define.ts#L28)
 
 ___
 
@@ -34,15 +34,17 @@ ___
 
 • **kloakAccountKey**: {} \| [*PGPKeys*](pgpkeys.md)
 
-Defined in: [define.ts:24](https://github.com/CoNET-project/kloak-bridge/blob/3ef3646/src/define.ts#L24)
+Defined in: [define.ts:29](https://github.com/CoNET-project/kloak-bridge/blob/8c6827d/src/define.ts#L29)
 
 ___
 
 ### messengerKeys
 
-• **messengerKeys**: {} \| { [keyID: string]: [*PGPKeys*](pgpkeys.md);  }
+• **messengerKeys**: *object*
 
-Defined in: [define.ts:26](https://github.com/CoNET-project/kloak-bridge/blob/3ef3646/src/define.ts#L26)
+#### Type declaration:
+
+Defined in: [define.ts:31](https://github.com/CoNET-project/kloak-bridge/blob/8c6827d/src/define.ts#L31)
 
 ___
 
@@ -50,4 +52,4 @@ ___
 
 • **storageKey**: {} \| [*PGPKeys*](pgpkeys.md)
 
-Defined in: [define.ts:25](https://github.com/CoNET-project/kloak-bridge/blob/3ef3646/src/define.ts#L25)
+Defined in: [define.ts:30](https://github.com/CoNET-project/kloak-bridge/blob/8c6827d/src/define.ts#L30)

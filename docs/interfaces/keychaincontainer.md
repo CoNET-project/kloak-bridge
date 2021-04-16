@@ -15,7 +15,7 @@
 
 • **keyChain**: *string*
 
-Defined in: [define.ts:38](https://github.com/CoNET-project/kloak-bridge/blob/3ef3646/src/define.ts#L38)
+Defined in: [define.ts:43](https://github.com/CoNET-project/kloak-bridge/blob/8c6827d/src/define.ts#L43)
 
 ___
 
@@ -31,4 +31,4 @@ Name | Type |
 `armoredPublicKey` | *string* |
 `keyID` | *string* |
 
-Defined in: [define.ts:33](https://github.com/CoNET-project/kloak-bridge/blob/3ef3646/src/define.ts#L33)
+Defined in: [define.ts:38](https://github.com/CoNET-project/kloak-bridge/blob/8c6827d/src/define.ts#L38)

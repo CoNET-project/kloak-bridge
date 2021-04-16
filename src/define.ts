@@ -19,13 +19,18 @@ export interface ApplicationKeys {
     }
 }
 
+export interface MessengerKey {
+    pgpKeys: PGPKeys,
+    profileUUID: string
+}
+
 export interface KeyChain {
     deviceKey: PGPKeys | {},
     kloakAccountKey: PGPKeys | {},
     storageKey: PGPKeys | {},
     messengerKeys: {
-        [keyID: string]: PGPKeys
-    } | {},
+        [keyID: string]: MessengerKey
+    },
     applicationKeys: ApplicationKeys | {}
 }
 
