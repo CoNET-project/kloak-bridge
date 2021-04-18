@@ -55,13 +55,16 @@ class KeyContainer {
         })
     )
 
-    public addKey = (appID: string, pgpKeys: PGPKeys): Promise<boolean> => (
+    public addKey = (appID: string, pgpKeys: PGPKeys, extra?: Object): Promise<boolean> => (
         new Promise<boolean>(async (resolve, _) => {
             if (appID === 'device' || appID === 'kloak') {
                 return resolve(false);
             }
             this.applications = Object.assign(this.applications, {
-                [appID]: [...this.applications[appID] || [], pgpKeys]
+                [appID]: [...this.applications[appID] || [], {
+                    ...pgpKeys,
+                    ...extra
+                }]
             });
             try {
                 const saved = await this.saveKeyContainer();
