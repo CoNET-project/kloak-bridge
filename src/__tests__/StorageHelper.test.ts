@@ -14,11 +14,9 @@ describe('StorageHelper Class', () => {
     };
     let storageHelper: KloakBridge;
     const keyChain: KeyChain = {
-        deviceKey: {},
-        kloakAccountKey: {},
-        storageKey: {},
-        messengerKeys: {},
-        applicationKeys: {}
+        device: {},
+        kloak: {},
+        applications: {}
     };
     let encryptHelper: EncryptHelper | null;
     let keyContainer: KeyContainer | null;
@@ -127,9 +125,9 @@ describe('StorageHelper Class', () => {
     test('Should add new key to KeyContainer class', async () => {
         const tempEncrypt = new EncryptHelper();
         const [, pgpKeys] = await tempEncrypt.generateKey({ passphrase: 'supersecretpassword' });
-        await keyContainer?.addApplicationKey('GAME', pgpKeys as PGPKeys);
-        const key = await keyContainer?.getKey('application', pgpKeys?.keyID, 'GAME');
-        expect(JSON.stringify(key)).toBe(JSON.stringify(pgpKeys));
+        await keyContainer?.addKey('GAME', pgpKeys as PGPKeys);
+        const key = await keyContainer?.getKey('GAME');
+        expect(JSON.stringify(key).includes(JSON.stringify(pgpKeys))).toBe(true);
     });
 
     test('Should switch KeyContainers class', async () => {

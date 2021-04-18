@@ -15,7 +15,7 @@
 
 • **pgpKeys**: [*PGPKeys*](pgpkeys.md)
 
-Defined in: [define.ts:23](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L23)
+Defined in: [define.ts:21](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/define.ts#L21)
 
 ___
 
@@ -23,4 +23,4 @@ ___
 
 • **profileUUID**: *string*
 
-Defined in: [define.ts:24](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L24)
+Defined in: [define.ts:22](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/define.ts#L22)
