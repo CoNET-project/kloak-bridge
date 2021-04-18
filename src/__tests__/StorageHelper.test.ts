@@ -3,6 +3,7 @@ import KloakBridge from '../KloakBridge';
 import { KeyChain, PGPKeys } from '../define';
 import EncryptHelper from '../EncryptHelper';
 import KeyContainer from '../KeyContainer';
+import { getUUIDv4 } from '../utils';
 require('fake-indexeddb/auto');
 
 describe('StorageHelper Class', () => {
@@ -128,6 +129,17 @@ describe('StorageHelper Class', () => {
         await keyContainer?.addKey('GAME', pgpKeys as PGPKeys);
         const key = await keyContainer?.getKey('GAME');
         expect(JSON.stringify(key).includes(JSON.stringify(pgpKeys))).toBe(true);
+    });
+
+    test('Should add new key to KeyContainer class with extra options', async () => {
+        const tempEncrypt = new EncryptHelper();
+        const [, pgpKeys] = await tempEncrypt.generateKey({ passphrase: 'supersecretpassword' });
+        const extra = {
+            profileUUID: getUUIDv4()
+        };
+        await keyContainer?.addKey('GAME', pgpKeys as PGPKeys, extra);
+        const key = await keyContainer?.getKey('GAME');
+        expect(JSON.stringify(key).includes(JSON.stringify({ ...pgpKeys, ...extra }))).toBe(true);
     });
 
     test('Should switch KeyContainers class', async () => {
