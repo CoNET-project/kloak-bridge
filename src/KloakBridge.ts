@@ -2,7 +2,6 @@ import EncryptHelper from './EncryptHelper';
 import IDBDatabaseHelper from './IDBDatabaseHelper';
 import {
     KeyChainContainer, KeyChain,
-    KeyPairType,
     PGPGenerateOptions, PGPKeys,
     KeyResolve, CreateContainerResolve,
     UnlockContainerResolve, CheckContainerResolve,
@@ -80,15 +79,22 @@ class KloakBridge {
                 const [, pgpKeys] = await tempEncrypt.generateKey({ passphrase });
                 await tempEncrypt.checkPassword(pgpKeys as PGPKeys, passphrase);
                 const keyChain: KeyChain = {
-                    deviceKey: {},
-                    kloakAccountKey: {},
-                    storageKey: {},
-                    messengerKeys: {},
-                    applicationKeys: {}
+                    device: {},
+                    kloak: {},
+                    applications: {
+                        storage: [],
+                        messenger: []
+                    }
                 };
-                keyChain.deviceKey = await tempEncrypt.generateKey({ passphrase: await createRandomValues() });
-                keyChain.kloakAccountKey = await tempEncrypt.generateKey({ passphrase: await createRandomValues() });
-                keyChain.storageKey = await tempEncrypt.generateKey({ passphrase: await createRandomValues() });
+                const [deviceKeyStatus, deviceKey] = await tempEncrypt.generateKey({ passphrase: await createRandomValues() });
+                const [kloakKeyStatus, kloakAccountKey] = await tempEncrypt.generateKey({ passphrase: await createRandomValues() });
+                const [storageKeyStatus, storageKey] = await tempEncrypt.generateKey({ passphrase: await createRandomValues() });
+                if (deviceKeyStatus === 'FAILURE' || kloakKeyStatus === 'FAILURE' || storageKeyStatus === 'FAILURE') {
+                    return resolve(<CreateContainerResolve>['FAILURE']);
+                }
+                keyChain.device = deviceKey as PGPKeys;
+                keyChain.kloak = kloakAccountKey as PGPKeys;
+                keyChain.applications.storage = [storageKey as PGPKeys];
                 const [, encryptedKeyChain] = await tempEncrypt.encryptMessage(JSON.stringify(keyChain));
                 const keyContainer: KeyChainContainer = {
                     pgpKeys: {
@@ -123,11 +129,9 @@ class KloakBridge {
 
     public getKeyChain = () => this.keyContainer?.getKeyChain()
 
-    public addApplicationKey = async (appID: string, pgpKeys: PGPKeys) => this.keyContainer?.addApplicationKey(appID, pgpKeys);
+    public addKey = async (appID: string, pgpKeys: PGPKeys) => this.keyContainer?.addKey(appID, pgpKeys);
 
-    public setKey = async (keyType: 'device' | 'kloak' | 'storage' | 'messenger', pgpKeys: PGPKeys): Promise<boolean | undefined> => this.keyContainer?.setKey(keyType, pgpKeys)
-
-    public getKey = (keyType: KeyPairType, keyID?: string, appID?: string): Promise<PGPKeys | {}> | undefined => this.keyContainer?.getKey(keyType, keyID, appID)
+    public getKey = (appID: string): Promise<PGPKeys | {}> | undefined => this.keyContainer?.getKey(appID)
 
     /**
      * Change password from KeyChainContainer.

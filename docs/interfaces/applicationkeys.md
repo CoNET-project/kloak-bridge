@@ -4,4 +4,4 @@
 
 ## Indexable
 
-▪ [appID: *string*]: { [keyID: string]: [*PGPKeys*](pgpkeys.md);  }
+▪ [appID: *string*]: ([*PGPKeys*](pgpkeys.md) \| {})[]

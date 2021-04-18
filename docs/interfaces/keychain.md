@@ -6,50 +6,30 @@
 
 ### Properties
 
-- [applicationKeys](keychain.md#applicationkeys)
-- [deviceKey](keychain.md#devicekey)
-- [kloakAccountKey](keychain.md#kloakaccountkey)
-- [messengerKeys](keychain.md#messengerkeys)
-- [storageKey](keychain.md#storagekey)
+- [applications](keychain.md#applications)
+- [device](keychain.md#device)
+- [kloak](keychain.md#kloak)
 
 ## Properties
 
-### applicationKeys
+### applications
 
-• **applicationKeys**: {} \| [*ApplicationKeys*](applicationkeys.md)
+• **applications**: [*ApplicationKeys*](applicationkeys.md)
 
-Defined in: [define.ts:38](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L38)
-
-___
-
-### deviceKey
-
-• **deviceKey**: {} \| [*PGPKeys*](pgpkeys.md)
-
-Defined in: [define.ts:32](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L32)
+Defined in: [define.ts:32](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/define.ts#L32)
 
 ___
 
-### kloakAccountKey
+### device
 
-• **kloakAccountKey**: {} \| [*PGPKeys*](pgpkeys.md)
+• **device**: {} \| [*PGPKeys*](pgpkeys.md)
 
-Defined in: [define.ts:33](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L33)
-
-___
-
-### messengerKeys
-
-• **messengerKeys**: *object*
-
-#### Type declaration:
-
-Defined in: [define.ts:35](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L35)
+Defined in: [define.ts:30](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/define.ts#L30)
 
 ___
 
-### storageKey
+### kloak
 
-• **storageKey**: {} \| [*PGPKeys*](pgpkeys.md)
+• **kloak**: {} \| [*PGPKeys*](pgpkeys.md)
 
-Defined in: [define.ts:34](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L34)
+Defined in: [define.ts:31](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/define.ts#L31)

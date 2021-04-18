@@ -43,7 +43,6 @@
 - [DisassemblySource](modules.md#disassemblysource)
 - [EncryptResolve](modules.md#encryptresolve)
 - [EncryptSaveResolve](modules.md#encryptsaveresolve)
-- [KeyPairType](modules.md#keypairtype)
 - [KeyResolve](modules.md#keyresolve)
 - [KeyStatus](modules.md#keystatus)
 - [LockContainerResolve](modules.md#lockcontainerresolve)
@@ -79,7 +78,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [define.ts:92](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L92)
+Defined in: [define.ts:86](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/define.ts#L86)
 
 ___
 
@@ -87,7 +86,7 @@ ___
 
 Ƭ **ChangeKeyContainerResolve**: [status: ChangeKeyContainerStatus, payload?: KeyChainContainer]
 
-Defined in: [define.ts:108](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L108)
+Defined in: [define.ts:100](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/define.ts#L100)
 
 ___
 
@@ -95,7 +94,7 @@ ___
 
 Ƭ **ChangeKeyContainerStatus**: *SUCCESS* \| *FAILURE* \| *NO_PASSPHRASE*
 
-Defined in: [define.ts:106](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L106)
+Defined in: [define.ts:98](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/define.ts#L98)
 
 ___
 
@@ -103,7 +102,7 @@ ___
 
 Ƭ **CheckContainerResolve**: [status: CheckContainerStatus, payload?: KeyChainContainer]
 
-Defined in: [define.ts:120](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L120)
+Defined in: [define.ts:112](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/define.ts#L112)
 
 ___
 
@@ -111,7 +110,7 @@ ___
 
 Ƭ **CheckContainerStatus**: *EXISTS* \| *DOES_NOT_EXIST*
 
-Defined in: [define.ts:118](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L118)
+Defined in: [define.ts:110](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/define.ts#L110)
 
 ___
 
@@ -119,7 +118,7 @@ ___
 
 Ƭ **CreateContainerResolve**: [status: CreateContainerStatus, payload?: KeyChainContainer]
 
-Defined in: [define.ts:112](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L112)
+Defined in: [define.ts:104](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/define.ts#L104)
 
 ___
 
@@ -127,7 +126,7 @@ ___
 
 Ƭ **CreateContainerStatus**: *SUCCESS* \| *FAILURE* \| *INVALID_PASSPHRASE*
 
-Defined in: [define.ts:110](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L110)
+Defined in: [define.ts:102](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/define.ts#L102)
 
 ___
 
@@ -135,7 +134,7 @@ ___
 
 Ƭ **DecryptResolve**: [status: "SUCCESS" \| "FAILURE", payload?: string \| Buffer]
 
-Defined in: [define.ts:128](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L128)
+Defined in: [define.ts:120](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/define.ts#L120)
 
 ___
 
@@ -143,7 +142,7 @@ ___
 
 Ƭ **DeleteKeychainResolve**: [status: DeleteKeychainStatus]
 
-Defined in: [define.ts:104](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L104)
+Defined in: [define.ts:96](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/define.ts#L96)
 
 ___
 
@@ -151,7 +150,7 @@ ___
 
 Ƭ **DeleteKeychainStatus**: *SUCCESS* \| *FAILURE*
 
-Defined in: [define.ts:102](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L102)
+Defined in: [define.ts:94](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/define.ts#L94)
 
 ___
 
@@ -173,7 +172,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [define.ts:85](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L85)
+Defined in: [define.ts:79](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/define.ts#L79)
 
 ___
 
@@ -181,7 +180,7 @@ ___
 
 Ƭ **DisassemblySource**: File \| Blob
 
-Defined in: [define.ts:56](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L56)
+Defined in: [define.ts:50](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/define.ts#L50)
 
 ___
 
@@ -189,7 +188,7 @@ ___
 
 Ƭ **EncryptResolve**: [status: "SUCCESS" \| "FAILURE", payload?: string]
 
-Defined in: [define.ts:126](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L126)
+Defined in: [define.ts:118](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/define.ts#L118)
 
 ___
 
@@ -197,15 +196,7 @@ ___
 
 Ƭ **EncryptSaveResolve**: [status: "SUCCESS" \| "FAILURE", payload?: string]
 
-Defined in: [define.ts:130](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L130)
-
-___
-
-### KeyPairType
-
-Ƭ **KeyPairType**: *device* \| *kloak* \| *storage* \| *messenger* \| *application*
-
-Defined in: [define.ts:94](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L94)
+Defined in: [define.ts:122](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/define.ts#L122)
 
 ___
 
@@ -213,7 +204,7 @@ ___
 
 Ƭ **KeyResolve**: [status: KeyStatus, payload?: PGPKeys]
 
-Defined in: [define.ts:98](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L98)
+Defined in: [define.ts:90](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/define.ts#L90)
 
 ___
 
@@ -221,7 +212,7 @@ ___
 
 Ƭ **KeyStatus**: *SUCCESS* \| *FAILURE* \| *INVALID_PASSPHRASE*
 
-Defined in: [define.ts:96](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L96)
+Defined in: [define.ts:88](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/define.ts#L88)
 
 ___
 
@@ -229,7 +220,7 @@ ___
 
 Ƭ **LockContainerResolve**: [status: LockContainerStatus]
 
-Defined in: [define.ts:124](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L124)
+Defined in: [define.ts:116](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/define.ts#L116)
 
 ___
 
@@ -237,7 +228,7 @@ ___
 
 Ƭ **LockContainerStatus**: *SUCCESS* \| *FAILURE*
 
-Defined in: [define.ts:122](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L122)
+Defined in: [define.ts:114](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/define.ts#L114)
 
 ___
 
@@ -245,7 +236,7 @@ ___
 
 Ƭ **RetrieveDecryptResolve**: [status: "SUCCESS" \| "FAILURE", payload?: string]
 
-Defined in: [define.ts:132](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L132)
+Defined in: [define.ts:124](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/define.ts#L124)
 
 ___
 
@@ -253,7 +244,7 @@ ___
 
 Ƭ **UnlockContainerResolve**: [status: UnlockContainerStatus]
 
-Defined in: [define.ts:116](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L116)
+Defined in: [define.ts:108](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/define.ts#L108)
 
 ___
 
@@ -261,7 +252,7 @@ ___
 
 Ƭ **UnlockContainerStatus**: *SUCCESS* \| *FAILURE* \| *INVALID_PASSPHRASE* \| *MISSING_KEYCHAIN* \| *MISSING_CONTAINER*
 
-Defined in: [define.ts:114](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L114)
+Defined in: [define.ts:106](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/define.ts#L106)
 
 ___
 
@@ -269,7 +260,7 @@ ___
 
 Ƭ **UnlockKeyResolve**: [status: KeyStatus, payload?: EncryptHelper]
 
-Defined in: [define.ts:100](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L100)
+Defined in: [define.ts:92](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/define.ts#L92)
 
 ## Functions
 
@@ -279,7 +270,7 @@ Defined in: [define.ts:100](https://github.com/CoNET-project/kloak-bridge/blob/d
 
 **Returns:** *Promise*<string\>
 
-Defined in: [utils.ts:17](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/utils.ts#L17)
+Defined in: [utils.ts:17](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/utils.ts#L17)
 
 ___
 
@@ -289,4 +280,4 @@ ___
 
 **Returns:** *string*
 
-Defined in: [utils.ts:3](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/utils.ts#L3)
+Defined in: [utils.ts:3](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/utils.ts#L3)
