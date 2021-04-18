@@ -14,9 +14,7 @@ export interface PGPKeys {
 }
 
 export interface ApplicationKeys {
-    [appID: string]: {
-        [keyID: string]: PGPKeys
-    }
+    [appID: string]: Array<PGPKeys | {}>
 }
 
 export interface MessengerKey {
@@ -29,13 +27,9 @@ export interface MessengerKeys {
 }
 
 export interface KeyChain {
-    deviceKey: PGPKeys | {},
-    kloakAccountKey: PGPKeys | {},
-    storageKey: PGPKeys | {},
-    messengerKeys: {
-        [keyID: string]: MessengerKey
-    },
-    applicationKeys: ApplicationKeys | {}
+    device: PGPKeys | {},
+    kloak: PGPKeys | {},
+    applications: ApplicationKeys
 }
 
 export interface KeyChainContainer {
@@ -90,8 +84,6 @@ export interface DisassemblyOptions {
 }
 
 export type AssemblyCallback = (error: any, progress: number, nextChunk?: string, data?: ArrayBuffer) => void;
-
-export type KeyPairType = 'device' | 'kloak' | 'storage' | 'messenger' | 'application'
 
 export type KeyStatus = 'SUCCESS' | 'FAILURE' | 'INVALID_PASSPHRASE'
 

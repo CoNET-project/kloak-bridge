@@ -24,7 +24,7 @@ Name | Type |
 `data` | ArrayBuffer \| *Uint8Array* |
 `uuid` | *string* |
 
-Defined in: [define.ts:76](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L76)
+Defined in: [define.ts:70](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/define.ts#L70)
 
 ___
 
@@ -32,7 +32,7 @@ ___
 
 • `Optional` **index**: [*KloakFileIndex*](kloakfileindex.md)
 
-Defined in: [define.ts:82](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L82)
+Defined in: [define.ts:76](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/define.ts#L76)
 
 ___
 
@@ -40,7 +40,7 @@ ___
 
 • `Optional` **metadata**: [*KloakFileMetadata*](kloakfilemetadata.md)
 
-Defined in: [define.ts:81](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L81)
+Defined in: [define.ts:75](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/define.ts#L75)
 
 ___
 
@@ -48,4 +48,4 @@ ___
 
 • `Optional` **progress**: *number*
 
-Defined in: [define.ts:80](https://github.com/CoNET-project/kloak-bridge/blob/db507e7/src/define.ts#L80)
+Defined in: [define.ts:74](https://github.com/CoNET-project/kloak-bridge/blob/8c682be/src/define.ts#L74)
