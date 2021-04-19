@@ -49,15 +49,7 @@ class EncryptHelper {
         return false;
     }
 
-    public checkPassword = (keyPair: PGPKeys, passphrase: string): Promise<KeyResolve> => new Promise<KeyResolve>(async (resolve, reject) => {
-        if (this.pgpKeyPair.armoredPublicKey && this.pgpKeyPair.armoredPrivateKey) {
-            if ((this.pgpKeyPair.armoredPrivateKey === keyPair.armoredPrivateKey && this.pgpKeyPair.armoredPublicKey === keyPair.armoredPublicKey)) {
-                const unlocked = await this.isUnlocked();
-                if (unlocked) {
-                    return reject(new Error(`This instance contains an ${unlocked ? 'unlocked' : 'locked'} OpenPGP key pair.`));
-                }
-            }
-        }
+    public checkPassword = (keyPair: PGPKeys, passphrase: string): Promise<KeyResolve> => new Promise<KeyResolve>(async (resolve, _) => {
         this.pgpKeyPair = keyPair;
         this.pgpKeyPair.readPublicKey = await openpgp.readKey({ armoredKey: this.pgpKeyPair.armoredPublicKey });
         this.pgpKeyPair.readPrivateKey = await openpgp.readKey({ armoredKey: this.pgpKeyPair.armoredPrivateKey });

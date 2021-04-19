@@ -38,7 +38,7 @@ Name | Type |
 
 **Returns:** [*KeyContainer*](keycontainer.md)
 
-Defined in: [KeyContainer.ts:10](https://github.com/CoNET-project/kloak-bridge/blob/3ce5978/src/KeyContainer.ts#L10)
+Defined in: [KeyContainer.ts:10](https://github.com/CoNET-project/kloak-bridge/blob/fe47ec7/src/KeyContainer.ts#L10)
 
 ## Properties
 
@@ -46,7 +46,7 @@ Defined in: [KeyContainer.ts:10](https://github.com/CoNET-project/kloak-bridge/b
 
 • `Private` **IDBHelper**: [*IDBDatabaseHelper*](idbdatabasehelper.md)
 
-Defined in: [KeyContainer.ts:6](https://github.com/CoNET-project/kloak-bridge/blob/3ce5978/src/KeyContainer.ts#L6)
+Defined in: [KeyContainer.ts:6](https://github.com/CoNET-project/kloak-bridge/blob/fe47ec7/src/KeyContainer.ts#L6)
 
 ___
 
@@ -54,7 +54,7 @@ ___
 
 • `Private` **applications**: [*ApplicationKeys*](../interfaces/applicationkeys.md)
 
-Defined in: [KeyContainer.ts:10](https://github.com/CoNET-project/kloak-bridge/blob/3ce5978/src/KeyContainer.ts#L10)
+Defined in: [KeyContainer.ts:10](https://github.com/CoNET-project/kloak-bridge/blob/fe47ec7/src/KeyContainer.ts#L10)
 
 ___
 
@@ -62,7 +62,7 @@ ___
 
 • `Private` **device**: {} \| [*PGPKeys*](../interfaces/pgpkeys.md)
 
-Defined in: [KeyContainer.ts:8](https://github.com/CoNET-project/kloak-bridge/blob/3ce5978/src/KeyContainer.ts#L8)
+Defined in: [KeyContainer.ts:8](https://github.com/CoNET-project/kloak-bridge/blob/fe47ec7/src/KeyContainer.ts#L8)
 
 ___
 
@@ -70,7 +70,7 @@ ___
 
 • `Private` **keyContainerEncrypt**: [*EncryptHelper*](encrypthelper.md)
 
-Defined in: [KeyContainer.ts:7](https://github.com/CoNET-project/kloak-bridge/blob/3ce5978/src/KeyContainer.ts#L7)
+Defined in: [KeyContainer.ts:7](https://github.com/CoNET-project/kloak-bridge/blob/fe47ec7/src/KeyContainer.ts#L7)
 
 ___
 
@@ -78,7 +78,7 @@ ___
 
 • `Private` **kloak**: {} \| [*PGPKeys*](../interfaces/pgpkeys.md)
 
-Defined in: [KeyContainer.ts:9](https://github.com/CoNET-project/kloak-bridge/blob/3ce5978/src/KeyContainer.ts#L9)
+Defined in: [KeyContainer.ts:9](https://github.com/CoNET-project/kloak-bridge/blob/fe47ec7/src/KeyContainer.ts#L9)
 
 ## Methods
 
@@ -96,7 +96,7 @@ Name | Type |
 
 **Returns:** *Promise*<boolean\>
 
-Defined in: [KeyContainer.ts:58](https://github.com/CoNET-project/kloak-bridge/blob/3ce5978/src/KeyContainer.ts#L58)
+Defined in: [KeyContainer.ts:58](https://github.com/CoNET-project/kloak-bridge/blob/fe47ec7/src/KeyContainer.ts#L58)
 
 ___
 
@@ -112,7 +112,7 @@ Name | Type |
 
 **Returns:** *Promise*<{} \| [*PGPKeys*](../interfaces/pgpkeys.md)\>
 
-Defined in: [KeyContainer.ts:42](https://github.com/CoNET-project/kloak-bridge/blob/3ce5978/src/KeyContainer.ts#L42)
+Defined in: [KeyContainer.ts:42](https://github.com/CoNET-project/kloak-bridge/blob/fe47ec7/src/KeyContainer.ts#L42)
 
 ___
 
@@ -122,7 +122,7 @@ ___
 
 **Returns:** *Promise*<[*KeyChain*](../interfaces/keychain.md)\>
 
-Defined in: [KeyContainer.ts:31](https://github.com/CoNET-project/kloak-bridge/blob/3ce5978/src/KeyContainer.ts#L31)
+Defined in: [KeyContainer.ts:31](https://github.com/CoNET-project/kloak-bridge/blob/fe47ec7/src/KeyContainer.ts#L31)
 
 ___
 
@@ -132,4 +132,4 @@ ___
 
 **Returns:** *Promise*<boolean\>
 
-Defined in: [KeyContainer.ts:19](https://github.com/CoNET-project/kloak-bridge/blob/3ce5978/src/KeyContainer.ts#L19)
+Defined in: [KeyContainer.ts:19](https://github.com/CoNET-project/kloak-bridge/blob/fe47ec7/src/KeyContainer.ts#L19)
