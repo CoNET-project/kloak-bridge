@@ -42,7 +42,7 @@ Name | Type |
 
 **Returns:** [*AssemblyHelper*](assemblyhelper.md)
 
-Defined in: [AssemblyHelper.ts:9](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/AssemblyHelper.ts#L9)
+Defined in: [AssemblyHelper.ts:9](https://github.com/CoNET-project/kloak-bridge/blob/3516064/src/AssemblyHelper.ts#L9)
 
 ## Properties
 
@@ -50,7 +50,7 @@ Defined in: [AssemblyHelper.ts:9](https://github.com/CoNET-project/kloak-bridge/
 
 • `Private` **callback**: [*AssemblyCallback*](../modules.md#assemblycallback)
 
-Defined in: [AssemblyHelper.ts:4](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/AssemblyHelper.ts#L4)
+Defined in: [AssemblyHelper.ts:4](https://github.com/CoNET-project/kloak-bridge/blob/3516064/src/AssemblyHelper.ts#L4)
 
 ___
 
@@ -58,7 +58,7 @@ ___
 
 • `Private` **chunks**: *string*[]= []
 
-Defined in: [AssemblyHelper.ts:9](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/AssemblyHelper.ts#L9)
+Defined in: [AssemblyHelper.ts:9](https://github.com/CoNET-project/kloak-bridge/blob/3516064/src/AssemblyHelper.ts#L9)
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 • `Private` **currentOffset**: *number*= 0
 
-Defined in: [AssemblyHelper.ts:5](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/AssemblyHelper.ts#L5)
+Defined in: [AssemblyHelper.ts:5](https://github.com/CoNET-project/kloak-bridge/blob/3516064/src/AssemblyHelper.ts#L5)
 
 ___
 
@@ -74,7 +74,7 @@ ___
 
 • `Private` **currentProgress**: *number*= 0
 
-Defined in: [AssemblyHelper.ts:6](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/AssemblyHelper.ts#L6)
+Defined in: [AssemblyHelper.ts:6](https://github.com/CoNET-project/kloak-bridge/blob/3516064/src/AssemblyHelper.ts#L6)
 
 ___
 
@@ -82,7 +82,7 @@ ___
 
 • `Private` **index**: *undefined* \| [*KloakFileIndex*](../interfaces/kloakfileindex.md)
 
-Defined in: [AssemblyHelper.ts:7](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/AssemblyHelper.ts#L7)
+Defined in: [AssemblyHelper.ts:7](https://github.com/CoNET-project/kloak-bridge/blob/3516064/src/AssemblyHelper.ts#L7)
 
 ___
 
@@ -90,7 +90,7 @@ ___
 
 • `Private` **workerInstance**: *undefined* \| Worker
 
-Defined in: [AssemblyHelper.ts:8](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/AssemblyHelper.ts#L8)
+Defined in: [AssemblyHelper.ts:8](https://github.com/CoNET-project/kloak-bridge/blob/3516064/src/AssemblyHelper.ts#L8)
 
 ## Methods
 
@@ -108,7 +108,7 @@ Name | Type |
 
 **Returns:** *undefined* \| *void*
 
-Defined in: [AssemblyHelper.ts:30](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/AssemblyHelper.ts#L30)
+Defined in: [AssemblyHelper.ts:30](https://github.com/CoNET-project/kloak-bridge/blob/3516064/src/AssemblyHelper.ts#L30)
 
 ___
 
@@ -118,7 +118,7 @@ ___
 
 **Returns:** *Promise*<Worker\>
 
-Defined in: [AssemblyHelper.ts:100](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/AssemblyHelper.ts#L100)
+Defined in: [AssemblyHelper.ts:100](https://github.com/CoNET-project/kloak-bridge/blob/3516064/src/AssemblyHelper.ts#L100)
 
 ___
 
@@ -128,7 +128,7 @@ ___
 
 **Returns:** *undefined* \| *void*
 
-Defined in: [AssemblyHelper.ts:46](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/AssemblyHelper.ts#L46)
+Defined in: [AssemblyHelper.ts:46](https://github.com/CoNET-project/kloak-bridge/blob/3516064/src/AssemblyHelper.ts#L46)
 
 ___
 
@@ -138,7 +138,7 @@ ___
 
 **Returns:** *Promise*<void\>
 
-Defined in: [AssemblyHelper.ts:16](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/AssemblyHelper.ts#L16)
+Defined in: [AssemblyHelper.ts:16](https://github.com/CoNET-project/kloak-bridge/blob/3516064/src/AssemblyHelper.ts#L16)
 
 ___
 
@@ -154,7 +154,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [AssemblyHelper.ts:86](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/AssemblyHelper.ts#L86)
+Defined in: [AssemblyHelper.ts:86](https://github.com/CoNET-project/kloak-bridge/blob/3516064/src/AssemblyHelper.ts#L86)
 
 ___
 
@@ -164,7 +164,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [AssemblyHelper.ts:22](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/AssemblyHelper.ts#L22)
+Defined in: [AssemblyHelper.ts:22](https://github.com/CoNET-project/kloak-bridge/blob/3516064/src/AssemblyHelper.ts#L22)
 
 ___
 
@@ -174,4 +174,4 @@ ___
 
 **Returns:** *void*
 
-Defined in: [AssemblyHelper.ts:53](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/AssemblyHelper.ts#L53)
+Defined in: [AssemblyHelper.ts:53](https://github.com/CoNET-project/kloak-bridge/blob/3516064/src/AssemblyHelper.ts#L53)
