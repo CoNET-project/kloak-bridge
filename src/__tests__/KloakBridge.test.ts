@@ -129,15 +129,8 @@ describe('StorageHelper Class', () => {
     });
 
     test('Should create new container, save into IndexedDB.', async () => {
-        await storageHelper.createKeyContainer('mypassword');
-        const [ status ] = await storageHelper.unlockKeyContainer('mypassword');
+        const [ status ] = await storageHelper.createKeyContainer('mypassword');
         expect(status).toBe('SUCCESS');
-    });
-
-    test('Should get INVALID_PASSWORD from unlockKeyContainer', async () => {
-        await storageHelper.createKeyContainer('mypassword');
-        const [ status ] = await storageHelper.unlockKeyContainer('wrongpassword');
-        expect(status).toBe('INVALID_PASSPHRASE');
     });
 
     test('Should create new container, save into IndexedDB and delete container', async () => {
