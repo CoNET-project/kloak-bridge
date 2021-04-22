@@ -36,7 +36,7 @@
 
 Inherited from: [connectRequest](connectrequest.md).[client_folder_name](connectrequest.md#client_folder_name)
 
-Defined in: [define.ts:167](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/define.ts#L167)
+Defined in: [define.ts:167](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/define.ts#L167)
 
 ___
 
@@ -46,7 +46,7 @@ ___
 
 Inherited from: [connectRequest](connectrequest.md).[connect_info](connectrequest.md#connect_info)
 
-Defined in: [define.ts:175](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/define.ts#L175)
+Defined in: [define.ts:175](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/define.ts#L175)
 
 ___
 
@@ -56,7 +56,7 @@ ___
 
 Inherited from: [connectRequest](connectrequest.md).[device_armor](connectrequest.md#device_armor)
 
-Defined in: [define.ts:166](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/define.ts#L166)
+Defined in: [define.ts:166](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/define.ts#L166)
 
 ___
 
@@ -64,7 +64,7 @@ ___
 
 • `Optional` **device\_private**: *string*
 
-Defined in: [define.ts:181](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/define.ts#L181)
+Defined in: [define.ts:181](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/define.ts#L181)
 
 ___
 
@@ -74,7 +74,7 @@ ___
 
 Inherited from: [connectRequest](connectrequest.md).[encrypted_request](connectrequest.md#encrypted_request)
 
-Defined in: [define.ts:174](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/define.ts#L174)
+Defined in: [define.ts:174](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/define.ts#L174)
 
 ___
 
@@ -84,7 +84,7 @@ ___
 
 Inherited from: [connectRequest](connectrequest.md).[encrypted_response](connectrequest.md#encrypted_response)
 
-Defined in: [define.ts:173](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/define.ts#L173)
+Defined in: [define.ts:173](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/define.ts#L173)
 
 ___
 
@@ -94,7 +94,7 @@ ___
 
 Inherited from: [connectRequest](connectrequest.md).[error](connectrequest.md#error)
 
-Defined in: [define.ts:171](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/define.ts#L171)
+Defined in: [define.ts:171](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/define.ts#L171)
 
 ___
 
@@ -104,7 +104,7 @@ ___
 
 Inherited from: [connectRequest](connectrequest.md).[imap_account](connectrequest.md#imap_account)
 
-Defined in: [define.ts:169](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/define.ts#L169)
+Defined in: [define.ts:169](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/define.ts#L169)
 
 ___
 
@@ -114,7 +114,7 @@ ___
 
 Inherited from: [connectRequest](connectrequest.md).[kloak_account_armor](connectrequest.md#kloak_account_armor)
 
-Defined in: [define.ts:165](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/define.ts#L165)
+Defined in: [define.ts:165](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/define.ts#L165)
 
 ___
 
@@ -122,7 +122,7 @@ ___
 
 • `Optional` **kloak\_private**: *string*
 
-Defined in: [define.ts:180](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/define.ts#L180)
+Defined in: [define.ts:180](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/define.ts#L180)
 
 ___
 
@@ -132,7 +132,7 @@ ___
 
 Inherited from: [connectRequest](connectrequest.md).[next_time_connect](connectrequest.md#next_time_connect)
 
-Defined in: [define.ts:170](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/define.ts#L170)
+Defined in: [define.ts:170](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/define.ts#L170)
 
 ___
 
@@ -140,7 +140,7 @@ ___
 
 • `Optional` **reponseJson**: [*connectRequest*](connectrequest.md)
 
-Defined in: [define.ts:182](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/define.ts#L182)
+Defined in: [define.ts:182](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/define.ts#L182)
 
 ___
 
@@ -150,7 +150,7 @@ ___
 
 Inherited from: [connectRequest](connectrequest.md).[requestJSON_text](connectrequest.md#requestjson_text)
 
-Defined in: [define.ts:176](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/define.ts#L176)
+Defined in: [define.ts:176](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/define.ts#L176)
 
 ___
 
@@ -160,7 +160,7 @@ ___
 
 Inherited from: [connectRequest](connectrequest.md).[server_folder](connectrequest.md#server_folder)
 
-Defined in: [define.ts:172](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/define.ts#L172)
+Defined in: [define.ts:172](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/define.ts#L172)
 
 ___
 
@@ -170,4 +170,4 @@ ___
 
 Inherited from: [connectRequest](connectrequest.md).[use_kloak_shared_imap_account](connectrequest.md#use_kloak_shared_imap_account)
 
-Defined in: [define.ts:168](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/define.ts#L168)
+Defined in: [define.ts:168](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/define.ts#L168)

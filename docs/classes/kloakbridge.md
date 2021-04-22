@@ -49,7 +49,7 @@
 
 • `Private` **IDBHelper**: [*IDBDatabaseHelper*](idbdatabasehelper.md)
 
-Defined in: [KloakBridge.ts:21](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/KloakBridge.ts#L21)
+Defined in: [KloakBridge.ts:21](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/KloakBridge.ts#L21)
 
 ___
 
@@ -59,7 +59,7 @@ ___
 
 #### Type declaration:
 
-Defined in: [KloakBridge.ts:19](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/KloakBridge.ts#L19)
+Defined in: [KloakBridge.ts:19](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/KloakBridge.ts#L19)
 
 ___
 
@@ -67,7 +67,7 @@ ___
 
 • **keyContainer**: *undefined* \| [*KeyContainer*](keycontainer.md)
 
-Defined in: [KloakBridge.ts:20](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/KloakBridge.ts#L20)
+Defined in: [KloakBridge.ts:20](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/KloakBridge.ts#L20)
 
 ___
 
@@ -77,7 +77,7 @@ ___
 
 #### Type declaration:
 
-Defined in: [KloakBridge.ts:18](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/KloakBridge.ts#L18)
+Defined in: [KloakBridge.ts:18](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/KloakBridge.ts#L18)
 
 ## Methods
 
@@ -94,7 +94,7 @@ Name | Type |
 
 **Returns:** *Promise*<undefined \| [status: "SUCCESS" \| "ALREADY\_EXISTS"]\>
 
-Defined in: [KloakBridge.ts:127](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/KloakBridge.ts#L127)
+Defined in: [KloakBridge.ts:127](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/KloakBridge.ts#L127)
 
 ___
 
@@ -111,7 +111,7 @@ Name | Type |
 
 **Returns:** *Promise*<undefined \| [status: "SUCCESS" \| "APP\_DOES\_NOT\_EXIST"]\>
 
-Defined in: [KloakBridge.ts:128](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/KloakBridge.ts#L128)
+Defined in: [KloakBridge.ts:128](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/KloakBridge.ts#L128)
 
 ___
 
@@ -130,7 +130,7 @@ Name | Type |
 
 **Returns:** *Promise*<[*ChangeKeyContainerResolve*](../modules.md#changekeycontainerresolve)\>
 
-Defined in: [KloakBridge.ts:133](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/KloakBridge.ts#L133)
+Defined in: [KloakBridge.ts:133](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/KloakBridge.ts#L133)
 
 ___
 
@@ -142,7 +142,7 @@ Check if IndexedDB contains a "KeyChainContainer".
 
 **Returns:** *Promise*<[*CheckContainerResolve*](../modules.md#checkcontainerresolve)\>
 
-Defined in: [KloakBridge.ts:33](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/KloakBridge.ts#L33)
+Defined in: [KloakBridge.ts:33](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/KloakBridge.ts#L33)
 
 ___
 
@@ -161,7 +161,7 @@ Name | Type |
 
 **Returns:** *Promise*<[*KeyResolve*](../modules.md#keyresolve)\>
 
-Defined in: [KloakBridge.ts:175](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/KloakBridge.ts#L175)
+Defined in: [KloakBridge.ts:175](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/KloakBridge.ts#L175)
 
 ___
 
@@ -179,7 +179,7 @@ Name | Type |
 
 **Returns:** *Promise*<[*CreateContainerResolve*](../modules.md#createcontainerresolve)\>
 
-Defined in: [KloakBridge.ts:79](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/KloakBridge.ts#L79)
+Defined in: [KloakBridge.ts:79](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/KloakBridge.ts#L79)
 
 ___
 
@@ -195,7 +195,7 @@ Name | Type |
 
 **Returns:** *Promise*<any\>
 
-Defined in: [KloakBridge.ts:214](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/KloakBridge.ts#L214)
+Defined in: [KloakBridge.ts:214](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/KloakBridge.ts#L214)
 
 ___
 
@@ -207,7 +207,7 @@ Delete KeyChainContainer from IndexedDB.
 
 **Returns:** *Promise*<[*DeleteKeychainResolve*](../modules.md#deletekeychainresolve)\>
 
-Defined in: [KloakBridge.ts:116](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/KloakBridge.ts#L116)
+Defined in: [KloakBridge.ts:116](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/KloakBridge.ts#L116)
 
 ___
 
@@ -225,7 +225,7 @@ Name | Type |
 
 **Returns:** *Promise*<[*EncryptSaveResolve*](../modules.md#encryptsaveresolve)\>
 
-Defined in: [KloakBridge.ts:216](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/KloakBridge.ts#L216)
+Defined in: [KloakBridge.ts:216](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/KloakBridge.ts#L216)
 
 ___
 
@@ -241,7 +241,7 @@ Name | Type |
 
 **Returns:** *Promise*<[status: "SUCCESS" \| "FAILURE", encryptedData?: string]\>
 
-Defined in: [KloakBridge.ts:246](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/KloakBridge.ts#L246)
+Defined in: [KloakBridge.ts:246](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/KloakBridge.ts#L246)
 
 ___
 
@@ -258,7 +258,7 @@ Name | Type |
 
 **Returns:** *Promise*<undefined \| [status: "SUCCESS" \| "DOES\_NOT\_EXIST" \| "FAILURE", pgpKeys?: PGPKeys]\>
 
-Defined in: [KloakBridge.ts:129](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/KloakBridge.ts#L129)
+Defined in: [KloakBridge.ts:129](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/KloakBridge.ts#L129)
 
 ___
 
@@ -268,7 +268,7 @@ ___
 
 **Returns:** *Promise*<[*LockContainerResolve*](../modules.md#lockcontainerresolve)\>
 
-Defined in: [KloakBridge.ts:23](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/KloakBridge.ts#L23)
+Defined in: [KloakBridge.ts:23](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/KloakBridge.ts#L23)
 
 ___
 
@@ -284,7 +284,7 @@ Name | Type |
 
 **Returns:** *Promise*<any\>
 
-Defined in: [KloakBridge.ts:210](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/KloakBridge.ts#L210)
+Defined in: [KloakBridge.ts:210](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/KloakBridge.ts#L210)
 
 ___
 
@@ -302,7 +302,7 @@ Name | Type |
 
 **Returns:** *Promise*<[*RetrieveDecryptResolve*](../modules.md#retrievedecryptresolve)\>
 
-Defined in: [KloakBridge.ts:231](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/KloakBridge.ts#L231)
+Defined in: [KloakBridge.ts:231](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/KloakBridge.ts#L231)
 
 ___
 
@@ -319,7 +319,7 @@ Name | Type |
 
 **Returns:** *Promise*<any\>
 
-Defined in: [KloakBridge.ts:212](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/KloakBridge.ts#L212)
+Defined in: [KloakBridge.ts:212](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/KloakBridge.ts#L212)
 
 ___
 
@@ -338,7 +338,7 @@ Name | Type |
 
 **Returns:** *Promise*<[*UnlockKeyResolve*](../modules.md#unlockkeyresolve)\>
 
-Defined in: [KloakBridge.ts:194](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/KloakBridge.ts#L194)
+Defined in: [KloakBridge.ts:194](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/KloakBridge.ts#L194)
 
 ___
 
@@ -357,4 +357,4 @@ Name | Type |
 
 **Returns:** *Promise*<[*UnlockContainerResolve*](../modules.md#unlockcontainerresolve)\>
 
-Defined in: [KloakBridge.ts:47](https://github.com/CoNET-project/kloak-bridge/blob/1725a9c/src/KloakBridge.ts#L47)
+Defined in: [KloakBridge.ts:47](https://github.com/CoNET-project/kloak-bridge/blob/2663f6d/src/KloakBridge.ts#L47)
