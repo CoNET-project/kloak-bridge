@@ -28,6 +28,7 @@ class KloakBridge {
                 kloak: {},
                 apps: {
                     '1B3166C1914E82E6': {
+                        encryptionKeys: {},
                         publicKey: '-----BEGIN PGP PUBLIC KEY BLOCK-----\n'
                             + '\n'
                             + 'mDMEYH95kRYJKwYBBAHaRw8BAQdABxVZb2HjVFQ6b0fBpuaw+VonWyipYwKuOmFJ\n'
@@ -41,9 +42,10 @@ class KloakBridge {
                             + 'SnpMxR+L5LY/rH6HCZEvMhgnrQ7BShtqsR8iDg==\n'
                             + '=i7h1\n'
                             + '-----END PGP PUBLIC KEY BLOCK-----',
-                        keys: {}
+                        dataUUID: getUUIDv4()
                     },
                     '216AABF3D6764CB0': {
+                        encryptionKeys: {},
                         publicKey: '-----BEGIN PGP PUBLIC KEY BLOCK-----\n'
                             + '\n'
                             + 'mDMEYH95kRYJKwYBBAHaRw8BAQdAMlOn5fTv0Q5bHTzQoRTovoawNrUu7r7VpOIB\n'
@@ -57,12 +59,16 @@ class KloakBridge {
                             + 'MiddDkpztZ7FgDC13iUCfCJ7UNIB7dKnrgHCDQ==\n'
                             + '=o9sO\n'
                             + '-----END PGP PUBLIC KEY BLOCK-----',
-                        keys: {}
+                        dataUUID: getUUIDv4()
                     }
                 }
             };
             const [, deviceKey] = await tempEncrypt.generateKey({ passphrase: '' });
             const [, kloakKey] = await tempEncrypt.generateKey({ passphrase: '' });
+            const [, messengerKeys] = await tempEncrypt.generateKey({ passphrase: '' });
+            const [, storageKeys] = await tempEncrypt.generateKey({ passphrase: '' });
+            keyChain.apps['1B3166C1914E82E6'].encryptionKeys = messengerKeys as PGPKeys;
+            keyChain.apps['216AABF3D6764CB0'].encryptionKeys = storageKeys as PGPKeys;
             keyChain.device = deviceKey as PGPKeys;
             keyChain.kloak = kloakKey as PGPKeys;
             return resolve(keyChain);
@@ -164,9 +170,10 @@ class KloakBridge {
         })
     )
 
-    public addAppID = async (appKeyID: string, publicKey: string) => this.keyContainer?.addAppID(appKeyID, publicKey);
-    public addAppKey = async (appKeyID: string, pgpKeys: PGPKeys) => this.keyContainer?.addAppKey(appKeyID, pgpKeys);
-    public getKey = async (appKeyID: string, keyId?: string) => this.keyContainer?.getKey(appKeyID, keyId)
+    // public addAppID = async (appKeyID: string, publicKey: string) => this.keyContainer?.addAppID(appKeyID, publicKey);
+    // public addAppKey = async (appKeyID: string, pgpKeys: PGPKeys) => this.keyContainer?.addAppKey(appKeyID, pgpKeys);
+    // public getKey = async (appKeyID: string, keyId?: string) => this.keyContainer?.getKey(appKeyID, keyId)
+    public getAppDataUUID = async (appKeyID: string) => this.keyContainer?.getAppDataUUID(appKeyID)
     /**
      * Change password from KeyChainContainer.
      */

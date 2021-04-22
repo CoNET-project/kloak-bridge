@@ -17,10 +17,8 @@
 ### Methods
 
 - [addAppID](keycontainer.md#addappid)
-- [addAppKey](keycontainer.md#addappkey)
-- [getKey](keycontainer.md#getkey)
+- [getAppDataUUID](keycontainer.md#getappdatauuid)
 - [getKeyChain](keycontainer.md#getkeychain)
-- [getKeys](keycontainer.md#getkeys)
 - [saveKeyContainer](keycontainer.md#savekeycontainer)
 
 ## Constructors
@@ -38,7 +36,7 @@ Name | Type |
 
 **Returns:** [*KeyContainer*](keycontainer.md)
 
-Defined in: [KeyContainer.ts:12](https://github.com/CoNET-project/kloak-bridge/blob/6df6a68/src/KeyContainer.ts#L12)
+Defined in: [KeyContainer.ts:13](https://github.com/CoNET-project/kloak-bridge/blob/dd2c22c/src/KeyContainer.ts#L13)
 
 ## Properties
 
@@ -46,7 +44,7 @@ Defined in: [KeyContainer.ts:12](https://github.com/CoNET-project/kloak-bridge/b
 
 • `Private` **IDBHelper**: [*IDBDatabaseHelper*](idbdatabasehelper.md)
 
-Defined in: [KeyContainer.ts:6](https://github.com/CoNET-project/kloak-bridge/blob/6df6a68/src/KeyContainer.ts#L6)
+Defined in: [KeyContainer.ts:7](https://github.com/CoNET-project/kloak-bridge/blob/dd2c22c/src/KeyContainer.ts#L7)
 
 ___
 
@@ -54,7 +52,7 @@ ___
 
 • `Private` **encryptHelper**: *null* \| [*EncryptHelper*](encrypthelper.md)= null
 
-Defined in: [KeyContainer.ts:7](https://github.com/CoNET-project/kloak-bridge/blob/6df6a68/src/KeyContainer.ts#L7)
+Defined in: [KeyContainer.ts:8](https://github.com/CoNET-project/kloak-bridge/blob/dd2c22c/src/KeyContainer.ts#L8)
 
 ___
 
@@ -62,7 +60,7 @@ ___
 
 • `Private` **keyChain**: [*KeyChain*](../interfaces/keychain.md)
 
-Defined in: [KeyContainer.ts:8](https://github.com/CoNET-project/kloak-bridge/blob/6df6a68/src/KeyContainer.ts#L8)
+Defined in: [KeyContainer.ts:9](https://github.com/CoNET-project/kloak-bridge/blob/dd2c22c/src/KeyContainer.ts#L9)
 
 ## Methods
 
@@ -79,43 +77,23 @@ Name | Type |
 
 **Returns:** *Promise*<[status: "SUCCESS" \| "ALREADY\_EXISTS"]\>
 
-Defined in: [KeyContainer.ts:33](https://github.com/CoNET-project/kloak-bridge/blob/6df6a68/src/KeyContainer.ts#L33)
+Defined in: [KeyContainer.ts:34](https://github.com/CoNET-project/kloak-bridge/blob/dd2c22c/src/KeyContainer.ts#L34)
 
 ___
 
-### addAppKey
+### getAppDataUUID
 
-▸ **addAppKey**(`appID`: *string*, `pgpKeys`: [*PGPKeys*](../interfaces/pgpkeys.md), `options?`: { `dataUUID`: *string*  }): *Promise*<[status: "SUCCESS" \| "APP\_DOES\_NOT\_EXIST"]\>
+▸ **getAppDataUUID**(`appID`: *string*): *Promise*<[*GetAppDataUUID*](../modules.md#getappdatauuid)\>
 
 #### Parameters:
 
 Name | Type |
 :------ | :------ |
 `appID` | *string* |
-`pgpKeys` | [*PGPKeys*](../interfaces/pgpkeys.md) |
-`options?` | *object* |
-`options.dataUUID` | *string* |
 
-**Returns:** *Promise*<[status: "SUCCESS" \| "APP\_DOES\_NOT\_EXIST"]\>
+**Returns:** *Promise*<[*GetAppDataUUID*](../modules.md#getappdatauuid)\>
 
-Defined in: [KeyContainer.ts:47](https://github.com/CoNET-project/kloak-bridge/blob/6df6a68/src/KeyContainer.ts#L47)
-
-___
-
-### getKey
-
-▸ **getKey**(`appID`: *string*, `keyId?`: *string*): *Promise*<[status: "SUCCESS" \| "DOES\_NOT\_EXIST" \| "FAILURE", pgpKeys?: PGPKeys]\>
-
-#### Parameters:
-
-Name | Type |
-:------ | :------ |
-`appID` | *string* |
-`keyId?` | *string* |
-
-**Returns:** *Promise*<[status: "SUCCESS" \| "DOES\_NOT\_EXIST" \| "FAILURE", pgpKeys?: PGPKeys]\>
-
-Defined in: [KeyContainer.ts:63](https://github.com/CoNET-project/kloak-bridge/blob/6df6a68/src/KeyContainer.ts#L63)
+Defined in: [KeyContainer.ts:86](https://github.com/CoNET-project/kloak-bridge/blob/dd2c22c/src/KeyContainer.ts#L86)
 
 ___
 
@@ -125,23 +103,7 @@ ___
 
 **Returns:** [*KeyChain*](../interfaces/keychain.md)
 
-Defined in: [KeyContainer.ts:31](https://github.com/CoNET-project/kloak-bridge/blob/6df6a68/src/KeyContainer.ts#L31)
-
-___
-
-### getKeys
-
-▸ **getKeys**(`appID`: *string*): *Promise*<[*KeyChainGetKeysResolve*](../modules.md#keychaingetkeysresolve)\>
-
-#### Parameters:
-
-Name | Type |
-:------ | :------ |
-`appID` | *string* |
-
-**Returns:** *Promise*<[*KeyChainGetKeysResolve*](../modules.md#keychaingetkeysresolve)\>
-
-Defined in: [KeyContainer.ts:83](https://github.com/CoNET-project/kloak-bridge/blob/6df6a68/src/KeyContainer.ts#L83)
+Defined in: [KeyContainer.ts:32](https://github.com/CoNET-project/kloak-bridge/blob/dd2c22c/src/KeyContainer.ts#L32)
 
 ___
 
@@ -151,4 +113,4 @@ ___
 
 **Returns:** *Promise*<boolean\>
 
-Defined in: [KeyContainer.ts:19](https://github.com/CoNET-project/kloak-bridge/blob/6df6a68/src/KeyContainer.ts#L19)
+Defined in: [KeyContainer.ts:20](https://github.com/CoNET-project/kloak-bridge/blob/dd2c22c/src/KeyContainer.ts#L20)

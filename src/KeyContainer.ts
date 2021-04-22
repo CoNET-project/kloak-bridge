@@ -1,4 +1,4 @@
-import { KeyChain, KeyChainGetKeysResolve, PGPKeys } from './define';
+import { GetAppDataUUID, KeyChain, PGPKeys } from './define';
 import EncryptHelper from './EncryptHelper';
 import IDBDatabaseHelper from './IDBDatabaseHelper';
 import { getUUIDv4 } from './utils';
@@ -36,9 +36,12 @@ class KeyContainer {
             if (this.keyChain.apps[appKeyID]) {
                 return resolve(['ALREADY_EXISTS']);
             }
+            const tempEncrypter = new EncryptHelper();
+            const [, encryptionKeys] = await tempEncrypter.generateKey({ passphrase: '' });
             this.keyChain.apps[appKeyID] = {
+                encryptionKeys: encryptionKeys as PGPKeys,
                 publicKey,
-                data: getUUIDv4()
+                dataUUID: getUUIDv4()
             };
             await this.saveKeyContainer();
             return resolve(['SUCCESS']);
@@ -76,17 +79,16 @@ class KeyContainer {
     //                     return resolve(['DOES_NOT_EXIST']);
     //                 }
     //                 return resolve(['SUCCESS', this.keyChain.apps[appID].keys[keyId]]);
-    //
     //         }
     //     })
     // )
 
-    public getAppDataUUID = (appID: string): Promise<KeyChainGetKeysResolve> => (
-        new Promise<KeyChainGetKeysResolve>((resolve, _) => {
-            if (!appID || !this.keyChain.apps[appID] || !this.keyChain.apps[appID].data) {
+    public getAppDataUUID = (appID: string): Promise<GetAppDataUUID> => (
+        new Promise<GetAppDataUUID>((resolve, _) => {
+            if (!appID || !this.keyChain.apps[appID] || !this.keyChain.apps[appID].dataUUID) {
                 return resolve(['DOES_NOT_EXIST']);
             }
-            return resolve(['SUCCESS', this.keyChain.apps[appID].data]);
+            return resolve(['SUCCESS', { encryptionKeys: this.keyChain.apps[appID].encryptionKeys as PGPKeys, uuid: this.keyChain.apps[appID].dataUUID }]);
         })
     )
 }

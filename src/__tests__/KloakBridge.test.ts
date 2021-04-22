@@ -129,7 +129,6 @@ describe('StorageHelper Class', () => {
 
     test('Should create new container, save into IndexedDB.', async () => {
         const [ status ] = await kloakBridge.createKeyContainer('mypassword');
-        console.log(kloakBridge?.keyContainer?.getKeyChain());
         expect(status).toBe('SUCCESS');
     });
 

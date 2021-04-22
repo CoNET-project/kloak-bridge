@@ -31,7 +31,6 @@ describe('IDBDatabaseHelper Class', () => {
     test('Should retrieve data from IndexedDB but fail', async () => {
         const idb = new IDBDatabaseHelper();
         const retrievedData = await idb.retrieve('randomUUID');
-        console.log(retrievedData);
     });
 
     test('Should delete data from IndexedDB', async () => {
