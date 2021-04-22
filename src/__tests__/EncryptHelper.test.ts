@@ -63,4 +63,31 @@ describe('Encrypt Class', () => {
         console.log(decryptedMsg);
         expect(decryptedMsg).toBe(plainText);
     });
+
+    describe('Testing static encryptWith and verifySignature functions', () => {
+        const tempEncrypt = new EncryptHelper();
+        let testPGPKey1: PGPKeys;
+        let testPGPKey2: PGPKeys;
+        let encryptedTestMessage: string;
+
+        test('Should generate 3 key pairs', async () => {
+            const [, pgpKey1] = await tempEncrypt.generateKey({ passphrase: '' });
+            const [, pgpKey2] = await tempEncrypt.generateKey({ passphrase: '' });
+            testPGPKey1 = pgpKey1 as PGPKeys;
+            testPGPKey2 = pgpKey2 as PGPKeys;
+        });
+
+        test('Should successfully encrypt with testPGPKey1 public key and sign with testPGPKey2 private key', async () => {
+            const message = 'Hello my super secret message!';
+            const [status, encryptedMessage] = await EncryptHelper.encryptSignWith([testPGPKey1.armoredPublicKey], [ testPGPKey2.armoredPrivateKey], message);
+            encryptedTestMessage = encryptedMessage as string;
+            expect(status).toBe('SUCCESS');
+        });
+
+        test('Should verify with key ID of testPGPKey2', async () => {
+            const keyIDs = await EncryptHelper.getEncryptionKeyIds(encryptedTestMessage);
+            console.log(keyIDs, testPGPKey1.keyID, testPGPKey2.keyID);
+            expect(keyIDs.includes(testPGPKey1.keyID)).toBe(true);
+        });
+    });
 });
