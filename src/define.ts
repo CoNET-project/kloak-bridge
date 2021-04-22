@@ -41,7 +41,7 @@ export interface KeyChain {
     apps: {
         [appKeyID: string]: {
             publicKey: string,
-            keys: AppKeys
+            data: string
         }
     }
 }
@@ -137,7 +137,7 @@ export type EncryptSaveResolve = [status: 'SUCCESS' | 'FAILURE', payload?: strin
 
 export type RetrieveDecryptResolve = [status: 'SUCCESS' | 'FAILURE', payload?: string]
 
-export type KeyChainGetKeysResolve = [status: 'SUCCESS' | 'DOES_NOT_EXIST' | 'FAILURE', keys?: AppKeys]
+export type KeyChainGetKeysResolve = [status: 'SUCCESS' | 'DOES_NOT_EXIST' | 'FAILURE', dataUUID?: string]
 
 // NETWORK DECLARATIONS FOR SEGURO LOCAL SERVER
 

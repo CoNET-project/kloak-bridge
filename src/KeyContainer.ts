@@ -1,6 +1,7 @@
 import { KeyChain, KeyChainGetKeysResolve, PGPKeys } from './define';
 import EncryptHelper from './EncryptHelper';
 import IDBDatabaseHelper from './IDBDatabaseHelper';
+import { getUUIDv4 } from './utils';
 
 class KeyContainer {
     private IDBHelper: IDBDatabaseHelper = new IDBDatabaseHelper();
@@ -37,55 +38,55 @@ class KeyContainer {
             }
             this.keyChain.apps[appKeyID] = {
                 publicKey,
-                keys: {}
+                data: getUUIDv4()
             };
             await this.saveKeyContainer();
             return resolve(['SUCCESS']);
         })
     )
 
-    public addAppKey = (appID: string, pgpKeys: PGPKeys, options?: {dataUUID: string}): Promise<[status: 'SUCCESS' | 'APP_DOES_NOT_EXIST']> => (
-        new Promise<[status: 'SUCCESS' | 'APP_DOES_NOT_EXIST']>(async (resolve, _) => {
-            if (!this.keyChain.apps[appID]) {
-                return resolve(['APP_DOES_NOT_EXIST']);
-            }
-            this.keyChain.apps[appID].keys[pgpKeys.keyID] = {
-                keyID: pgpKeys.keyID,
-                armoredPublicKey: pgpKeys.armoredPublicKey,
-                armoredPrivateKey: pgpKeys.armoredPrivateKey,
-                ...options
-            };
-            await this.saveKeyContainer();
-            return resolve(['SUCCESS']);
-        })
-    )
+    // public addAppKey = (appID: string, pgpKeys: PGPKeys, options?: {dataUUID: string}): Promise<[status: 'SUCCESS' | 'APP_DOES_NOT_EXIST']> => (
+    //     new Promise<[status: 'SUCCESS' | 'APP_DOES_NOT_EXIST']>(async (resolve, _) => {
+    //         if (!this.keyChain.apps[appID]) {
+    //             return resolve(['APP_DOES_NOT_EXIST']);
+    //         }
+    //         this.keyChain.apps[appID].keys[pgpKeys.keyID] = {
+    //             keyID: pgpKeys.keyID,
+    //             armoredPublicKey: pgpKeys.armoredPublicKey,
+    //             armoredPrivateKey: pgpKeys.armoredPrivateKey,
+    //             ...options
+    //         };
+    //         await this.saveKeyContainer();
+    //         return resolve(['SUCCESS']);
+    //     })
+    // )
 
-    public getKey = (appID: string, keyId?: string): Promise<[status: 'SUCCESS' | 'DOES_NOT_EXIST' | 'FAILURE', pgpKeys?: PGPKeys]> => (
-        new Promise<[status: 'SUCCESS' | 'DOES_NOT_EXIST' | 'FAILURE', pgpKeys?: PGPKeys]>((resolve, _) => {
-            switch (appID) {
-                case 'device':
-                    return resolve(['SUCCESS', this.keyChain.device as PGPKeys]);
-                case 'kloak':
-                    return resolve(['SUCCESS', this.keyChain.kloak as PGPKeys]);
-                default:
-                    if (!keyId) {
-                        return resolve(['FAILURE']);
-                    }
-                    if (!this.keyChain.apps[appID] || !this.keyChain.apps[appID].keys[keyId]) {
-                        return resolve(['DOES_NOT_EXIST']);
-                    }
-                    return resolve(['SUCCESS', this.keyChain.apps[appID].keys[keyId]]);
+    // public getKey = (appID: string, keyId?: string): Promise<[status: 'SUCCESS' | 'DOES_NOT_EXIST' | 'FAILURE', pgpKeys?: PGPKeys]> => (
+    //     new Promise<[status: 'SUCCESS' | 'DOES_NOT_EXIST' | 'FAILURE', pgpKeys?: PGPKeys]>((resolve, _) => {
+    //         switch (appID) {
+    //             case 'device':
+    //                 return resolve(['SUCCESS', this.keyChain.device as PGPKeys]);
+    //             case 'kloak':
+    //                 return resolve(['SUCCESS', this.keyChain.kloak as PGPKeys]);
+    //             default:
+    //                 if (!keyId) {
+    //                     return resolve(['FAILURE']);
+    //                 }
+    //                 if (!this.keyChain.apps[appID] || !this.keyChain.apps[appID].keys[keyId]) {
+    //                     return resolve(['DOES_NOT_EXIST']);
+    //                 }
+    //                 return resolve(['SUCCESS', this.keyChain.apps[appID].keys[keyId]]);
+    //
+    //         }
+    //     })
+    // )
 
-            }
-        })
-    )
-
-    public getKeys = (appID: string): Promise<KeyChainGetKeysResolve> => (
+    public getAppDataUUID = (appID: string): Promise<KeyChainGetKeysResolve> => (
         new Promise<KeyChainGetKeysResolve>((resolve, _) => {
-            if (!appID || !this.keyChain.apps[appID]) {
+            if (!appID || !this.keyChain.apps[appID] || !this.keyChain.apps[appID].data) {
                 return resolve(['DOES_NOT_EXIST']);
             }
-            return resolve(['SUCCESS', this.keyChain.apps[appID].keys]);
+            return resolve(['SUCCESS', this.keyChain.apps[appID].data]);
         })
     )
 }
