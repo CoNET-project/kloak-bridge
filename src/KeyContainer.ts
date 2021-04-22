@@ -1,4 +1,4 @@
-import { KeyChain, PGPKeys } from './define';
+import { KeyChain, KeyChainGetKeysResolve, PGPKeys } from './define';
 import EncryptHelper from './EncryptHelper';
 import IDBDatabaseHelper from './IDBDatabaseHelper';
 
@@ -44,12 +44,15 @@ class KeyContainer {
         })
     )
 
-    public addAppKey = (appID: string, pgpKeys: PGPKeys): Promise<[status: 'SUCCESS' | 'APP_DOES_NOT_EXIST']> => (
+    public addAppKey = (appID: string, pgpKeys: PGPKeys, options?: {data: string}): Promise<[status: 'SUCCESS' | 'APP_DOES_NOT_EXIST']> => (
         new Promise<[status: 'SUCCESS' | 'APP_DOES_NOT_EXIST']>(async (resolve, _) => {
             if (!this.keyChain.apps[appID]) {
                 return resolve(['APP_DOES_NOT_EXIST']);
             }
-            this.keyChain.apps[appID].keys[pgpKeys.keyID] = pgpKeys;
+            this.keyChain.apps[appID].keys[pgpKeys.keyID] = {
+                ...pgpKeys,
+                ...options
+            };
             await this.saveKeyContainer();
             return resolve(['SUCCESS']);
         })
@@ -72,6 +75,15 @@ class KeyContainer {
                     return resolve(['SUCCESS', this.keyChain.apps[appID].keys[keyId]]);
 
             }
+        })
+    )
+
+    public getKeys = (appID: string): Promise<KeyChainGetKeysResolve> => (
+        new Promise<KeyChainGetKeysResolve>((resolve, _) => {
+            if (!appID || !this.keyChain.apps[appID]) {
+                return resolve(['DOES_NOT_EXIST']);
+            }
+            return resolve(['SUCCESS', this.keyChain.apps[appID].keys]);
         })
     )
 }
