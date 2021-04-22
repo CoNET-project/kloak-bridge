@@ -133,15 +133,6 @@ describe('StorageHelper Class', () => {
         expect(status).toBe('SUCCESS');
     });
 
-<<<<<<< HEAD:src/__tests__/KloakBridge.ts
-    test('Should get INVALID_PASSWORD from unlockKeyContainer', async () => {
-        await storageHelper.createKeyContainer('mypassword');
-        const [ status ] = await storageHelper.unlockKeyContainer('wrongpassword');
-        expect(status).toBe('INVALID_PASSPHRASE');
-    });
-
-=======
->>>>>>> 5fee0844561e50dd0d88a4000fbe5f22620b5a14:src/__tests__/KloakBridge.test.ts
     test('Should create new container, save into IndexedDB and delete container', async () => {
         await storageHelper.createKeyContainer('mypassword');
         await storageHelper.deleteKeyContainer();
