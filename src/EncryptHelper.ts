@@ -125,8 +125,11 @@ class EncryptHelper {
     static encryptSignWith = (encryptPublicKeys: Array<string>, signPrivateKey: Array<string>, data: ArrayBuffer | Uint8Array | string): Promise<EncryptResolve> => (
         new Promise<EncryptResolve>(async (resolve, _) => {
             try {
+                let privateKeys: Array<openpgp.Key> = [];
                 const publicKeys = await Promise.all(encryptPublicKeys.map((armoredPublicKey) => openpgp.readKey({ armoredKey: armoredPublicKey })));
-                const privateKeys = await Promise.all(signPrivateKey.map((armoredPrivateKey) => openpgp.readKey({ armoredKey: armoredPrivateKey })));
+                if (signPrivateKey.length) {
+                    privateKeys = await Promise.all(signPrivateKey.map((armoredPrivateKey) => openpgp.readKey({ armoredKey: armoredPrivateKey })));
+                }
                 // @ts-ignore
                 const message = await openpgp.Message.fromText(data);
                 const encrypted = await openpgp.encrypt({
