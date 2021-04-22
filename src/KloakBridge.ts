@@ -20,6 +20,55 @@ class KloakBridge {
     public keyContainer: KeyContainer | undefined
     private IDBHelper = new IDBDatabaseHelper();
 
+    private generateDefaultKeychain = (): Promise<KeyChain> => (
+        new Promise<KeyChain>(async (resolve, _) => {
+            const tempEncrypt = new EncryptHelper();
+            const keyChain: KeyChain = {
+                device: {},
+                kloak: {},
+                apps: {
+                    '1B3166C1914E82E6': {
+                        publicKey: '-----BEGIN PGP PUBLIC KEY BLOCK-----\n'
+                            + '\n'
+                            + 'mDMEYH95kRYJKwYBBAHaRw8BAQdABxVZb2HjVFQ6b0fBpuaw+VonWyipYwKuOmFJ\n'
+                            + 'LktZnNO0I1NlZ3VybyBBUFAgU3RvcmFnZSA8aW5mb0BLbG9hay5BUFA+iIwEEBYK\n'
+                            + 'AB0FAmB/eZEECwkHCAMVCAoEFgIBAAIZAQIbAwIeAQAhCRClX5RiPh2UKRYhBGlz\n'
+                            + '7eGLOKdFAb5AXqVflGI+HZQpTqABANgQEAze9/nSadNsRO2wO5eTD082uwusuTdu\n'
+                            + '4kyjnPj3APsHIp9KZ8q1fhr/tuMnhAzd6Af7qbWrg8bqOJM9YH0EBrg4BGB/eZES\n'
+                            + 'CisGAQQBl1UBBQEBB0CczBs6as6xtRvfFteiC8nMhgYWVz+zN9O67bb+0WrlagMB\n'
+                            + 'CAeIeAQYFggACQUCYH95kQIbDAAhCRClX5RiPh2UKRYhBGlz7eGLOKdFAb5AXqVf\n'
+                            + 'lGI+HZQpd7wBAKB2Tc3iOxr3+z5Xnd2dMw4wjDL/Cjibc/q04SFFK/wbAQCNWRDA\n'
+                            + 'SnpMxR+L5LY/rH6HCZEvMhgnrQ7BShtqsR8iDg==\n'
+                            + '=i7h1\n'
+                            + '-----END PGP PUBLIC KEY BLOCK-----',
+                        keys: {}
+                    },
+                    '216AABF3D6764CB0': {
+                        publicKey: '-----BEGIN PGP PUBLIC KEY BLOCK-----\n'
+                            + '\n'
+                            + 'mDMEYH95kRYJKwYBBAHaRw8BAQdAMlOn5fTv0Q5bHTzQoRTovoawNrUu7r7VpOIB\n'
+                            + 'oKadoW+0I1NlZ3VybyBBUFAgTWVzc2FnZSA8aW5mb0BLbG9hay5BUFA+iIwEEBYK\n'
+                            + 'AB0FAmB/eZEECwkHCAMVCAoEFgIBAAIZAQIbAwIeAQAhCRBZ5LlX7OYxkBYhBIMY\n'
+                            + 'YuopQCDqYrRSO1nkuVfs5jGQ0i4A/2Ik4QZcpSxeC5LP6NiMnm3kYl9ndqnYq8e3\n'
+                            + 'WcG6dv/BAQCN5v1RV4FGiv1MNhKbSM+31iCL/G50z+gGQRWN7higArg4BGB/eZES\n'
+                            + 'CisGAQQBl1UBBQEBB0Be4frT9RfwyK2n34IO4EUKQUuGb7zAau7qJBnwsH/kEQMB\n'
+                            + 'CAeIeAQYFggACQUCYH95kQIbDAAhCRBZ5LlX7OYxkBYhBIMYYuopQCDqYrRSO1nk\n'
+                            + 'uVfs5jGQHG0BANBOEX2bJL8DOg9squn5ZgZJJD9MBri7D5UB9gLe+jdTAPwJL1AF\n'
+                            + 'MiddDkpztZ7FgDC13iUCfCJ7UNIB7dKnrgHCDQ==\n'
+                            + '=o9sO\n'
+                            + '-----END PGP PUBLIC KEY BLOCK-----',
+                        keys: {}
+                    }
+                }
+            };
+            const [, deviceKey] = await tempEncrypt.generateKey({ passphrase: '' });
+            const [, kloakKey] = await tempEncrypt.generateKey({ passphrase: '' });
+            keyChain.device = deviceKey as PGPKeys;
+            keyChain.kloak = kloakKey as PGPKeys;
+            return resolve(keyChain);
+        })
+    )
+
     public lockKeyContainer = (): Promise<LockContainerResolve> => (
         new Promise<LockContainerResolve>((resolve, _) => {
             this.keyContainer = undefined;
@@ -54,8 +103,7 @@ class KloakBridge {
                 case 'EXISTS':
                     if (keyChainContainer?.pgpKeys && keyChainContainer?.keyChain) {
                         const tempEncrypt = new EncryptHelper();
-                        const [checkStatus, pgpKeys] = await tempEncrypt.checkPassword(keyChainContainer?.pgpKeys, passphrase);
-                        console.log('UNLOCK CONTAINER', checkStatus, pgpKeys);
+                        const [checkStatus] = await tempEncrypt.checkPassword(keyChainContainer?.pgpKeys, passphrase);
                         if (checkStatus === 'SUCCESS') {
                             const [, decryptedKeyChain] = await tempEncrypt.decryptMessage(keyChainContainer?.keyChain);
                             this.keyContainer = new KeyContainer(tempEncrypt, decryptedKeyChain as unknown as KeyChain);
@@ -82,16 +130,8 @@ class KloakBridge {
                 const tempEncrypt = new EncryptHelper();
                 const [, containerPGPKey] = await tempEncrypt.generateKey({ passphrase });
                 await tempEncrypt.checkPassword(containerPGPKey as PGPKeys, passphrase);
-                const keyChain: KeyChain = {
-                    device: {},
-                    kloak: {},
-                    apps: {}
-                };
-                const [, deviceKey] = await tempEncrypt.generateKey({ passphrase: '' });
-                const [, kloakKey] = await tempEncrypt.generateKey({ passphrase: '' });
-                keyChain.device = deviceKey as PGPKeys;
-                keyChain.kloak = kloakKey as PGPKeys;
-                const [, encryptedKeyChain] = await tempEncrypt.encryptMessage(JSON.stringify({}));
+                const defaultKeyChain = await this.generateDefaultKeychain();
+                const [, encryptedKeyChain] = await tempEncrypt.encryptMessage(JSON.stringify(defaultKeyChain));
                 const keyContainer: KeyChainContainer = {
                     pgpKeys: {
                         keyID: containerPGPKey?.keyID as string,
@@ -100,11 +140,11 @@ class KloakBridge {
                     },
                     keyChain: encryptedKeyChain as string
                 };
-                this.keyContainer = new KeyContainer(tempEncrypt, keyChain);
+                this.keyContainer = new KeyContainer(tempEncrypt, defaultKeyChain);
                 await this.IDBHelper.save('KeyContainer', keyContainer);
+                await this.IDBHelper.retrieve('KeyContainer');
                 return resolve(<CreateContainerResolve>['SUCCESS', keyContainer]);
             } catch (err) {
-                console.log(err);
                 return resolve(<CreateContainerResolve>['FAILURE']);
             }
         })
@@ -135,14 +175,18 @@ class KloakBridge {
             const tempEncrypt = new EncryptHelper();
             const [, newPGPKeys] = await tempEncrypt.generateKey({ passphrase: newPassphrase });
             try {
-                const oldContainer: KeyChainContainer = await this.IDBHelper.retrieve('keyContainer');
+                const oldContainer: KeyChainContainer = await this.IDBHelper.retrieve('KeyContainer');
                 const [status] = await tempEncrypt.checkPassword(oldContainer.pgpKeys, oldPassphrase);
                 if (status === 'SUCCESS') {
                     const [, decryptedKeyChain] = await tempEncrypt.decryptMessage(oldContainer.keyChain);
                     await tempEncrypt.checkPassword(newPGPKeys as PGPKeys, newPassphrase);
                     const [, encryptedKeyChain] = await tempEncrypt.encryptMessage(JSON.stringify(decryptedKeyChain));
                     const newContainer: KeyChainContainer = {
-                        pgpKeys: newPGPKeys as PGPKeys,
+                        pgpKeys: {
+                            keyID: newPGPKeys?.keyID as string,
+                            armoredPublicKey: newPGPKeys?.armoredPublicKey as string,
+                            armoredPrivateKey: newPGPKeys?.armoredPrivateKey as string
+                        },
                         keyChain: encryptedKeyChain as string
                     };
                     await this.IDBHelper.save('keyContainer', JSON.stringify(newContainer));

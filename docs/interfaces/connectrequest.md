@@ -31,7 +31,7 @@
 
 • **client\_folder\_name**: *string*
 
-Defined in: [define.ts:167](https://github.com/CoNET-project/kloak-bridge/blob/3516064/src/define.ts#L167)
+Defined in: [define.ts:167](https://github.com/CoNET-project/kloak-bridge/blob/85792bb/src/define.ts#L167)
 
 ___
 
@@ -39,7 +39,7 @@ ___
 
 • `Optional` **connect\_info**: [*connect\_imap\_reqponse*](connect_imap_reqponse.md)
 
-Defined in: [define.ts:175](https://github.com/CoNET-project/kloak-bridge/blob/3516064/src/define.ts#L175)
+Defined in: [define.ts:175](https://github.com/CoNET-project/kloak-bridge/blob/85792bb/src/define.ts#L175)
 
 ___
 
@@ -47,7 +47,7 @@ ___
 
 • **device\_armor**: *string*
 
-Defined in: [define.ts:166](https://github.com/CoNET-project/kloak-bridge/blob/3516064/src/define.ts#L166)
+Defined in: [define.ts:166](https://github.com/CoNET-project/kloak-bridge/blob/85792bb/src/define.ts#L166)
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 • `Optional` **encrypted\_request**: *string*
 
-Defined in: [define.ts:174](https://github.com/CoNET-project/kloak-bridge/blob/3516064/src/define.ts#L174)
+Defined in: [define.ts:174](https://github.com/CoNET-project/kloak-bridge/blob/85792bb/src/define.ts#L174)
 
 ___
 
@@ -63,7 +63,7 @@ ___
 
 • `Optional` **encrypted\_response**: *string*
 
-Defined in: [define.ts:173](https://github.com/CoNET-project/kloak-bridge/blob/3516064/src/define.ts#L173)
+Defined in: [define.ts:173](https://github.com/CoNET-project/kloak-bridge/blob/85792bb/src/define.ts#L173)
 
 ___
 
@@ -71,7 +71,7 @@ ___
 
 • `Optional` **error**: *string*
 
-Defined in: [define.ts:171](https://github.com/CoNET-project/kloak-bridge/blob/3516064/src/define.ts#L171)
+Defined in: [define.ts:171](https://github.com/CoNET-project/kloak-bridge/blob/85792bb/src/define.ts#L171)
 
 ___
 
@@ -79,7 +79,7 @@ ___
 
 • `Optional` **imap\_account**: [*IMAPAccount*](imapaccount.md)
 
-Defined in: [define.ts:169](https://github.com/CoNET-project/kloak-bridge/blob/3516064/src/define.ts#L169)
+Defined in: [define.ts:169](https://github.com/CoNET-project/kloak-bridge/blob/85792bb/src/define.ts#L169)
 
 ___
 
@@ -87,7 +87,7 @@ ___
 
 • **kloak\_account\_armor**: *string*
 
-Defined in: [define.ts:165](https://github.com/CoNET-project/kloak-bridge/blob/3516064/src/define.ts#L165)
+Defined in: [define.ts:165](https://github.com/CoNET-project/kloak-bridge/blob/85792bb/src/define.ts#L165)
 
 ___
 
@@ -95,7 +95,7 @@ ___
 
 • `Optional` **next\_time\_connect**: [*next\_time\_connect*](next_time_connect.md)
 
-Defined in: [define.ts:170](https://github.com/CoNET-project/kloak-bridge/blob/3516064/src/define.ts#L170)
+Defined in: [define.ts:170](https://github.com/CoNET-project/kloak-bridge/blob/85792bb/src/define.ts#L170)
 
 ___
 
@@ -103,7 +103,7 @@ ___
 
 • `Optional` **requestJSON\_text**: *string*
 
-Defined in: [define.ts:176](https://github.com/CoNET-project/kloak-bridge/blob/3516064/src/define.ts#L176)
+Defined in: [define.ts:176](https://github.com/CoNET-project/kloak-bridge/blob/85792bb/src/define.ts#L176)
 
 ___
 
@@ -111,7 +111,7 @@ ___
 
 • `Optional` **server\_folder**: *string*
 
-Defined in: [define.ts:172](https://github.com/CoNET-project/kloak-bridge/blob/3516064/src/define.ts#L172)
+Defined in: [define.ts:172](https://github.com/CoNET-project/kloak-bridge/blob/85792bb/src/define.ts#L172)
 
 ___
 
@@ -119,4 +119,4 @@ ___
 
 • **use\_kloak\_shared\_imap\_account**: *boolean*
 
-Defined in: [define.ts:168](https://github.com/CoNET-project/kloak-bridge/blob/3516064/src/define.ts#L168)
+Defined in: [define.ts:168](https://github.com/CoNET-project/kloak-bridge/blob/85792bb/src/define.ts#L168)
