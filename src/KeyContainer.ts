@@ -44,13 +44,15 @@ class KeyContainer {
         })
     )
 
-    public addAppKey = (appID: string, pgpKeys: PGPKeys, options?: {data: string}): Promise<[status: 'SUCCESS' | 'APP_DOES_NOT_EXIST']> => (
+    public addAppKey = (appID: string, pgpKeys: PGPKeys, options?: {dataUUID: string}): Promise<[status: 'SUCCESS' | 'APP_DOES_NOT_EXIST']> => (
         new Promise<[status: 'SUCCESS' | 'APP_DOES_NOT_EXIST']>(async (resolve, _) => {
             if (!this.keyChain.apps[appID]) {
                 return resolve(['APP_DOES_NOT_EXIST']);
             }
             this.keyChain.apps[appID].keys[pgpKeys.keyID] = {
-                ...pgpKeys,
+                keyID: pgpKeys.keyID,
+                armoredPublicKey: pgpKeys.armoredPublicKey,
+                armoredPrivateKey: pgpKeys.armoredPrivateKey,
                 ...options
             };
             await this.saveKeyContainer();

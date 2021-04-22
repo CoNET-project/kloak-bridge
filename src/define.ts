@@ -26,15 +26,22 @@ export interface MessengerKeys {
     [keyID: string]: MessengerKey
 }
 
+export interface AppKeys {
+    [keyID: string]: {
+        keyID: string,
+        armoredPublicKey: string,
+        armoredPrivateKey: string,
+        dataUUID?: string
+    }
+}
+
 export interface KeyChain {
     device: PGPKeys | {},
     kloak: PGPKeys | {},
     apps: {
         [appKeyID: string]: {
             publicKey: string,
-            keys: {
-                [keyID: string]: PGPKeys
-            }
+            keys: AppKeys
         }
     }
 }
