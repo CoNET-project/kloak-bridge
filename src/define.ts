@@ -29,7 +29,14 @@ export interface MessengerKeys {
 export interface KeyChain {
     device: PGPKeys | {},
     kloak: PGPKeys | {},
-    applications: ApplicationKeys
+    apps: {
+        [appKeyID: string]: {
+            publicKey: string,
+            keys: {
+                [keyID: string]: PGPKeys
+            }
+        }
+    }
 }
 
 export interface KeyChainContainer {
@@ -103,7 +110,7 @@ export type CreateContainerStatus = 'SUCCESS' | 'FAILURE' | 'INVALID_PASSPHRASE'
 
 export type CreateContainerResolve = [status: CreateContainerStatus, payload?: KeyChainContainer]
 
-export type UnlockContainerStatus = 'SUCCESS' | 'FAILURE' | 'INVALID_PASSPHRASE' | 'MISSING_KEYCHAIN' | 'MISSING_CONTAINER';
+export type UnlockContainerStatus = 'SUCCESS' | 'ALREADY_UNLOCKED' | 'FAILURE' | 'INVALID_PASSPHRASE' | 'MISSING_KEYCHAIN' | 'MISSING_CONTAINER';
 
 export type UnlockContainerResolve = [status: UnlockContainerStatus]
 
@@ -122,6 +129,55 @@ export type DecryptResolve = [status: 'SUCCESS' | 'FAILURE', payload?: string | 
 export type EncryptSaveResolve = [status: 'SUCCESS' | 'FAILURE', payload?: string]
 
 export type RetrieveDecryptResolve = [status: 'SUCCESS' | 'FAILURE', payload?: string]
-// export type KeyContainerStatus = 'SUCCESS' | 'INVALID_PASSWORD' | 'DOES_NOT_EXIST' | 'FAILURE'
-//
-// export type KeyContainerResolve = [status: KeyContainerStatus, payload?: KeyChainContainer]
+
+// NETWORK DECLARATIONS FOR SEGURO LOCAL SERVER
+
+// @ts-ignore
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export interface imapConnect {
+    imapServer: string
+    imapUserName: string
+    imapUserPassword: string
+    imapPortNumber: number | number[]
+    imapSsl: boolean
+    imapIgnoreCertificate?: boolean
+}
+
+export interface IMAPAccount {
+    imap_username: string
+    imap_user_password: string
+    imap_port_number: number
+    imap_server: string
+}
+
+export interface next_time_connect {
+    imap_account: IMAPAccount
+    server_folder: string
+}
+
+export interface connect_imap_reqponse {
+    imap_account: IMAPAccount
+    server_folder: string
+    client_folder: string
+}
+
+export interface connectRequest {
+    kloak_account_armor: string
+    device_armor: string
+    client_folder_name: string
+    use_kloak_shared_imap_account: boolean
+    imap_account?: IMAPAccount
+    next_time_connect?: next_time_connect
+    error?: string
+    server_folder?: string
+    encrypted_response?: string
+    encrypted_request?: string
+    connect_info?: connect_imap_reqponse,
+    requestJSON_text?: string
+}
+
+export interface connectRequest_test extends connectRequest {
+    kloak_private?: string
+    device_private?: string
+    reponseJson?: connectRequest
+}

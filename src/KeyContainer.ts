@@ -1,25 +1,25 @@
-import { ApplicationKeys, KeyChain, PGPKeys } from './define';
+import { KeyChain, PGPKeys } from './define';
 import EncryptHelper from './EncryptHelper';
 import IDBDatabaseHelper from './IDBDatabaseHelper';
 
 class KeyContainer {
     private IDBHelper: IDBDatabaseHelper = new IDBDatabaseHelper();
-    private keyContainerEncrypt: EncryptHelper;
-    private device: PGPKeys | {};
-    private kloak: PGPKeys | {};
-    private applications: ApplicationKeys
+    private encryptHelper: EncryptHelper | null = null
+    private keyChain: KeyChain = {
+        device: {},
+        kloak: {},
+        apps: {}
+    }
 
-    constructor(encryptHelper: EncryptHelper, keyContainer: KeyChain) {
-        this.keyContainerEncrypt = encryptHelper;
-        this.device = keyContainer.device;
-        this.kloak = keyContainer.kloak;
-        this.applications = keyContainer.applications;
+    constructor(encryptHelper: EncryptHelper, keyChain: KeyChain) {
+        this.encryptHelper = encryptHelper;
+        this.keyChain = keyChain;
     }
 
     private saveKeyContainer = (): Promise<boolean> => (
         new Promise<boolean>(async (resolve, reject) => {
             try {
-                const encryptedMessage = await this.keyContainerEncrypt.encryptMessage(JSON.stringify(this.getKeyChain()));
+                const encryptedMessage = await this.encryptHelper?.encryptMessage(JSON.stringify(this.keyChain));
                 await this.IDBHelper.save('KeyContainer', encryptedMessage);
                 return resolve(true);
             } catch (err) {
@@ -28,49 +28,49 @@ class KeyContainer {
         })
     )
 
-    public getKeyChain = (): Promise<KeyChain> => (
-        new Promise<KeyChain>((resolve, _) => {
-            const keyChain: KeyChain = {
-                device: this.device,
-                kloak: this.kloak,
-                applications: this.applications
+    public getKeyChain = () => this.keyChain
+
+    public addAppID = (appKeyID: string, publicKey: string): Promise<[status: 'SUCCESS' | 'ALREADY_EXISTS']> => (
+        new Promise<[status: 'SUCCESS' | 'ALREADY_EXISTS']>(async (resolve, _) => {
+            if (this.keyChain.apps[appKeyID]) {
+                return resolve(['ALREADY_EXISTS']);
+            }
+            this.keyChain.apps[appKeyID] = {
+                publicKey,
+                keys: {}
             };
-            return resolve(keyChain);
+            await this.saveKeyContainer();
+            return resolve(['SUCCESS']);
         })
     )
 
-    public getKey = (appID: string): Promise<PGPKeys | {}> => (
-        new Promise<PGPKeys | {}>((resolve, _) => {
+    public addAppKey = (appID: string, pgpKeys: PGPKeys): Promise<[status: 'SUCCESS' | 'APP_DOES_NOT_EXIST']> => (
+        new Promise<[status: 'SUCCESS' | 'APP_DOES_NOT_EXIST']>(async (resolve, _) => {
+            if (!this.keyChain.apps[appID]) {
+                return resolve(['APP_DOES_NOT_EXIST']);
+            }
+            this.keyChain.apps[appID].keys[pgpKeys.keyID] = pgpKeys;
+            await this.saveKeyContainer();
+            return resolve(['SUCCESS']);
+        })
+    )
+
+    public getKey = (appID: string, keyId?: string): Promise<[status: 'SUCCESS' | 'DOES_NOT_EXIST' | 'FAILURE', pgpKeys?: PGPKeys]> => (
+        new Promise<[status: 'SUCCESS' | 'DOES_NOT_EXIST' | 'FAILURE', pgpKeys?: PGPKeys]>((resolve, _) => {
             switch (appID) {
                 case 'device':
-                    return resolve(this.device);
+                    return resolve(['SUCCESS', this.keyChain.device as PGPKeys]);
                 case 'kloak':
-                    return resolve(this.kloak);
+                    return resolve(['SUCCESS', this.keyChain.kloak as PGPKeys]);
                 default:
-                    if (!this.applications[appID]) {
-                        return resolve({});
+                    if (!keyId) {
+                        return resolve(['FAILURE']);
                     }
-                    return resolve(this.applications[appID]);
-            }
-        })
-    )
+                    if (!this.keyChain.apps[appID] || !this.keyChain.apps[appID].keys[keyId]) {
+                        return resolve(['DOES_NOT_EXIST']);
+                    }
+                    return resolve(['SUCCESS', this.keyChain.apps[appID].keys[keyId]]);
 
-    public addKey = (appID: string, pgpKeys: PGPKeys, extra?: Object): Promise<boolean> => (
-        new Promise<boolean>(async (resolve, _) => {
-            if (appID === 'device' || appID === 'kloak') {
-                return resolve(false);
-            }
-            this.applications = Object.assign(this.applications, {
-                [appID]: [...this.applications[appID] || [], {
-                    ...pgpKeys,
-                    ...extra
-                }]
-            });
-            try {
-                const saved = await this.saveKeyContainer();
-                return resolve(saved);
-            } catch (err) {
-                return resolve(false);
             }
         })
     )

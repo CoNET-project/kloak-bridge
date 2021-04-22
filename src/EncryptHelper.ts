@@ -31,8 +31,9 @@ class EncryptHelper {
         };
 
         return openpgp.generateKey(pgpKeyOptions).then(async (result: openpgp.KeyPair) => {
+            const readPublicKey = await openpgp.readKey({ armoredKey: result.publicKeyArmored });
             const pgpKeys: PGPKeys = {
-                keyID: result.key.getKeyId().toHex(),
+                keyID: readPublicKey.getKeyIds().map((key) => key.toHex().toUpperCase())[1],
                 passphrase: options.passphrase,
                 armoredPublicKey: result.publicKeyArmored,
                 armoredPrivateKey: result.privateKeyArmored,
@@ -97,7 +98,7 @@ class EncryptHelper {
 
     })
 
-    public decryptMessage = (encryptedMessage: string, buffer?: boolean): Promise<DecryptResolve> => new Promise(async (resolve, _) => {
+    public decryptMessage = (encryptedMessage: string, buffer?: boolean): Promise<DecryptResolve> => new Promise<DecryptResolve>(async (resolve, _) => {
         const cleanEncrypted = this.modifyPGPMessage(encryptedMessage);
         try {
             const message = await openpgp.readMessage({ armoredMessage: cleanEncrypted });
@@ -107,7 +108,7 @@ class EncryptHelper {
                 privateKeys: this.pgpKeyPair.readPrivateKey // for decryption
             });
             const dataBuffer = Buffer.from(decrypted.data, 'base64');
-
+            console.log(dataBuffer);
             if (buffer) {
                 return resolve(['SUCCESS', dataBuffer]);
             }
@@ -120,6 +121,55 @@ class EncryptHelper {
             return resolve(['FAILURE', err]);
         }
     })
+
+    static encryptSignWith = (encryptPublicKeys: Array<string>, signPrivateKey: Array<string>, data: ArrayBuffer | Uint8Array | string): Promise<EncryptResolve> => (
+        new Promise<EncryptResolve>(async (resolve, _) => {
+            try {
+                let privateKeys: Array<openpgp.Key> = [];
+                const publicKeys = await Promise.all(encryptPublicKeys.map((armoredPublicKey) => openpgp.readKey({ armoredKey: armoredPublicKey })));
+                if (signPrivateKey.length) {
+                    privateKeys = await Promise.all(signPrivateKey.map((armoredPrivateKey) => openpgp.readKey({ armoredKey: armoredPrivateKey })));
+                }
+                // @ts-ignore
+                const message = await openpgp.Message.fromText(data);
+                const encrypted = await openpgp.encrypt({
+                    message,
+                    publicKeys,
+                    privateKeys
+                });
+                return resolve(['SUCCESS', encrypted as string]);
+            } catch (err) {
+                console.log(err);
+                return resolve(['FAILURE']);
+            }
+        })
+    )
+
+    static decryptWith = (pgpKeys: PGPKeys, encryptedMessage: string, checkKeyID?: string): Promise<[status: 'SUCCESS' | 'FAILURE' | 'KEYID_CHECK_ERROR', payload?: any]> => (
+        new Promise<[status: 'SUCCESS' | 'FAILURE' | 'KEYID_CHECK_ERROR', payload?: any]>(async (resolve, _) => {
+            const options = {
+                privateKeys: await openpgp.readKey({ armoredKey: pgpKeys.armoredPrivateKey }),
+                // publicKeys: await openpgp.readKey({ armoredKey: pgpKeys.armoredPublicKey }),
+                message: await openpgp.readMessage({ armoredMessage: encryptedMessage })
+            };
+            try {
+                const decryptedMessage = await openpgp.decrypt(options);
+                if (decryptedMessage.signatures[0].keyid.toHex().toUpperCase() !== checkKeyID) {
+                    return resolve(['KEYID_CHECK_ERROR']);
+                }
+                return resolve(['SUCCESS', decryptedMessage]);
+            } catch (err) {
+                return resolve(['FAILURE']);
+            }
+        })
+    )
+
+    static getEncryptionKeyIds = (encryptedMessage: string): Promise<Array<string>> => (
+        new Promise<any>(async (resolve, _) => {
+            const message = await openpgp.readMessage({ armoredMessage: encryptedMessage });
+            resolve(message.getEncryptionKeyIds().map((keyid) => keyid.toHex().toUpperCase()));
+        })
+    )
 }
 
 export default EncryptHelper;
