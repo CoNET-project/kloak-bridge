@@ -10,14 +10,14 @@ import {
 } from './define';
 import DisassemblyHelper from './DisassemblyHelper';
 import AssemblyHelper from './AssemblyHelper';
-import { createRandomValues, getUUIDv4 } from './utils';
+import { getUUIDv4 } from './utils';
 import KeyContainer from './KeyContainer';
 
 class KloakBridge {
 
     private uploadHelpers: {[name: string]: DisassemblyHelper} = {};
     private assemblyHelpers: {[name: string]: AssemblyHelper} = {};
-    private keyContainer: KeyContainer | undefined
+    public keyContainer: KeyContainer | undefined
     private IDBHelper = new IDBDatabaseHelper();
 
     public lockKeyContainer = (): Promise<LockContainerResolve> => (
@@ -46,12 +46,16 @@ class KloakBridge {
      */
     public unlockKeyContainer = (passphrase: string): Promise<UnlockContainerResolve> => (
         new Promise<UnlockContainerResolve>(async (resolve, _) => {
+            if (this.keyContainer) {
+                return resolve(['ALREADY_UNLOCKED']);
+            }
             const [status, keyChainContainer] = await this.checkKeyContainer();
             switch (status) {
                 case 'EXISTS':
                     if (keyChainContainer?.pgpKeys && keyChainContainer?.keyChain) {
                         const tempEncrypt = new EncryptHelper();
-                        const [checkStatus] = await tempEncrypt.checkPassword(keyChainContainer?.pgpKeys, passphrase);
+                        const [checkStatus, pgpKeys] = await tempEncrypt.checkPassword(keyChainContainer?.pgpKeys, passphrase);
+                        console.log('UNLOCK CONTAINER', checkStatus, pgpKeys);
                         if (checkStatus === 'SUCCESS') {
                             const [, decryptedKeyChain] = await tempEncrypt.decryptMessage(keyChainContainer?.keyChain);
                             this.keyContainer = new KeyContainer(tempEncrypt, decryptedKeyChain as unknown as KeyChain);
@@ -76,31 +80,23 @@ class KloakBridge {
         new Promise<CreateContainerResolve>(async (resolve, _) => {
             try {
                 const tempEncrypt = new EncryptHelper();
-                const [, pgpKeys] = await tempEncrypt.generateKey({ passphrase });
-                await tempEncrypt.checkPassword(pgpKeys as PGPKeys, passphrase);
+                const [, containerPGPKey] = await tempEncrypt.generateKey({ passphrase });
+                await tempEncrypt.checkPassword(containerPGPKey as PGPKeys, passphrase);
                 const keyChain: KeyChain = {
                     device: {},
                     kloak: {},
-                    applications: {
-                        storage: [],
-                        messenger: []
-                    }
+                    apps: {}
                 };
-                const [deviceKeyStatus, deviceKey] = await tempEncrypt.generateKey({ passphrase: await createRandomValues() });
-                const [kloakKeyStatus, kloakAccountKey] = await tempEncrypt.generateKey({ passphrase: await createRandomValues() });
-                const [storageKeyStatus, storageKey] = await tempEncrypt.generateKey({ passphrase: await createRandomValues() });
-                if (deviceKeyStatus === 'FAILURE' || kloakKeyStatus === 'FAILURE' || storageKeyStatus === 'FAILURE') {
-                    return resolve(<CreateContainerResolve>['FAILURE']);
-                }
+                const [, deviceKey] = await tempEncrypt.generateKey({ passphrase: '' });
+                const [, kloakKey] = await tempEncrypt.generateKey({ passphrase: '' });
                 keyChain.device = deviceKey as PGPKeys;
-                keyChain.kloak = kloakAccountKey as PGPKeys;
-                keyChain.applications.storage = [storageKey as PGPKeys];
-                const [, encryptedKeyChain] = await tempEncrypt.encryptMessage(JSON.stringify(keyChain));
+                keyChain.kloak = kloakKey as PGPKeys;
+                const [, encryptedKeyChain] = await tempEncrypt.encryptMessage(JSON.stringify({}));
                 const keyContainer: KeyChainContainer = {
                     pgpKeys: {
-                        keyID: pgpKeys?.keyID as string,
-                        armoredPrivateKey: pgpKeys?.armoredPrivateKey as string,
-                        armoredPublicKey: pgpKeys?.armoredPublicKey as string
+                        keyID: containerPGPKey?.keyID as string,
+                        armoredPrivateKey: containerPGPKey?.armoredPrivateKey as string,
+                        armoredPublicKey: containerPGPKey?.armoredPublicKey as string
                     },
                     keyChain: encryptedKeyChain as string
                 };
@@ -108,6 +104,7 @@ class KloakBridge {
                 await this.IDBHelper.save('KeyContainer', keyContainer);
                 return resolve(<CreateContainerResolve>['SUCCESS', keyContainer]);
             } catch (err) {
+                console.log(err);
                 return resolve(<CreateContainerResolve>['FAILURE']);
             }
         })
@@ -127,31 +124,48 @@ class KloakBridge {
         })
     )
 
-    public getKeyChain = () => this.keyContainer?.getKeyChain()
-
-    public addKey = async (appID: string, pgpKeys: PGPKeys) => this.keyContainer?.addKey(appID, pgpKeys);
-
-    public getKey = (appID: string): Promise<PGPKeys | {}> | undefined => this.keyContainer?.getKey(appID)
-
+    public addAppID = async (appKeyID: string, publicKey: string) => this.keyContainer?.addAppID(appKeyID, publicKey);
+    public addAppKey = async (appKeyID: string, pgpKeys: PGPKeys) => this.keyContainer?.addAppKey(appKeyID, pgpKeys);
+    public getKey = async (appKeyID: string, keyId?: string) => this.keyContainer?.getKey(appKeyID, keyId)
     /**
      * Change password from KeyChainContainer.
      */
-    public changeKeyContainer = (newPassphrase: string, keyChain: KeyChain): Promise<ChangeKeyContainerResolve> => (
+    public changeKeyContainer = (oldPassphrase: string, newPassphrase: string): Promise<ChangeKeyContainerResolve> => (
         new Promise<ChangeKeyContainerResolve>(async (resolve, _) => {
             const tempEncrypt = new EncryptHelper();
-            const { keyID, armoredPrivateKey, armoredPublicKey } = (await tempEncrypt.generateKey({ passphrase: newPassphrase }))[1] as PGPKeys;
-
-            await tempEncrypt.checkPassword({ keyID, armoredPublicKey, armoredPrivateKey }, newPassphrase);
-            const [, encryptedKeyChain] = await tempEncrypt.encryptMessage(JSON.stringify(keyChain));
-            const newContainer: KeyChainContainer = {
-                pgpKeys: {
-                    keyID,
-                    armoredPrivateKey,
-                    armoredPublicKey
-                },
-                keyChain: encryptedKeyChain as string
-            };
-            return resolve(<ChangeKeyContainerResolve>['SUCCESS', newContainer]);
+            const [, newPGPKeys] = await tempEncrypt.generateKey({ passphrase: newPassphrase });
+            try {
+                const oldContainer: KeyChainContainer = await this.IDBHelper.retrieve('keyContainer');
+                const [status] = await tempEncrypt.checkPassword(oldContainer.pgpKeys, oldPassphrase);
+                if (status === 'SUCCESS') {
+                    const [, decryptedKeyChain] = await tempEncrypt.decryptMessage(oldContainer.keyChain);
+                    await tempEncrypt.checkPassword(newPGPKeys as PGPKeys, newPassphrase);
+                    const [, encryptedKeyChain] = await tempEncrypt.encryptMessage(JSON.stringify(decryptedKeyChain));
+                    const newContainer: KeyChainContainer = {
+                        pgpKeys: newPGPKeys as PGPKeys,
+                        keyChain: encryptedKeyChain as string
+                    };
+                    await this.IDBHelper.save('keyContainer', JSON.stringify(newContainer));
+                    this.keyContainer = new KeyContainer(tempEncrypt, decryptedKeyChain as unknown as KeyChain);
+                    return resolve(['SUCCESS', newContainer ]);
+                }
+                return resolve(['FAILURE']);
+            } catch (err) {
+                return resolve(['FAILURE']);
+            }
+            // const tempEncrypt = new EncryptHelper();
+            // const [, pgpKeys] = await tempEncrypt.generateKey({ passphrase: newPassphrase });
+            // await tempEncrypt.checkPassword(pgpKeys as PGPKeys, newPassphrase);
+            // const [, encryptedKeyChain] = await tempEncrypt.encryptMessage(JSON.stringify(keyChain));
+            // const newContainer: KeyChainContainer = {
+            //     pgpKeys: {
+            //         keyID: (pgpKeys?.keyID as string),
+            //         armoredPrivateKey: (pgpKeys?.armoredPrivateKey as string),
+            //         armoredPublicKey: (pgpKeys?.armoredPublicKey as string)
+            //     },
+            //     keyChain: encryptedKeyChain as string
+            // };
+            // return resolve(<ChangeKeyContainerResolve>['SUCCESS', newContainer]);
         })
     )
 
@@ -225,6 +239,26 @@ class KloakBridge {
                 return resolve(['SUCCESS', decryptedMsg as string]);
             } catch (err) {
                 return reject(err);
+            }
+        })
+    )
+
+    public encryptWithDeviceKey = (data: string): Promise<[status: 'SUCCESS' | 'FAILURE', encryptedData?: string]> => (
+        new Promise<[status: 'SUCCESS' | 'FAILURE', encryptedData?: string]>(async (resolve, _) => {
+            if (!this.keyContainer) {
+                return resolve(['FAILURE']);
+            }
+            try {
+                const devicePGPKey = this.keyContainer.getKeyChain().device;
+                const tempEncrypt = new EncryptHelper();
+                await tempEncrypt.checkPassword(devicePGPKey as PGPKeys, '');
+                const [status, encryptedMessage] = await tempEncrypt.encryptMessage(data);
+                if (status === 'SUCCESS') {
+                    return resolve(['SUCCESS', encryptedMessage]);
+                }
+                return resolve(['FAILURE']);
+            } catch (err) {
+                return resolve(['FAILURE']);
             }
         })
     )
