@@ -6,3 +6,5 @@ yarn-error.log
 *.js
 !rollup.config.js
 .DS_Store
+
+src/__tests__/Network.test.ts
