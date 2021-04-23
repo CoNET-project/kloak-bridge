@@ -16,7 +16,7 @@
 
 • `Optional` **email**: *string*
 
-Defined in: [define.ts:61](https://github.com/CoNET-project/kloak-bridge/blob/dd2c22c/src/define.ts#L61)
+Defined in: [define.ts:61](https://github.com/CoNET-project/kloak-bridge/blob/89f6f20/src/define.ts#L61)
 
 ___
 
@@ -24,7 +24,7 @@ ___
 
 • `Optional` **nickname**: *string*
 
-Defined in: [define.ts:60](https://github.com/CoNET-project/kloak-bridge/blob/dd2c22c/src/define.ts#L60)
+Defined in: [define.ts:60](https://github.com/CoNET-project/kloak-bridge/blob/89f6f20/src/define.ts#L60)
 
 ___
 
@@ -32,4 +32,4 @@ ___
 
 • **passphrase**: *string*
 
-Defined in: [define.ts:62](https://github.com/CoNET-project/kloak-bridge/blob/dd2c22c/src/define.ts#L62)
+Defined in: [define.ts:62](https://github.com/CoNET-project/kloak-bridge/blob/89f6f20/src/define.ts#L62)

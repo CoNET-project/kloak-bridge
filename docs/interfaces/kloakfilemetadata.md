@@ -19,7 +19,7 @@
 
 • **extension**: *string*
 
-Defined in: [define.ts:78](https://github.com/CoNET-project/kloak-bridge/blob/dd2c22c/src/define.ts#L78)
+Defined in: [define.ts:78](https://github.com/CoNET-project/kloak-bridge/blob/89f6f20/src/define.ts#L78)
 
 ___
 
@@ -27,7 +27,7 @@ ___
 
 • **name**: *string*
 
-Defined in: [define.ts:77](https://github.com/CoNET-project/kloak-bridge/blob/dd2c22c/src/define.ts#L77)
+Defined in: [define.ts:77](https://github.com/CoNET-project/kloak-bridge/blob/89f6f20/src/define.ts#L77)
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 • **size**: *number*
 
-Defined in: [define.ts:79](https://github.com/CoNET-project/kloak-bridge/blob/dd2c22c/src/define.ts#L79)
+Defined in: [define.ts:79](https://github.com/CoNET-project/kloak-bridge/blob/89f6f20/src/define.ts#L79)
 
 ___
 
@@ -43,7 +43,7 @@ ___
 
 • **type**: *string*
 
-Defined in: [define.ts:80](https://github.com/CoNET-project/kloak-bridge/blob/dd2c22c/src/define.ts#L80)
+Defined in: [define.ts:80](https://github.com/CoNET-project/kloak-bridge/blob/89f6f20/src/define.ts#L80)
 
 ___
 
@@ -51,7 +51,7 @@ ___
 
 • **uploadDate**: Date
 
-Defined in: [define.ts:81](https://github.com/CoNET-project/kloak-bridge/blob/dd2c22c/src/define.ts#L81)
+Defined in: [define.ts:81](https://github.com/CoNET-project/kloak-bridge/blob/89f6f20/src/define.ts#L81)
 
 ___
 
@@ -59,4 +59,4 @@ ___
 
 • **uuid**: *string*
 
-Defined in: [define.ts:76](https://github.com/CoNET-project/kloak-bridge/blob/dd2c22c/src/define.ts#L76)
+Defined in: [define.ts:76](https://github.com/CoNET-project/kloak-bridge/blob/89f6f20/src/define.ts#L76)
