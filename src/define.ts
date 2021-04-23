@@ -138,6 +138,10 @@ export type EncryptSaveResolve = [status: 'SUCCESS' | 'FAILURE', payload?: strin
 
 export type RetrieveDecryptResolve = [status: 'SUCCESS' | 'FAILURE', payload?: string]
 
+export type GetDeviceKey = [status: 'NO_DEVICE_KEY' | 'SUCCESS' | 'FAILURE' | 'NO_KEY_CONTAINER', deviceKey?: PGPKeys];
+
+export type GetKloakKey = [status: 'NO_KLOAK_KEY' | 'SUCCESS' | 'FAILURE' | 'NO_KEY_CONTAINER', kloakKey?: PGPKeys];
+
 export type GetAppDataUUID = [status: 'SUCCESS' | 'DOES_NOT_EXIST' | 'FAILURE' | 'NO_KEY_CONTAINER', appData?: {encryptionKeys: PGPKeys, dataUUID: string}]
 
 // NETWORK DECLARATIONS FOR SEGURO LOCAL SERVER

@@ -1,4 +1,4 @@
-import { GetAppDataUUID, KeyChain, PGPKeys } from './define';
+import { GetAppDataUUID, GetDeviceKey, GetKloakKey, KeyChain, PGPKeys } from './define';
 import EncryptHelper from './EncryptHelper';
 import IDBDatabaseHelper from './IDBDatabaseHelper';
 import { getUUIDv4 } from './utils';
@@ -82,6 +82,24 @@ class KeyContainer {
     //         }
     //     })
     // )
+
+    public retrieveDeviceKey = (): Promise<GetDeviceKey> => (
+        new Promise<GetDeviceKey>((resolve, _) => {
+            if (Object.keys(this.keyChain.device).length > 0) {
+                return resolve(['SUCCESS', this.keyChain.device as PGPKeys]);
+            }
+            return resolve(['FAILURE']);
+        })
+    )
+
+    public retrieveKloakKey = (): Promise<GetKloakKey> => (
+        new Promise<GetKloakKey>((resolve, _) => {
+            if (Object.keys(this.keyChain.kloak).length > 0) {
+                return resolve(['SUCCESS', this.keyChain.kloak as PGPKeys]);
+            }
+            return resolve(['FAILURE']);
+        })
+    )
 
     public getAppDataUUID = (appID: string): Promise<GetAppDataUUID> => (
         new Promise<GetAppDataUUID>((resolve, _) => {

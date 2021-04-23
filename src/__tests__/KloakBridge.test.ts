@@ -127,6 +127,18 @@ describe('StorageHelper Class', () => {
         expect(status).toBe('SUCCESS');
     });
 
+    test('Should get device key', async () => {
+        const [status, deviceKey] = await kloakBridge.getDeviceKey();
+        console.log(deviceKey);
+        expect(status).toBe('SUCCESS');
+    });
+
+    test('Should get kloak key', async () => {
+        const [status, kloakKey] = await kloakBridge.getKloakKey();
+        console.log(kloakKey);
+        expect(status).toBe('SUCCESS');
+    });
+
     test('Should switch KeyContainers class', async () => {
         const [status, keyChainContainer] = await kloakBridge.changeKeyContainer('mysupersecretpassword', 'mynewpassword');
         console.log(status, keyChainContainer);

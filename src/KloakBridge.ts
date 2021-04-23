@@ -6,7 +6,7 @@ import {
     KeyResolve, CreateContainerResolve,
     UnlockContainerResolve, CheckContainerResolve,
     LockContainerResolve, ChangeKeyContainerResolve,
-    DeleteKeychainResolve, EncryptSaveResolve, RetrieveDecryptResolve, UnlockKeyResolve, GetAppDataUUID
+    DeleteKeychainResolve, EncryptSaveResolve, RetrieveDecryptResolve, UnlockKeyResolve, GetAppDataUUID, GetDeviceKey, GetKloakKey
 } from './define';
 import DisassemblyHelper from './DisassemblyHelper';
 import AssemblyHelper from './AssemblyHelper';
@@ -311,6 +311,24 @@ class KloakBridge {
             } catch (err) {
                 return resolve(['FAILURE']);
             }
+        })
+    )
+
+    public getDeviceKey = (): Promise<GetDeviceKey> => (
+        new Promise<GetDeviceKey>(async (resolve, _) => {
+            if (!this.keyContainer) {
+                return resolve(['NO_KEY_CONTAINER']);
+            }
+            return resolve(await this.keyContainer.retrieveDeviceKey());
+        })
+    )
+
+    public getKloakKey = (): Promise<GetKloakKey> => (
+        new Promise<GetKloakKey>(async (resolve, _) => {
+            if (!this.keyContainer) {
+                return resolve(['NO_KEY_CONTAINER']);
+            }
+            return resolve(await this.keyContainer.retrieveKloakKey());
         })
     )
 
