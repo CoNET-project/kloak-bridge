@@ -52,6 +52,7 @@ class EncryptHelper {
 
     public checkPassword = (keyPair: PGPKeys, passphrase: string): Promise<KeyResolve> => new Promise<KeyResolve>(async (resolve, _) => {
         this.pgpKeyPair = keyPair;
+        console.log(keyPair);
         this.pgpKeyPair.readPublicKey = await openpgp.readKey({ armoredKey: this.pgpKeyPair.armoredPublicKey });
         this.pgpKeyPair.readPrivateKey = await openpgp.readKey({ armoredKey: this.pgpKeyPair.armoredPrivateKey });
 

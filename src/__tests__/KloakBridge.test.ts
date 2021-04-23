@@ -121,6 +121,12 @@ describe('StorageHelper Class', () => {
         expect(tempKey).toBe(JSON.stringify(keyChain));
     });
 
+    test('Should get app data', async () => {
+        const [status, appData] = await kloakBridge.getAppData('1B3166C1914E82E6');
+        console.log(appData);
+        expect(status).toBe('SUCCESS');
+    });
+
     test('Should switch KeyContainers class', async () => {
         const [status, keyChainContainer] = await kloakBridge.changeKeyContainer('mysupersecretpassword', 'mynewpassword');
         console.log(status, keyChainContainer);

@@ -88,7 +88,7 @@ class KeyContainer {
             if (!appID || !this.keyChain.apps[appID] || !this.keyChain.apps[appID].dataUUID) {
                 return resolve(['DOES_NOT_EXIST']);
             }
-            return resolve(['SUCCESS', { encryptionKeys: this.keyChain.apps[appID].encryptionKeys as PGPKeys, uuid: this.keyChain.apps[appID].dataUUID }]);
+            return resolve(['SUCCESS', { encryptionKeys: this.keyChain.apps[appID].encryptionKeys as PGPKeys, dataUUID: this.keyChain.apps[appID].dataUUID }]);
         })
     )
 }

@@ -6,7 +6,7 @@ import {
     KeyResolve, CreateContainerResolve,
     UnlockContainerResolve, CheckContainerResolve,
     LockContainerResolve, ChangeKeyContainerResolve,
-    DeleteKeychainResolve, EncryptSaveResolve, RetrieveDecryptResolve, UnlockKeyResolve
+    DeleteKeychainResolve, EncryptSaveResolve, RetrieveDecryptResolve, UnlockKeyResolve, GetAppDataUUID
 } from './define';
 import DisassemblyHelper from './DisassemblyHelper';
 import AssemblyHelper from './AssemblyHelper';
@@ -17,7 +17,7 @@ class KloakBridge {
 
     private uploadHelpers: {[name: string]: DisassemblyHelper} = {};
     private assemblyHelpers: {[name: string]: AssemblyHelper} = {};
-    public keyContainer: KeyContainer | undefined
+    private keyContainer: KeyContainer | undefined
     private IDBHelper = new IDBDatabaseHelper();
 
     private generateDefaultKeychain = (): Promise<KeyChain> => (
@@ -311,6 +311,16 @@ class KloakBridge {
             } catch (err) {
                 return resolve(['FAILURE']);
             }
+        })
+    )
+
+    public getAppData = (appID: string): Promise<GetAppDataUUID> => (
+        new Promise<GetAppDataUUID>(async (resolve, _) => {
+            if (!this.keyContainer) {
+                return resolve(['NO_KEY_CONTAINER']);
+            }
+            const [status, appData] = await this.keyContainer.getAppDataUUID(appID);
+            return resolve([status, appData]);
         })
     )
 
