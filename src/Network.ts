@@ -156,13 +156,9 @@ class Network {
             return callback(null, returnedData);
         });
 
-        ws.once('close', () => {
-            console.log('on close');
-            return callback(new Error('Closed'), null);
-        });
+        ws.once('close', () => callback(new Error('Closed'), null));
         ws.once('open', () => ws.send(JSON.stringify(connectionInfo)));
         return ws;
-
     }
 }
 

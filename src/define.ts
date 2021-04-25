@@ -3,6 +3,60 @@ import { Buffer } from 'buffer/';
 // eslint-disable-next-line import/no-cycle
 import EncryptHelper from './EncryptHelper';
 
+// NETWORK DECLARATIONS FOR SEGURO LOCAL SERVER
+
+// @ts-ignore
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export interface imapConnect {
+    imapServer: string
+    imapUserName: string
+    imapUserPassword: string
+    imapPortNumber: number | number[]
+    imapSsl: boolean
+    imapIgnoreCertificate?: boolean
+}
+
+export interface IMAPAccount {
+    imap_username: string
+    imap_user_password: string
+    imap_port_number: number
+    imap_server: string
+}
+
+export interface next_time_connect {
+    imap_account: IMAPAccount
+    server_folder: string
+}
+
+export interface connect_imap_reqponse {
+    imap_account: IMAPAccount
+    server_folder: string
+    client_folder: string
+}
+
+export interface connectRequest {
+    kloak_account_armor: string
+    device_armor: string
+    client_folder_name: string
+    use_kloak_shared_imap_account: boolean
+    imap_account?: IMAPAccount
+    next_time_connect?: next_time_connect
+    error?: string
+    server_folder?: string
+    encrypted_response?: string
+    encrypted_request?: string
+    connect_info?: connect_imap_reqponse,
+    requestJSON_text?: string
+}
+
+export interface connectRequest_test extends connectRequest {
+    kloak_private?: string
+    device_private?: string
+    reponseJson?: connectRequest
+}
+
+//============================================
+
 export interface PGPKeys {
     keyID: string,
     armoredPublicKey: string,
@@ -47,13 +101,19 @@ export interface KeyChain {
     }
 }
 
+export interface ContainerNetwork {
+    imapAccount: IMAPAccount,
+    serverFolder: string
+}
+
 export interface KeyChainContainer {
     pgpKeys: {
         keyID: string,
         armoredPublicKey: string,
         armoredPrivateKey: string,
     },
-    keyChain: string
+    keychain: string,
+    network: string
 }
 
 export interface PGPGenerateOptions {
@@ -143,55 +203,3 @@ export type GetDeviceKey = [status: 'NO_DEVICE_KEY' | 'SUCCESS' | 'FAILURE' | 'N
 export type GetKloakKey = [status: 'NO_KLOAK_KEY' | 'SUCCESS' | 'FAILURE' | 'NO_KEY_CONTAINER', kloakKey?: PGPKeys];
 
 export type GetAppDataUUID = [status: 'SUCCESS' | 'DOES_NOT_EXIST' | 'FAILURE' | 'NO_KEY_CONTAINER', appData?: {encryptionKeys: PGPKeys, dataUUID: string}]
-
-// NETWORK DECLARATIONS FOR SEGURO LOCAL SERVER
-
-// @ts-ignore
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export interface imapConnect {
-    imapServer: string
-    imapUserName: string
-    imapUserPassword: string
-    imapPortNumber: number | number[]
-    imapSsl: boolean
-    imapIgnoreCertificate?: boolean
-}
-
-export interface IMAPAccount {
-    imap_username: string
-    imap_user_password: string
-    imap_port_number: number
-    imap_server: string
-}
-
-export interface next_time_connect {
-    imap_account: IMAPAccount
-    server_folder: string
-}
-
-export interface connect_imap_reqponse {
-    imap_account: IMAPAccount
-    server_folder: string
-    client_folder: string
-}
-
-export interface connectRequest {
-    kloak_account_armor: string
-    device_armor: string
-    client_folder_name: string
-    use_kloak_shared_imap_account: boolean
-    imap_account?: IMAPAccount
-    next_time_connect?: next_time_connect
-    error?: string
-    server_folder?: string
-    encrypted_response?: string
-    encrypted_request?: string
-    connect_info?: connect_imap_reqponse,
-    requestJSON_text?: string
-}
-
-export interface connectRequest_test extends connectRequest {
-    kloak_private?: string
-    device_private?: string
-    reponseJson?: connectRequest
-}
