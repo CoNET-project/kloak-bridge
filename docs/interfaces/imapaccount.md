@@ -17,7 +17,7 @@
 
 • **imap\_port\_number**: *number*
 
-Defined in: [define.ts:163](https://github.com/CoNET-project/kloak-bridge/blob/31a272e/src/define.ts#L163)
+Defined in: [define.ts:22](https://github.com/CoNET-project/kloak-bridge/blob/8805a29/src/define.ts#L22)
 
 ___
 
@@ -25,7 +25,7 @@ ___
 
 • **imap\_server**: *string*
 
-Defined in: [define.ts:164](https://github.com/CoNET-project/kloak-bridge/blob/31a272e/src/define.ts#L164)
+Defined in: [define.ts:23](https://github.com/CoNET-project/kloak-bridge/blob/8805a29/src/define.ts#L23)
 
 ___
 
@@ -33,7 +33,7 @@ ___
 
 • **imap\_user\_password**: *string*
 
-Defined in: [define.ts:162](https://github.com/CoNET-project/kloak-bridge/blob/31a272e/src/define.ts#L162)
+Defined in: [define.ts:21](https://github.com/CoNET-project/kloak-bridge/blob/8805a29/src/define.ts#L21)
 
 ___
 
@@ -41,4 +41,4 @@ ___
 
 • **imap\_username**: *string*
 
-Defined in: [define.ts:161](https://github.com/CoNET-project/kloak-bridge/blob/31a272e/src/define.ts#L161)
+Defined in: [define.ts:20](https://github.com/CoNET-project/kloak-bridge/blob/8805a29/src/define.ts#L20)

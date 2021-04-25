@@ -3,6 +3,7 @@ import KloakBridge from '../KloakBridge';
 import { KeyChain, PGPKeys } from '../define';
 import EncryptHelper from '../EncryptHelper';
 import KeyContainer from '../KeyContainer';
+import IDBDatabaseHelper from '../IDBDatabaseHelper';
 require('fake-indexeddb/auto');
 
 describe('StorageHelper Class', () => {
@@ -26,7 +27,7 @@ describe('StorageHelper Class', () => {
         const textEncoding = require('text-encoding-utf-8');
         global.TextEncoder = textEncoding.TextEncoder;
         global.TextDecoder = textEncoding.TextDecoder;
-        kloakBridge = new KloakBridge();
+        kloakBridge = new KloakBridge(true);
     });
 
     test('Should create a new key pair and NOT unlock', async () => {
@@ -94,29 +95,31 @@ describe('StorageHelper Class', () => {
     });
 
     test('Should create new container with encrypted keychain', async () => {
-        const [, container ] = await kloakBridge.createKeyContainer('mysecretpassword');
-        const { keyID, armoredPublicKey, armoredPrivateKey } = container!!.pgpKeys;
+        const [, newContainer ] = await kloakBridge.createKeyContainer('mysecretpassword');
+        const { keyID, armoredPublicKey, armoredPrivateKey } = newContainer!!.pgpKeys;
         expect(keyID).toBeTruthy();
         expect(armoredPublicKey).toBeTruthy();
         expect(armoredPrivateKey).toBeTruthy();
     });
 
     test('Should create new container and be able to decrypt keychain.', async () => {
-        const [, container ] = await kloakBridge.createKeyContainer('mysupersecretpassword');
-        const { keyID, armoredPublicKey, armoredPrivateKey } = container!!.pgpKeys;
+        const [, newContainer ] = await kloakBridge.createKeyContainer('mysupersecretpassword');
+        const { keyID, armoredPublicKey, armoredPrivateKey } = newContainer!!.pgpKeys;
         const tempEncrypt = new EncryptHelper();
         await tempEncrypt.checkPassword({ keyID, armoredPublicKey, armoredPrivateKey }, 'mysupersecretpassword');
-        const keyChain = await tempEncrypt.decryptMessage(container!!.keyChain);
-        expect(keyChain).toBeTruthy();
+        const encryptedKeychain = await new IDBDatabaseHelper().retrieve(newContainer?.keychain as string);
+        const [, decryptedKeychain] = await tempEncrypt.decryptMessage(encryptedKeychain);
+        expect(decryptedKeychain).toBeTruthy();
     });
 
     test('Should create new container, decrypt keychain and create new KeyContainer class', async () => {
-        const [, container] = await kloakBridge.createKeyContainer('mysupersecretpassword');
-        const { keyID, armoredPublicKey, armoredPrivateKey } = container!!.pgpKeys;
+        const [, newContainer] = await kloakBridge.createKeyContainer('mysupersecretpassword');
+        const { keyID, armoredPublicKey, armoredPrivateKey } = newContainer!!.pgpKeys;
         const tempEncrypt = new EncryptHelper();
         await tempEncrypt.checkPassword({ keyID, armoredPublicKey, armoredPrivateKey }, 'mysupersecretpassword');
-        const [, keyChain] = await tempEncrypt.decryptMessage(container?.keyChain as string);
-        keyContainer = new KeyContainer(tempEncrypt, keyChain as unknown as KeyChain);
+        const encryptedKeychain = await new IDBDatabaseHelper().retrieve(newContainer?.keychain as string);
+        const [, keyChain] = await tempEncrypt.decryptMessage(encryptedKeychain);
+        keyContainer = new KeyContainer(tempEncrypt, newContainer?.keychain as string, keyChain as unknown as KeyChain);
         const tempKey = JSON.stringify(keyContainer.getKeyChain());
         expect(tempKey).toBe(JSON.stringify(keyChain));
     });

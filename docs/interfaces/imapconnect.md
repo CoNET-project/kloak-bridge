@@ -19,7 +19,7 @@
 
 • `Optional` **imapIgnoreCertificate**: *boolean*
 
-Defined in: [define.ts:157](https://github.com/CoNET-project/kloak-bridge/blob/31a272e/src/define.ts#L157)
+Defined in: [define.ts:16](https://github.com/CoNET-project/kloak-bridge/blob/8805a29/src/define.ts#L16)
 
 ___
 
@@ -27,7 +27,7 @@ ___
 
 • **imapPortNumber**: *number* \| *number*[]
 
-Defined in: [define.ts:155](https://github.com/CoNET-project/kloak-bridge/blob/31a272e/src/define.ts#L155)
+Defined in: [define.ts:14](https://github.com/CoNET-project/kloak-bridge/blob/8805a29/src/define.ts#L14)
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 • **imapServer**: *string*
 
-Defined in: [define.ts:152](https://github.com/CoNET-project/kloak-bridge/blob/31a272e/src/define.ts#L152)
+Defined in: [define.ts:11](https://github.com/CoNET-project/kloak-bridge/blob/8805a29/src/define.ts#L11)
 
 ___
 
@@ -43,7 +43,7 @@ ___
 
 • **imapSsl**: *boolean*
 
-Defined in: [define.ts:156](https://github.com/CoNET-project/kloak-bridge/blob/31a272e/src/define.ts#L156)
+Defined in: [define.ts:15](https://github.com/CoNET-project/kloak-bridge/blob/8805a29/src/define.ts#L15)
 
 ___
 
@@ -51,7 +51,7 @@ ___
 
 • **imapUserName**: *string*
 
-Defined in: [define.ts:153](https://github.com/CoNET-project/kloak-bridge/blob/31a272e/src/define.ts#L153)
+Defined in: [define.ts:12](https://github.com/CoNET-project/kloak-bridge/blob/8805a29/src/define.ts#L12)
 
 ___
 
@@ -59,4 +59,4 @@ ___
 
 • **imapUserPassword**: *string*
 
-Defined in: [define.ts:154](https://github.com/CoNET-project/kloak-bridge/blob/31a272e/src/define.ts#L154)
+Defined in: [define.ts:13](https://github.com/CoNET-project/kloak-bridge/blob/8805a29/src/define.ts#L13)

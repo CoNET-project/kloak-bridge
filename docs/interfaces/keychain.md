@@ -18,7 +18,7 @@
 
 #### Type declaration:
 
-Defined in: [define.ts:41](https://github.com/CoNET-project/kloak-bridge/blob/31a272e/src/define.ts#L41)
+Defined in: [define.ts:95](https://github.com/CoNET-project/kloak-bridge/blob/8805a29/src/define.ts#L95)
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **device**: {} \| [*PGPKeys*](pgpkeys.md)
 
-Defined in: [define.ts:39](https://github.com/CoNET-project/kloak-bridge/blob/31a272e/src/define.ts#L39)
+Defined in: [define.ts:93](https://github.com/CoNET-project/kloak-bridge/blob/8805a29/src/define.ts#L93)
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 • **kloak**: {} \| [*PGPKeys*](pgpkeys.md)
 
-Defined in: [define.ts:40](https://github.com/CoNET-project/kloak-bridge/blob/31a272e/src/define.ts#L40)
+Defined in: [define.ts:94](https://github.com/CoNET-project/kloak-bridge/blob/8805a29/src/define.ts#L94)

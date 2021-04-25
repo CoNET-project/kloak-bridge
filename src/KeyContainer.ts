@@ -6,14 +6,16 @@ import { getUUIDv4 } from './utils';
 class KeyContainer {
     private IDBHelper: IDBDatabaseHelper = new IDBDatabaseHelper();
     private encryptHelper: EncryptHelper | null = null
+    private keychainUUID: string
     private keyChain: KeyChain = {
         device: {},
         kloak: {},
         apps: {}
     }
 
-    constructor(encryptHelper: EncryptHelper, keyChain: KeyChain) {
+    constructor(encryptHelper: EncryptHelper, keychainUUID: string, keyChain: KeyChain) {
         this.encryptHelper = encryptHelper;
+        this.keychainUUID = keychainUUID;
         this.keyChain = keyChain;
     }
 
@@ -21,7 +23,7 @@ class KeyContainer {
         new Promise<boolean>(async (resolve, reject) => {
             try {
                 const encryptedMessage = await this.encryptHelper?.encryptMessage(JSON.stringify(this.keyChain));
-                await this.IDBHelper.save('KeyContainer', encryptedMessage);
+                await this.IDBHelper.save(this.keychainUUID, encryptedMessage);
                 return resolve(true);
             } catch (err) {
                 return reject(err);
@@ -30,6 +32,8 @@ class KeyContainer {
     )
 
     public getKeyChain = () => this.keyChain
+
+    public getEncryptedKeyChain = () => this.encryptHelper?.encryptMessage(JSON.stringify(this.getKeyChain()))
 
     public addAppID = (appKeyID: string, publicKey: string): Promise<[status: 'SUCCESS' | 'ALREADY_EXISTS']> => (
         new Promise<[status: 'SUCCESS' | 'ALREADY_EXISTS']>(async (resolve, _) => {
