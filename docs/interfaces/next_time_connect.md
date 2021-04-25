@@ -15,7 +15,7 @@
 
 • **imap\_account**: [*IMAPAccount*](imapaccount.md)
 
-Defined in: [define.ts:168](https://github.com/CoNET-project/kloak-bridge/blob/feaa5e6/src/define.ts#L168)
+Defined in: [define.ts:168](https://github.com/CoNET-project/kloak-bridge/blob/31a272e/src/define.ts#L168)
 
 ___
 
@@ -23,4 +23,4 @@ ___
 
 • **server\_folder**: *string*
 
-Defined in: [define.ts:169](https://github.com/CoNET-project/kloak-bridge/blob/feaa5e6/src/define.ts#L169)
+Defined in: [define.ts:169](https://github.com/CoNET-project/kloak-bridge/blob/31a272e/src/define.ts#L169)

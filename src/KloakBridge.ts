@@ -101,9 +101,6 @@ class KloakBridge {
      */
     public unlockKeyContainer = (passphrase: string): Promise<UnlockContainerResolve> => (
         new Promise<UnlockContainerResolve>(async (resolve, _) => {
-            if (this.keyContainer) {
-                return resolve(['ALREADY_UNLOCKED']);
-            }
             const [status, keyChainContainer] = await this.checkKeyContainer();
             switch (status) {
                 case 'EXISTS':
