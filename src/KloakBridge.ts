@@ -6,12 +6,14 @@ import {
     KeyResolve, CreateContainerResolve,
     UnlockContainerResolve, CheckContainerResolve,
     LockContainerResolve, ChangeKeyContainerResolve,
-    DeleteKeychainResolve, EncryptSaveResolve, RetrieveDecryptResolve, UnlockKeyResolve, GetAppDataUUID, GetDeviceKey, GetKloakKey
+    // eslint-disable-next-line camelcase
+    DeleteKeychainResolve, EncryptSaveResolve, RetrieveDecryptResolve, UnlockKeyResolve, GetAppDataUUID, GetDeviceKey, GetKloakKey, IMAPAccount, next_time_connect, connectRequest
 } from './define';
 import DisassemblyHelper from './DisassemblyHelper';
 import AssemblyHelper from './AssemblyHelper';
 import { getUUIDv4 } from './utils';
 import KeyContainer from './KeyContainer';
+import Network from './Network';
 
 class KloakBridge {
 
@@ -19,6 +21,21 @@ class KloakBridge {
     private assemblyHelpers: {[name: string]: AssemblyHelper} = {};
     private keyContainer: KeyContainer | undefined
     private IDBHelper = new IDBDatabaseHelper();
+    private containerEncrypter: EncryptHelper = new EncryptHelper();
+    private skipNetwork = false
+    private keyChainContainer: KeyChainContainer = {
+        pgpKeys: {
+            keyID: '',
+            armoredPrivateKey: '',
+            armoredPublicKey: ''
+        },
+        keychain: '',
+        network: ''
+    }
+
+    constructor(skipNetwork = false) {
+        this.skipNetwork = skipNetwork;
+    }
 
     private generateDefaultKeychain = (): Promise<KeyChain> => (
         new Promise<KeyChain>(async (resolve, _) => {
@@ -82,6 +99,76 @@ class KloakBridge {
         })
     )
 
+    private saveNetworkInfo = async (imapAccount: IMAPAccount, serverFolder: string): Promise<boolean> => (
+        new Promise<boolean>(async (resolve, _) => {
+            const network = {
+                imapAccount,
+                serverFolder
+            };
+            if (!this.keyChainContainer.network) {
+                this.keyChainContainer.network = getUUIDv4();
+            }
+            try {
+                const [status, encryptedNetwork] = await this.containerEncrypter.encryptMessage(JSON.stringify(network));
+                if (status === 'SUCCESS') {
+                    await this.IDBHelper.save('keyContainer', JSON.stringify(this.keyChainContainer));
+                    await this.IDBHelper.save(this.keyChainContainer.network, encryptedNetwork);
+                    return resolve(true);
+                }
+                resolve(false);
+
+            } catch (err) {
+                return resolve(false);
+            }
+            // container.network = network;
+        })
+    )
+
+    private establishConnection = async (urlPath: string = 'http://localhost:3000/getInformationFromSeguro') => {
+        const [deviceKeyStatus, deviceKey] = await this.getDeviceKey();
+        const [kloakKeyStatus, kloakKey] = await this.getKloakKey();
+        let imapAccount:IMAPAccount | undefined;
+        let serverFolder: string | undefined;
+        let networkConnection;
+        if (deviceKeyStatus === 'NO_DEVICE_KEY'
+            || deviceKeyStatus === 'NO_KEY_CONTAINER'
+            || kloakKeyStatus === 'NO_KLOAK_KEY'
+            || kloakKeyStatus === 'NO_KEY_CONTAINER') {
+            return;
+        }
+
+        if (this.keyChainContainer.network) {
+            const encryptedNetwork = await this.IDBHelper.retrieve(this.keyChainContainer.network);
+            const [ status, decryptedNetwork ] = await this.containerEncrypter.decryptMessage(encryptedNetwork);
+            if (status === 'SUCCESS') {
+                // eslint-disable-next-line camelcase
+                imapAccount = (decryptedNetwork as unknown as next_time_connect).imap_account;
+                // eslint-disable-next-line camelcase
+                serverFolder = (decryptedNetwork as unknown as next_time_connect).server_folder;
+                networkConnection = await Network.connection(deviceKey as PGPKeys, kloakKey?.armoredPublicKey as string, urlPath, imapAccount, serverFolder);
+            }
+        } else {
+            networkConnection = await Network.connection(deviceKey as PGPKeys, kloakKey?.armoredPublicKey as string, urlPath);
+        }
+
+        if (networkConnection && networkConnection[0] && networkConnection[1]) {
+            if (networkConnection[0] === 'SUCCESS') {
+                const connectRequest: connectRequest = networkConnection[1];
+                await this.saveNetworkInfo(connectRequest.next_time_connect?.imap_account as IMAPAccount, connectRequest.next_time_connect?.server_folder as string);
+                const ws = Network.wsConnect('ws://localhost:3000/connectToSeguro', connectRequest.connect_info, (err, data) => {
+                    if (err) {
+                        console.log(err);
+                        ws.close();
+                    }
+                    if (data) {
+                        console.log(data);
+                    }
+                });
+            }
+        }
+
+    }
+
     /**
      * Check if IndexedDB contains a "KeyChainContainer".
      */
@@ -107,18 +194,22 @@ class KloakBridge {
             const [status, keyChainContainer] = await this.checkKeyContainer();
             switch (status) {
                 case 'EXISTS':
-                    if (keyChainContainer?.pgpKeys && keyChainContainer?.keyChain) {
-                        const tempEncrypt = new EncryptHelper();
-                        const [checkStatus] = await tempEncrypt.checkPassword(keyChainContainer?.pgpKeys, passphrase);
+                    if (keyChainContainer?.pgpKeys && keyChainContainer?.keychain) {
+                        this.keyChainContainer = keyChainContainer;
+                        const [checkStatus] = await this.containerEncrypter.checkPassword(keyChainContainer?.pgpKeys, passphrase);
                         if (checkStatus === 'SUCCESS') {
-                            const [, decryptedKeyChain] = await tempEncrypt.decryptMessage(keyChainContainer?.keyChain);
-                            this.keyContainer = new KeyContainer(tempEncrypt, decryptedKeyChain as unknown as KeyChain);
+                            const encryptedKeychain = await this.IDBHelper.retrieve(keyChainContainer.keychain);
+                            const [, decryptedContainer] = await this.containerEncrypter.decryptMessage(encryptedKeychain);
+                            this.keyContainer = new KeyContainer(this.containerEncrypter, keyChainContainer.keychain, decryptedContainer as unknown as KeyChain);
+                            // await this.establishConnection();
+                            if (!this.skipNetwork) {
+                                await this.establishConnection();
+                            }
                             return resolve(['SUCCESS']);
                         }
                         return resolve(['INVALID_PASSPHRASE']);
                     }
                     return resolve(['MISSING_KEYCHAIN']);
-
                 case 'DOES_NOT_EXIST':
                     return resolve(['MISSING_CONTAINER']);
                 default:
@@ -137,6 +228,7 @@ class KloakBridge {
                 const [, containerPGPKey] = await tempEncrypt.generateKey({ passphrase });
                 await tempEncrypt.checkPassword(containerPGPKey as PGPKeys, passphrase);
                 const defaultKeyChain = await this.generateDefaultKeychain();
+                const keychainUUID = getUUIDv4();
                 const [, encryptedKeyChain] = await tempEncrypt.encryptMessage(JSON.stringify(defaultKeyChain));
                 const keyContainer: KeyChainContainer = {
                     pgpKeys: {
@@ -144,12 +236,18 @@ class KloakBridge {
                         armoredPrivateKey: containerPGPKey?.armoredPrivateKey as string,
                         armoredPublicKey: containerPGPKey?.armoredPublicKey as string
                     },
-                    keyChain: encryptedKeyChain as string
+                    keychain: keychainUUID,
+                    network: ''
                 };
-                this.keyContainer = new KeyContainer(tempEncrypt, defaultKeyChain);
+                this.keyContainer = new KeyContainer(tempEncrypt, keychainUUID, defaultKeyChain);
+                await this.IDBHelper.save(keychainUUID, encryptedKeyChain);
                 await this.IDBHelper.save('KeyContainer', keyContainer);
                 await this.IDBHelper.retrieve('KeyContainer');
-                return resolve(<CreateContainerResolve>['SUCCESS', keyContainer]);
+                resolve(<CreateContainerResolve>['SUCCESS', keyContainer]);
+                if (!this.skipNetwork) {
+                    await this.establishConnection();
+                }
+                return;
             } catch (err) {
                 return resolve(<CreateContainerResolve>['FAILURE']);
             }
@@ -183,21 +281,22 @@ class KloakBridge {
             const [, newPGPKeys] = await tempEncrypt.generateKey({ passphrase: newPassphrase });
             try {
                 const oldContainer: KeyChainContainer = await this.IDBHelper.retrieve('KeyContainer');
+                const encryptedKeychain = await this.IDBHelper.retrieve(oldContainer.keychain);
                 const [status] = await tempEncrypt.checkPassword(oldContainer.pgpKeys, oldPassphrase);
                 if (status === 'SUCCESS') {
-                    const [, decryptedKeyChain] = await tempEncrypt.decryptMessage(oldContainer.keyChain);
+                    const [, decryptedKeyChain] = await tempEncrypt.decryptMessage(encryptedKeychain);
                     await tempEncrypt.checkPassword(newPGPKeys as PGPKeys, newPassphrase);
-                    const [, encryptedKeyChain] = await tempEncrypt.encryptMessage(JSON.stringify(decryptedKeyChain));
                     const newContainer: KeyChainContainer = {
                         pgpKeys: {
                             keyID: newPGPKeys?.keyID as string,
                             armoredPublicKey: newPGPKeys?.armoredPublicKey as string,
                             armoredPrivateKey: newPGPKeys?.armoredPrivateKey as string
                         },
-                        keyChain: encryptedKeyChain as string
+                        keychain: oldContainer.keychain,
+                        network: oldContainer.network
                     };
                     await this.IDBHelper.save('keyContainer', JSON.stringify(newContainer));
-                    this.keyContainer = new KeyContainer(tempEncrypt, decryptedKeyChain as unknown as KeyChain);
+                    this.keyContainer = new KeyContainer(tempEncrypt, newContainer.keychain, decryptedKeyChain as unknown as KeyChain);
                     return resolve(['SUCCESS', newContainer ]);
                 }
                 return resolve(['FAILURE']);
