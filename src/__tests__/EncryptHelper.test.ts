@@ -89,5 +89,10 @@ describe('Encrypt Class', () => {
             console.log(keyIDs, testPGPKey1.keyID, testPGPKey2.keyID);
             expect(keyIDs.includes(testPGPKey1.keyID)).toBe(true);
         });
+
+        test('Should read keyId', async () => {
+            const keyId = await EncryptHelper.getKeyId(testPGPKey1.armoredPublicKey);
+            console.log(keyId);
+        });
     });
 });

@@ -18,7 +18,6 @@ class EncryptHelper {
     }
 
     public generateKey = (options: PGPGenerateOptions): Promise<KeyResolve> => new Promise<KeyResolve>(async (resolve, _) => {
-
         const userIds = {
             name: options.nickname || '',
             email: options.email || ''
@@ -162,6 +161,14 @@ class EncryptHelper {
             } catch (err) {
                 return resolve(['FAILURE']);
             }
+        })
+    )
+
+    static getKeyId = async (publicKey: string): Promise<string> => (
+        new Promise<string>(async (resolve, _) => {
+            const readKey = await openpgp.readKey({ armoredKey: publicKey });
+            const keyIds = await readKey.getKeyIds();
+            return resolve(keyIds[1].toHex().toUpperCase());
         })
     )
 
