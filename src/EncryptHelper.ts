@@ -160,8 +160,10 @@ class EncryptHelper {
             };
             try {
                 const decryptedMessage = await openpgp.decrypt(options);
-                if (decryptedMessage.signatures[0].keyid.toHex().toUpperCase() !== checkKeyID) {
-                    return resolve(['KEYID_CHECK_ERROR']);
+                if (checkKeyID) {
+                    if (decryptedMessage.signatures[0].keyid.toHex().toUpperCase() !== checkKeyID) {
+                        return resolve(['KEYID_CHECK_ERROR']);
+                    }
                 }
                 return resolve(['SUCCESS', decryptedMessage]);
             } catch (err) {
