@@ -165,7 +165,7 @@ class EncryptHelper {
                         return resolve(['KEYID_CHECK_ERROR']);
                     }
                 }
-                return resolve(['SUCCESS', decryptedMessage]);
+                return resolve(['SUCCESS', decryptedMessage.data]);
             } catch (err) {
                 return resolve(['FAILURE']);
             }
