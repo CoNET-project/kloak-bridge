@@ -19,11 +19,11 @@
 - [encryptMessage](encrypthelper.md#encryptmessage)
 - [generateKey](encrypthelper.md#generatekey)
 - [isUnlocked](encrypthelper.md#isunlocked)
-- [modifyPGPMessage](encrypthelper.md#modifypgpmessage)
 - [decryptWith](encrypthelper.md#decryptwith)
 - [encryptSignWith](encrypthelper.md#encryptsignwith)
 - [getEncryptionKeyIds](encrypthelper.md#getencryptionkeyids)
 - [getKeyId](encrypthelper.md#getkeyid)
+- [modifyPGPMessage](encrypthelper.md#modifypgpmessage)
 
 ## Constructors
 
@@ -33,7 +33,7 @@
 
 **Returns:** [*EncryptHelper*](encrypthelper.md)
 
-Defined in: [EncryptHelper.ts:14](https://github.com/CoNET-project/kloak-bridge/blob/db9c422/src/EncryptHelper.ts#L14)
+Defined in: [EncryptHelper.ts:14](https://github.com/CoNET-project/kloak-bridge/blob/d5ed71b/src/EncryptHelper.ts#L14)
 
 ## Properties
 
@@ -41,7 +41,7 @@ Defined in: [EncryptHelper.ts:14](https://github.com/CoNET-project/kloak-bridge/
 
 • `Private` **pgpKeyPair**: [*PGPKeys*](../interfaces/pgpkeys.md)
 
-Defined in: [EncryptHelper.ts:9](https://github.com/CoNET-project/kloak-bridge/blob/db9c422/src/EncryptHelper.ts#L9)
+Defined in: [EncryptHelper.ts:9](https://github.com/CoNET-project/kloak-bridge/blob/d5ed71b/src/EncryptHelper.ts#L9)
 
 ## Methods
 
@@ -58,7 +58,7 @@ Name | Type |
 
 **Returns:** *Promise*<[*KeyResolve*](../modules.md#keyresolve)\>
 
-Defined in: [EncryptHelper.ts:52](https://github.com/CoNET-project/kloak-bridge/blob/db9c422/src/EncryptHelper.ts#L52)
+Defined in: [EncryptHelper.ts:71](https://github.com/CoNET-project/kloak-bridge/blob/d5ed71b/src/EncryptHelper.ts#L71)
 
 ___
 
@@ -75,7 +75,7 @@ Name | Type |
 
 **Returns:** *Promise*<[*DecryptResolve*](../modules.md#decryptresolve)\>
 
-Defined in: [EncryptHelper.ts:101](https://github.com/CoNET-project/kloak-bridge/blob/db9c422/src/EncryptHelper.ts#L101)
+Defined in: [EncryptHelper.ts:101](https://github.com/CoNET-project/kloak-bridge/blob/d5ed71b/src/EncryptHelper.ts#L101)
 
 ___
 
@@ -91,7 +91,7 @@ Name | Type |
 
 **Returns:** *Promise*<[*EncryptResolve*](../modules.md#encryptresolve)\>
 
-Defined in: [EncryptHelper.ts:84](https://github.com/CoNET-project/kloak-bridge/blob/db9c422/src/EncryptHelper.ts#L84)
+Defined in: [EncryptHelper.ts:84](https://github.com/CoNET-project/kloak-bridge/blob/d5ed71b/src/EncryptHelper.ts#L84)
 
 ___
 
@@ -107,7 +107,7 @@ Name | Type |
 
 **Returns:** *Promise*<[*KeyResolve*](../modules.md#keyresolve)\>
 
-Defined in: [EncryptHelper.ts:20](https://github.com/CoNET-project/kloak-bridge/blob/db9c422/src/EncryptHelper.ts#L20)
+Defined in: [EncryptHelper.ts:39](https://github.com/CoNET-project/kloak-bridge/blob/d5ed71b/src/EncryptHelper.ts#L39)
 
 ___
 
@@ -117,24 +117,7 @@ ___
 
 **Returns:** *boolean*
 
-Defined in: [EncryptHelper.ts:45](https://github.com/CoNET-project/kloak-bridge/blob/db9c422/src/EncryptHelper.ts#L45)
-
-___
-
-### modifyPGPMessage
-
-▸ **modifyPGPMessage**(`message`: *string*, `trim?`: *boolean*): *string*
-
-#### Parameters:
-
-Name | Type | Default value |
-:------ | :------ | :------ |
-`message` | *string* | - |
-`trim` | *boolean* | false |
-
-**Returns:** *string*
-
-Defined in: [EncryptHelper.ts:65](https://github.com/CoNET-project/kloak-bridge/blob/db9c422/src/EncryptHelper.ts#L65)
+Defined in: [EncryptHelper.ts:64](https://github.com/CoNET-project/kloak-bridge/blob/d5ed71b/src/EncryptHelper.ts#L64)
 
 ___
 
@@ -152,25 +135,26 @@ Name | Type |
 
 **Returns:** *Promise*<[status: "SUCCESS" \| "FAILURE" \| "KEYID\_CHECK\_ERROR", payload?: any]\>
 
-Defined in: [EncryptHelper.ts:148](https://github.com/CoNET-project/kloak-bridge/blob/db9c422/src/EncryptHelper.ts#L148)
+Defined in: [EncryptHelper.ts:153](https://github.com/CoNET-project/kloak-bridge/blob/d5ed71b/src/EncryptHelper.ts#L153)
 
 ___
 
 ### encryptSignWith
 
-▸ `Static`**encryptSignWith**(`encryptPublicKeys`: *string*[], `signPrivateKey`: *string*[], `data`: *string* \| ArrayBuffer \| *Uint8Array*): *Promise*<[*EncryptResolve*](../modules.md#encryptresolve)\>
+▸ `Static`**encryptSignWith**(`encryptPublicKeys`: *string*[], `signPrivateKey`: *string*[], `data`: *string* \| ArrayBuffer \| *Uint8Array*, `trim?`: *boolean*): *Promise*<[*EncryptResolve*](../modules.md#encryptresolve)\>
 
 #### Parameters:
 
-Name | Type |
-:------ | :------ |
-`encryptPublicKeys` | *string*[] |
-`signPrivateKey` | *string*[] |
-`data` | *string* \| ArrayBuffer \| *Uint8Array* |
+Name | Type | Default value |
+:------ | :------ | :------ |
+`encryptPublicKeys` | *string*[] | - |
+`signPrivateKey` | *string*[] | - |
+`data` | *string* \| ArrayBuffer \| *Uint8Array* | - |
+`trim` | *boolean* | false |
 
 **Returns:** *Promise*<[*EncryptResolve*](../modules.md#encryptresolve)\>
 
-Defined in: [EncryptHelper.ts:125](https://github.com/CoNET-project/kloak-bridge/blob/db9c422/src/EncryptHelper.ts#L125)
+Defined in: [EncryptHelper.ts:125](https://github.com/CoNET-project/kloak-bridge/blob/d5ed71b/src/EncryptHelper.ts#L125)
 
 ___
 
@@ -186,7 +170,7 @@ Name | Type |
 
 **Returns:** *Promise*<string[]\>
 
-Defined in: [EncryptHelper.ts:175](https://github.com/CoNET-project/kloak-bridge/blob/db9c422/src/EncryptHelper.ts#L175)
+Defined in: [EncryptHelper.ts:181](https://github.com/CoNET-project/kloak-bridge/blob/d5ed71b/src/EncryptHelper.ts#L181)
 
 ___
 
@@ -202,4 +186,21 @@ Name | Type |
 
 **Returns:** *Promise*<string\>
 
-Defined in: [EncryptHelper.ts:167](https://github.com/CoNET-project/kloak-bridge/blob/db9c422/src/EncryptHelper.ts#L167)
+Defined in: [EncryptHelper.ts:173](https://github.com/CoNET-project/kloak-bridge/blob/d5ed71b/src/EncryptHelper.ts#L173)
+
+___
+
+### modifyPGPMessage
+
+▸ `Static`**modifyPGPMessage**(`message`: *string*, `trim?`: *boolean*): *string*
+
+#### Parameters:
+
+Name | Type | Default value |
+:------ | :------ | :------ |
+`message` | *string* | - |
+`trim` | *boolean* | false |
+
+**Returns:** *string*
+
+Defined in: [EncryptHelper.ts:20](https://github.com/CoNET-project/kloak-bridge/blob/d5ed71b/src/EncryptHelper.ts#L20)

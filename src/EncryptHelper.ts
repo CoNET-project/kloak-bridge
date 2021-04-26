@@ -17,6 +17,25 @@ class EncryptHelper {
         openpgp.config.compression = openpgp.enums.compression.zip;
     }
 
+    static modifyPGPMessage = (message: string, trim: boolean = false): string => {
+        let modified: string;
+        const pgpHead = '-----BEGIN PGP MESSAGE-----';
+        const pgpComment = 'Comment: https://openpgpjs.org';
+        const pgpMisc = /([A-Z])\w+: OpenPGP.js *.*/;
+        const pgpEnd = '-----END PGP MESSAGE-----';
+
+        modified = message.replace(pgpHead, '');
+        modified = modified.replace(pgpComment, '');
+        modified = modified.replace(pgpMisc, '');
+        modified = modified.replace(pgpEnd, '');
+
+        if (trim) {
+            return modified.trim();
+        }
+
+        return pgpHead.concat('\r\n\r\n', message, '\r\n\r\n', pgpEnd);
+    }
+
     public generateKey = (options: PGPGenerateOptions): Promise<KeyResolve> => new Promise<KeyResolve>(async (resolve, _) => {
         const userIds = {
             name: options.nickname || '',
@@ -62,25 +81,6 @@ class EncryptHelper {
         }
     })
 
-    public modifyPGPMessage = (message: string, trim: boolean = false): string => {
-        let modified: string;
-        const pgpHead = '-----BEGIN PGP MESSAGE-----';
-        const pgpComment = 'Comment: https://openpgpjs.org';
-        const pgpMisc = /([A-Z])\w+: OpenPGP.js *.*/;
-        const pgpEnd = '-----END PGP MESSAGE-----';
-
-        modified = message.replace(pgpHead, '');
-        modified = modified.replace(pgpComment, '');
-        modified = modified.replace(pgpMisc, '');
-        modified = modified.replace(pgpEnd, '');
-
-        if (trim) {
-            return modified.trim();
-        }
-
-        return pgpHead.concat('\r\n\r\n', message, '\r\n\r\n', pgpEnd);
-    }
-
     public encryptMessage = (originalData: ArrayBuffer | Uint8Array | string): Promise<EncryptResolve> => new Promise<EncryptResolve>(async (resolve, _) => {
         try {
             // @ts-ignore
@@ -92,14 +92,14 @@ class EncryptHelper {
                 privateKeys: this.pgpKeyPair.readPrivateKey
             });
 
-            const modifiedPGP = this.modifyPGPMessage(encryptedMsg, true);
+            const modifiedPGP = EncryptHelper.modifyPGPMessage(encryptedMsg, true);
             return resolve(['SUCCESS', modifiedPGP]);
         } catch (err) { resolve(['FAILURE', err]); }
 
     })
 
     public decryptMessage = (encryptedMessage: string, buffer?: boolean): Promise<DecryptResolve> => new Promise<DecryptResolve>(async (resolve, _) => {
-        const cleanEncrypted = this.modifyPGPMessage(encryptedMessage);
+        const cleanEncrypted = EncryptHelper.modifyPGPMessage(encryptedMessage);
         try {
             const message = await openpgp.readMessage({ armoredMessage: cleanEncrypted });
             const decrypted = await openpgp.decrypt({
@@ -122,7 +122,7 @@ class EncryptHelper {
         }
     })
 
-    static encryptSignWith = (encryptPublicKeys: Array<string>, signPrivateKey: Array<string>, data: ArrayBuffer | Uint8Array | string): Promise<EncryptResolve> => (
+    static encryptSignWith = (encryptPublicKeys: Array<string>, signPrivateKey: Array<string>, data: ArrayBuffer | Uint8Array | string, trim = false): Promise<EncryptResolve> => (
         new Promise<EncryptResolve>(async (resolve, _) => {
             try {
                 let privateKeys: Array<openpgp.Key> = [];
@@ -137,7 +137,12 @@ class EncryptHelper {
                     publicKeys,
                     privateKeys
                 });
-                return resolve(['SUCCESS', encrypted as string]);
+
+                let modified = encrypted;
+                if (trim) {
+                    modified = EncryptHelper.modifyPGPMessage(encrypted as string, trim);
+                }
+                return resolve(['SUCCESS', modified as string]);
             } catch (err) {
                 console.log(err);
                 return resolve(['FAILURE']);
@@ -147,10 +152,11 @@ class EncryptHelper {
 
     static decryptWith = (pgpKeys: PGPKeys, encryptedMessage: string, checkKeyID?: string): Promise<[status: 'SUCCESS' | 'FAILURE' | 'KEYID_CHECK_ERROR', payload?: any]> => (
         new Promise<[status: 'SUCCESS' | 'FAILURE' | 'KEYID_CHECK_ERROR', payload?: any]>(async (resolve, _) => {
+            const modifiedEncryptedMessage = EncryptHelper.modifyPGPMessage(encryptedMessage);
             const options = {
                 privateKeys: await openpgp.readKey({ armoredKey: pgpKeys.armoredPrivateKey }),
                 // publicKeys: await openpgp.readKey({ armoredKey: pgpKeys.armoredPublicKey }),
-                message: await openpgp.readMessage({ armoredMessage: encryptedMessage })
+                message: await openpgp.readMessage({ armoredMessage: modifiedEncryptedMessage })
             };
             try {
                 const decryptedMessage = await openpgp.decrypt(options);

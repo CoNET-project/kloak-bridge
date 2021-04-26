@@ -41,7 +41,7 @@ Name | Type |
 
 **Returns:** [*KeyContainer*](keycontainer.md)
 
-Defined in: [KeyContainer.ts:14](https://github.com/CoNET-project/kloak-bridge/blob/db9c422/src/KeyContainer.ts#L14)
+Defined in: [KeyContainer.ts:14](https://github.com/CoNET-project/kloak-bridge/blob/d5ed71b/src/KeyContainer.ts#L14)
 
 ## Properties
 
@@ -49,7 +49,7 @@ Defined in: [KeyContainer.ts:14](https://github.com/CoNET-project/kloak-bridge/b
 
 • `Private` **IDBHelper**: [*IDBDatabaseHelper*](idbdatabasehelper.md)
 
-Defined in: [KeyContainer.ts:7](https://github.com/CoNET-project/kloak-bridge/blob/db9c422/src/KeyContainer.ts#L7)
+Defined in: [KeyContainer.ts:7](https://github.com/CoNET-project/kloak-bridge/blob/d5ed71b/src/KeyContainer.ts#L7)
 
 ___
 
@@ -57,7 +57,7 @@ ___
 
 • `Private` **encryptHelper**: *null* \| [*EncryptHelper*](encrypthelper.md)= null
 
-Defined in: [KeyContainer.ts:8](https://github.com/CoNET-project/kloak-bridge/blob/db9c422/src/KeyContainer.ts#L8)
+Defined in: [KeyContainer.ts:8](https://github.com/CoNET-project/kloak-bridge/blob/d5ed71b/src/KeyContainer.ts#L8)
 
 ___
 
@@ -65,7 +65,7 @@ ___
 
 • `Private` **keyChain**: [*KeyChain*](../interfaces/keychain.md)
 
-Defined in: [KeyContainer.ts:10](https://github.com/CoNET-project/kloak-bridge/blob/db9c422/src/KeyContainer.ts#L10)
+Defined in: [KeyContainer.ts:10](https://github.com/CoNET-project/kloak-bridge/blob/d5ed71b/src/KeyContainer.ts#L10)
 
 ___
 
@@ -73,7 +73,7 @@ ___
 
 • `Private` **keychainUUID**: *string*
 
-Defined in: [KeyContainer.ts:9](https://github.com/CoNET-project/kloak-bridge/blob/db9c422/src/KeyContainer.ts#L9)
+Defined in: [KeyContainer.ts:9](https://github.com/CoNET-project/kloak-bridge/blob/d5ed71b/src/KeyContainer.ts#L9)
 
 ## Methods
 
@@ -90,7 +90,7 @@ Name | Type |
 
 **Returns:** *Promise*<[status: "SUCCESS" \| "ALREADY\_EXISTS"]\>
 
-Defined in: [KeyContainer.ts:38](https://github.com/CoNET-project/kloak-bridge/blob/db9c422/src/KeyContainer.ts#L38)
+Defined in: [KeyContainer.ts:38](https://github.com/CoNET-project/kloak-bridge/blob/d5ed71b/src/KeyContainer.ts#L38)
 
 ___
 
@@ -106,7 +106,7 @@ Name | Type |
 
 **Returns:** *Promise*<[*GetAppDataUUID*](../modules.md#getappdatauuid)\>
 
-Defined in: [KeyContainer.ts:108](https://github.com/CoNET-project/kloak-bridge/blob/db9c422/src/KeyContainer.ts#L108)
+Defined in: [KeyContainer.ts:108](https://github.com/CoNET-project/kloak-bridge/blob/d5ed71b/src/KeyContainer.ts#L108)
 
 ___
 
@@ -116,7 +116,7 @@ ___
 
 **Returns:** *undefined* \| *Promise*<[*EncryptResolve*](../modules.md#encryptresolve)\>
 
-Defined in: [KeyContainer.ts:36](https://github.com/CoNET-project/kloak-bridge/blob/db9c422/src/KeyContainer.ts#L36)
+Defined in: [KeyContainer.ts:36](https://github.com/CoNET-project/kloak-bridge/blob/d5ed71b/src/KeyContainer.ts#L36)
 
 ___
 
@@ -126,7 +126,7 @@ ___
 
 **Returns:** [*KeyChain*](../interfaces/keychain.md)
 
-Defined in: [KeyContainer.ts:34](https://github.com/CoNET-project/kloak-bridge/blob/db9c422/src/KeyContainer.ts#L34)
+Defined in: [KeyContainer.ts:34](https://github.com/CoNET-project/kloak-bridge/blob/d5ed71b/src/KeyContainer.ts#L34)
 
 ___
 
@@ -136,7 +136,7 @@ ___
 
 **Returns:** *Promise*<[*GetDeviceKey*](../modules.md#getdevicekey)\>
 
-Defined in: [KeyContainer.ts:90](https://github.com/CoNET-project/kloak-bridge/blob/db9c422/src/KeyContainer.ts#L90)
+Defined in: [KeyContainer.ts:90](https://github.com/CoNET-project/kloak-bridge/blob/d5ed71b/src/KeyContainer.ts#L90)
 
 ___
 
@@ -146,7 +146,7 @@ ___
 
 **Returns:** *Promise*<[*GetKloakKey*](../modules.md#getkloakkey)\>
 
-Defined in: [KeyContainer.ts:99](https://github.com/CoNET-project/kloak-bridge/blob/db9c422/src/KeyContainer.ts#L99)
+Defined in: [KeyContainer.ts:99](https://github.com/CoNET-project/kloak-bridge/blob/d5ed71b/src/KeyContainer.ts#L99)
 
 ___
 
@@ -156,4 +156,4 @@ ___
 
 **Returns:** *Promise*<boolean\>
 
-Defined in: [KeyContainer.ts:22](https://github.com/CoNET-project/kloak-bridge/blob/db9c422/src/KeyContainer.ts#L22)
+Defined in: [KeyContainer.ts:22](https://github.com/CoNET-project/kloak-bridge/blob/d5ed71b/src/KeyContainer.ts#L22)
