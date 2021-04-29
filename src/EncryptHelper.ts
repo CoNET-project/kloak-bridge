@@ -186,6 +186,17 @@ class EncryptHelper {
             resolve(message.getEncryptionKeyIds().map((keyid) => keyid.toHex().toUpperCase()));
         })
     )
+
+    static validatePGPKey = (armoredKey: string): Promise<[status: 'VALID_KEY'| 'INVALID_KEY']> => (
+        new Promise<[status: 'VALID_KEY' | 'INVALID_KEY']>(async (resolve, _) => {
+            try {
+                await openpgp.readKey({ armoredKey });
+                return resolve(['VALID_KEY']);
+            } catch (err) {
+                return resolve(['INVALID_KEY']);
+            }
+        })
+    )
 }
 
 export default EncryptHelper;
