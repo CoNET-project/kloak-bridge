@@ -42,7 +42,7 @@ class KloakBridge {
             const tempEncrypt = new EncryptHelper();
             const keyChain: KeyChain = {
                 device: {},
-                kloak: {},
+                seguro: {},
                 apps: {
                     '1B3166C1914E82E6': {
                         encryptionKeys: {},
@@ -87,7 +87,7 @@ class KloakBridge {
             keyChain.apps['1B3166C1914E82E6'].encryptionKeys = messengerKeys as PGPKeys;
             keyChain.apps['216AABF3D6764CB0'].encryptionKeys = storageKeys as PGPKeys;
             keyChain.device = deviceKey as PGPKeys;
-            keyChain.kloak = kloakKey as PGPKeys;
+            keyChain.seguro = kloakKey as PGPKeys;
             return resolve(keyChain);
         })
     )

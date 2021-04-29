@@ -8,7 +8,7 @@
 
 - [apps](keychain.md#apps)
 - [device](keychain.md#device)
-- [kloak](keychain.md#kloak)
+- [seguro](keychain.md#seguro)
 
 ## Properties
 
@@ -18,7 +18,7 @@
 
 #### Type declaration:
 
-Defined in: [define.ts:95](https://github.com/CoNET-project/kloak-bridge/blob/1d36987/src/define.ts#L95)
+Defined in: [define.ts:95](https://github.com/CoNET-project/kloak-bridge/blob/725d1ff/src/define.ts#L95)
 
 ___
 
@@ -26,12 +26,12 @@ ___
 
 • **device**: {} \| [*PGPKeys*](pgpkeys.md)
 
-Defined in: [define.ts:93](https://github.com/CoNET-project/kloak-bridge/blob/1d36987/src/define.ts#L93)
+Defined in: [define.ts:93](https://github.com/CoNET-project/kloak-bridge/blob/725d1ff/src/define.ts#L93)
 
 ___
 
-### kloak
+### seguro
 
-• **kloak**: {} \| [*PGPKeys*](pgpkeys.md)
+• **seguro**: {} \| [*PGPKeys*](pgpkeys.md)
 
-Defined in: [define.ts:94](https://github.com/CoNET-project/kloak-bridge/blob/1d36987/src/define.ts#L94)
+Defined in: [define.ts:94](https://github.com/CoNET-project/kloak-bridge/blob/725d1ff/src/define.ts#L94)

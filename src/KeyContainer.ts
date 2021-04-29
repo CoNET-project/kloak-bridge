@@ -9,7 +9,7 @@ class KeyContainer {
     private keychainUUID: string
     private keyChain: KeyChain = {
         device: {},
-        kloak: {},
+        seguro: {},
         apps: {}
     }
 
@@ -98,8 +98,8 @@ class KeyContainer {
 
     public retrieveKloakKey = (): Promise<GetKloakKey> => (
         new Promise<GetKloakKey>((resolve, _) => {
-            if (Object.keys(this.keyChain.kloak).length > 0) {
-                return resolve(['SUCCESS', this.keyChain.kloak as PGPKeys]);
+            if (Object.keys(this.keyChain.seguro).length > 0) {
+                return resolve(['SUCCESS', this.keyChain.seguro as PGPKeys]);
             }
             return resolve(['FAILURE']);
         })
