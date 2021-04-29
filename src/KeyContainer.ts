@@ -1,4 +1,4 @@
-import { GetAppDataUUID, GetDeviceKey, GetKloakKey, KeyChain, PGPKeys } from './define';
+import { GetAppDataUUID, GetDeviceKey, GetSeguroKey, KeyChain, PGPKeys } from './define';
 import EncryptHelper from './EncryptHelper';
 import IDBDatabaseHelper from './IDBDatabaseHelper';
 import { getUUIDv4 } from './utils';
@@ -9,7 +9,7 @@ class KeyContainer {
     private keychainUUID: string
     private keyChain: KeyChain = {
         device: {},
-        kloak: {},
+        seguro: {},
         apps: {}
     }
 
@@ -96,10 +96,10 @@ class KeyContainer {
         })
     )
 
-    public retrieveKloakKey = (): Promise<GetKloakKey> => (
-        new Promise<GetKloakKey>((resolve, _) => {
-            if (Object.keys(this.keyChain.kloak).length > 0) {
-                return resolve(['SUCCESS', this.keyChain.kloak as PGPKeys]);
+    public retrieveSeguroKey = (): Promise<GetSeguroKey> => (
+        new Promise<GetSeguroKey>((resolve, _) => {
+            if (Object.keys(this.keyChain.seguro).length > 0) {
+                return resolve(['SUCCESS', this.keyChain.seguro as PGPKeys]);
             }
             return resolve(['FAILURE']);
         })

@@ -7,7 +7,7 @@ import {
     UnlockContainerResolve, CheckContainerResolve,
     LockContainerResolve, ChangeKeyContainerResolve,
     // eslint-disable-next-line camelcase
-    DeleteKeychainResolve, EncryptSaveResolve, RetrieveDecryptResolve, UnlockKeyResolve, GetAppDataUUID, GetDeviceKey, GetKloakKey, IMAPAccount, next_time_connect, connectRequest
+    DeleteKeychainResolve, EncryptSaveResolve, RetrieveDecryptResolve, UnlockKeyResolve, GetAppDataUUID, GetDeviceKey, GetSeguroKey, IMAPAccount, next_time_connect, connectRequest
 } from './define';
 import DisassemblyHelper from './DisassemblyHelper';
 import AssemblyHelper from './AssemblyHelper';
@@ -42,7 +42,7 @@ class KloakBridge {
             const tempEncrypt = new EncryptHelper();
             const keyChain: KeyChain = {
                 device: {},
-                kloak: {},
+                seguro: {},
                 apps: {
                     '1B3166C1914E82E6': {
                         encryptionKeys: {},
@@ -87,7 +87,7 @@ class KloakBridge {
             keyChain.apps['1B3166C1914E82E6'].encryptionKeys = messengerKeys as PGPKeys;
             keyChain.apps['216AABF3D6764CB0'].encryptionKeys = storageKeys as PGPKeys;
             keyChain.device = deviceKey as PGPKeys;
-            keyChain.kloak = kloakKey as PGPKeys;
+            keyChain.seguro = kloakKey as PGPKeys;
             return resolve(keyChain);
         })
     )
@@ -126,7 +126,7 @@ class KloakBridge {
 
     private establishConnection = async (urlPath: string = 'http://localhost:3000/getInformationFromSeguro') => {
         const [deviceKeyStatus, deviceKey] = await this.getDeviceKey();
-        const [kloakKeyStatus, kloakKey] = await this.getKloakKey();
+        const [kloakKeyStatus, kloakKey] = await this.getSeguroKey();
         let imapAccount:IMAPAccount | undefined;
         let serverFolder: string | undefined;
         let networkConnection;
@@ -419,12 +419,12 @@ class KloakBridge {
         })
     )
 
-    public getKloakKey = (): Promise<GetKloakKey> => (
-        new Promise<GetKloakKey>(async (resolve, _) => {
+    public getSeguroKey = (): Promise<GetSeguroKey> => (
+        new Promise<GetSeguroKey>(async (resolve, _) => {
             if (!this.keyContainer) {
                 return resolve(['NO_KEY_CONTAINER']);
             }
-            return resolve(await this.keyContainer.retrieveKloakKey());
+            return resolve(await this.keyContainer.retrieveSeguroKey());
         })
     )
 
@@ -437,6 +437,19 @@ class KloakBridge {
             return resolve([status, appData]);
         })
     )
+
+    // public sendTo = (encryptedMessage: string, recipientPublicKey?: string): Promise<[status: 'SUCCESS' | 'FAILURE']> => (
+    //     new Promise<[status: 'SUCCESS' | 'FAILURE']>(async (resolve, _) => {
+    //         const [deviceKeyStatus, deviceKey] = await this.keyContainer?.retrieveDeviceKey();
+    //         const;
+    //         if (deviceKeyStatus === 'SUCCESS') {
+    //             await EncryptHelper.encryptSignWith(
+    //                 [deviceKey.armoredPublicKey],
+    //                 [deviceKey], encryptedMessage
+    //             );
+    //         }
+    //     })
+    // )
 
     // public upload = (encryptInstance: string, source: File | Blob, callback: (err: Error | null, progress: number, done: boolean) => void): Promise<string> => (
     //     new Promise<string>((resolve, _) => {

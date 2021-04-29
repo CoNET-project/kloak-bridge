@@ -16,7 +16,7 @@ describe('StorageHelper Class', () => {
     let kloakBridge: KloakBridge;
     const keyChain: KeyChain = {
         device: {},
-        kloak: {},
+        seguro: {},
         apps: {}
     };
     let encryptHelper: EncryptHelper | null;

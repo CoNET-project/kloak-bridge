@@ -91,7 +91,7 @@ export interface AppKeys {
 
 export interface KeyChain {
     device: PGPKeys | {},
-    kloak: PGPKeys | {},
+    seguro: PGPKeys | {},
     apps: {
         [appKeyID: string]: {
             publicKey: string,
@@ -200,6 +200,6 @@ export type RetrieveDecryptResolve = [status: 'SUCCESS' | 'FAILURE', payload?: s
 
 export type GetDeviceKey = [status: 'NO_DEVICE_KEY' | 'SUCCESS' | 'FAILURE' | 'NO_KEY_CONTAINER', deviceKey?: PGPKeys];
 
-export type GetKloakKey = [status: 'NO_KLOAK_KEY' | 'SUCCESS' | 'FAILURE' | 'NO_KEY_CONTAINER', kloakKey?: PGPKeys];
+export type GetSeguroKey = [status: 'NO_KLOAK_KEY' | 'SUCCESS' | 'FAILURE' | 'NO_KEY_CONTAINER', seguroKey?: PGPKeys];
 
 export type GetAppDataUUID = [status: 'SUCCESS' | 'DOES_NOT_EXIST' | 'FAILURE' | 'NO_KEY_CONTAINER', appData?: {encryptionKeys: PGPKeys, dataUUID: string}]

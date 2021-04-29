@@ -70,7 +70,6 @@ class EncryptHelper {
 
     public checkPassword = (keyPair: PGPKeys, passphrase: string): Promise<KeyResolve> => new Promise<KeyResolve>(async (resolve, _) => {
         this.pgpKeyPair = keyPair;
-        console.log(keyPair);
         this.pgpKeyPair.readPublicKey = await openpgp.readKey({ armoredKey: this.pgpKeyPair.armoredPublicKey });
         this.pgpKeyPair.readPrivateKey = await openpgp.readKey({ armoredKey: this.pgpKeyPair.armoredPrivateKey });
 
@@ -108,7 +107,6 @@ class EncryptHelper {
                 privateKeys: this.pgpKeyPair.readPrivateKey // for decryption
             });
             const dataBuffer = Buffer.from(decrypted.data, 'base64');
-            console.log(dataBuffer);
             if (buffer) {
                 return resolve(['SUCCESS', dataBuffer]);
             }
