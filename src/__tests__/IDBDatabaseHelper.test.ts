@@ -9,11 +9,11 @@ describe('IDBDatabaseHelper Class', () => {
         date: (new Date()).toISOString()
     };
 
-    test('Should successfully return an object store', async () => {
-        const idb = new IDBDatabaseHelper();
-        const objectStore = await idb.getObjectStore();
-        expect(objectStore).toBeTruthy();
-    });
+    // test('Should successfully return an object store', async () => {
+    //     const idb = new IDBDatabaseHelper();
+    //     const objectStore = await idb.getObjectStore();
+    //     expect(objectStore).toBeTruthy();
+    // });
 
     test('Should save data into IndexedDB', async () => {
         const idb = new IDBDatabaseHelper();

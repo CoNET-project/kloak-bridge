@@ -12,14 +12,14 @@ class IDBDatabaseHelper {
         if (version) this.version = version;
     }
 
-    public getObjectStore = (): Promise<IDBObjectStore> => new Promise<IDBObjectStore>((resolve, reject) => {
+    public getObjectStore = (): Promise<[tx: IDBTransaction, objectStore: IDBObjectStore]> => new Promise<[tx: IDBTransaction, objectStore: IDBObjectStore]>((resolve, reject) => {
         // eslint-disable-next-line no-undef
         const req = indexedDB.open(this.databaseName, this.version);
         req.onupgradeneeded = async (evt: IDBVersionChangeEvent): Promise<any> => {
             try {
                 const db = await (evt.target as IDBDatabaseEventTarget).result;
-                const objectStore = await db.createObjectStore('data');
-                resolve(objectStore);
+                const objectStore = await db.createObjectStore('data') as IDBObjectStore;
+                resolve([objectStore.transaction, objectStore]);
             } catch (err: any) {
                 reject(err);
             }
@@ -28,9 +28,9 @@ class IDBDatabaseHelper {
         req.onsuccess = async (evt) => {
             try {
                 const db = await (evt.target as IDBDatabaseEventTarget).result;
-                const tx: IDBTransaction = await db.transaction('data', 'readwrite') as IDBTransaction;
-                const objectStore = await tx.objectStore('data');
-                resolve(objectStore);
+                const tx: IDBTransaction = db.transaction('data', 'readwrite') as IDBTransaction;
+                const objectStore = tx.objectStore('data');
+                resolve([tx, objectStore]);
             } catch (err: any) {
                 reject(err);
             }
@@ -39,7 +39,9 @@ class IDBDatabaseHelper {
 
     public save = (uuid: string, data: any): Promise<string> => new Promise<string>(async (resolve, reject) => {
         try {
-            const objectStore = await this.getObjectStore();
+            const [tx, objectStore] = await this.getObjectStore();
+            tx.oncomplete = () => resolve(uuid);
+            tx.onerror = (err) => console.log(err);
             const storeAction = await objectStore?.put(JSON.stringify(data), uuid);
             storeAction.onsuccess = () => resolve(uuid);
             storeAction.onerror = (evt: Event) => reject(evt);
@@ -50,7 +52,9 @@ class IDBDatabaseHelper {
 
     public retrieve = (uuid: string): Promise<any> => new Promise<any>(async (resolve, reject) => {
         try {
-            const objectStore = await this.getObjectStore();
+            const [tx, objectStore] = await this.getObjectStore();
+            tx.oncomplete = () => resolve(uuid);
+            tx.onerror = (err) => console.log(err);
             const storeAction = await objectStore?.get(uuid);
             storeAction.onsuccess = (evt: Event) => {
                 const data = (evt.target as IDBDatabaseEventTarget).result;
@@ -68,7 +72,9 @@ class IDBDatabaseHelper {
 
     public delete = (uuid: string): Promise<string> => new Promise<string>(async (resolve, reject) => {
         try {
-            const objectStore = await this.getObjectStore();
+            const [tx, objectStore] = await this.getObjectStore();
+            tx.oncomplete = () => resolve(uuid);
+            tx.onerror = (err) => console.log(err);
             const storeAction = await objectStore?.delete(uuid);
             storeAction.onsuccess = () => resolve(uuid);
             storeAction.onerror = (evt: Event) => reject(evt);
