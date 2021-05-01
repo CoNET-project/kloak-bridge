@@ -43,7 +43,7 @@ class IDBDatabaseHelper {
             tx.oncomplete = () => resolve(uuid);
             tx.onerror = (err) => console.log(err);
             const storeAction = await objectStore?.put(JSON.stringify(data), uuid);
-            storeAction.onsuccess = () => resolve(uuid);
+            storeAction.onsuccess = () => {};
             storeAction.onerror = (evt: Event) => reject(evt);
         } catch (err) {
             reject(err);
@@ -53,7 +53,7 @@ class IDBDatabaseHelper {
     public retrieve = (uuid: string): Promise<any> => new Promise<any>(async (resolve, reject) => {
         try {
             const [tx, objectStore] = await this.getObjectStore();
-            tx.oncomplete = () => resolve(uuid);
+            tx.oncomplete = () => {};
             tx.onerror = (err) => console.log(err);
             const storeAction = await objectStore?.get(uuid);
             storeAction.onsuccess = (evt: Event) => {
@@ -76,7 +76,7 @@ class IDBDatabaseHelper {
             tx.oncomplete = () => resolve(uuid);
             tx.onerror = (err) => console.log(err);
             const storeAction = await objectStore?.delete(uuid);
-            storeAction.onsuccess = () => resolve(uuid);
+            storeAction.onsuccess = () => {};
             storeAction.onerror = (evt: Event) => reject(evt);
         } catch (err) {
             reject(err);

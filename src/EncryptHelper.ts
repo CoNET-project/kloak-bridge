@@ -142,7 +142,6 @@ class EncryptHelper {
                 }
                 return resolve(['SUCCESS', modified as string]);
             } catch (err) {
-                console.log(err);
                 return resolve(['FAILURE']);
             }
         })
