@@ -7,7 +7,7 @@ import {
     UnlockContainerResolve, CheckContainerResolve,
     LockContainerResolve, ChangeKeyContainerResolve,
     // eslint-disable-next-line camelcase
-    DeleteKeychainResolve, EncryptSaveResolve, RetrieveDecryptResolve, UnlockKeyResolve, GetAppDataUUID, GetDeviceKey, GetKloakKey, IMAPAccount, next_time_connect, connectRequest
+    DeleteKeychainResolve, EncryptSaveResolve, RetrieveDecryptResolve, UnlockKeyResolve, GetAppDataUUID, GetDeviceKey, IMAPAccount, next_time_connect, connectRequest, GetSeguroKey
 } from './define';
 import DisassemblyHelper from './DisassemblyHelper';
 import AssemblyHelper from './AssemblyHelper';
@@ -126,7 +126,7 @@ class KloakBridge {
 
     private establishConnection = async (urlPath: string = 'http://localhost:3000/getInformationFromSeguro') => {
         const [deviceKeyStatus, deviceKey] = await this.getDeviceKey();
-        const [kloakKeyStatus, kloakKey] = await this.getKloakKey();
+        const [kloakKeyStatus, kloakKey] = await this.getSeguroKey();
         let imapAccount:IMAPAccount | undefined;
         let serverFolder: string | undefined;
         let networkConnection;
@@ -419,12 +419,12 @@ class KloakBridge {
         })
     )
 
-    public getKloakKey = (): Promise<GetKloakKey> => (
-        new Promise<GetKloakKey>(async (resolve, _) => {
+    public getSeguroKey = (): Promise<GetSeguroKey> => (
+        new Promise<GetSeguroKey>(async (resolve, _) => {
             if (!this.keyContainer) {
                 return resolve(['NO_KEY_CONTAINER']);
             }
-            return resolve(await this.keyContainer.retrieveKloakKey());
+            return resolve(await this.keyContainer.retrieveSeguroKey());
         })
     )
 
