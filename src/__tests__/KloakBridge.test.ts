@@ -137,7 +137,7 @@ describe('StorageHelper Class', () => {
     });
 
     test('Should get kloak key', async () => {
-        const [status, kloakKey] = await kloakBridge.getKloakKey();
+        const [status, kloakKey] = await kloakBridge.getSeguroKey();
         console.log(kloakKey);
         expect(status).toBe('SUCCESS');
     });
