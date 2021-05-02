@@ -1,4 +1,4 @@
-import { URL } from 'url';
+import { URL as NodeURL } from 'url';
 import Websocket from 'ws';
 import { request } from 'http';
 import { connectRequest, IMAPAccount, PGPKeys } from './define';
@@ -78,15 +78,21 @@ class Network {
 
     static requestPost = (postData: connectRequest, postURLPath: string = 'http://localhost:3000'): Promise<[status: 'SUCCESS' | 'FAILURE', payload?: any]> => (
         new Promise<[status: 'SUCCESS' | 'FAILURE', payload?: any]>((resolve, _) => {
-            const URLObject = new URL(postURLPath);
+            let URLObject;
+            if ((typeof process !== 'undefined') && (process.release.name === 'node')) {
+                URLObject = new NodeURL(postURLPath);
+            } else {
+                URLObject = new URL(postURLPath);
+            }
+
             console.log(URLObject);
-            console.log(URLObject.host);
-            console.log(URLObject.port);
+            console.log(URLObject?.host);
+            console.log(URLObject?.port);
             const postString = JSON.stringify(postData);
             const options = {
-                host: URLObject.hostname,
-                port: URLObject.port,
-                path: URLObject.pathname,
+                host: URLObject?.hostname,
+                port: URLObject?.port,
+                path: URLObject?.pathname,
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

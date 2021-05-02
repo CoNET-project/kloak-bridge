@@ -1,7 +1,7 @@
 describe('Network test', () => {
     test('Should pass', () => {});
 });
-
+//
 // import EncryptHelper from '../EncryptHelper';
 // import { PGPKeys } from '../../dist';
 // import Network from '../Network';
