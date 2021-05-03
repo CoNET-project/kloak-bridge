@@ -79,7 +79,7 @@ class Network {
     static requestPost = (postData: connectRequest, postURLPath: string = 'http://localhost:3000'): Promise<[status: 'SUCCESS' | 'FAILURE', payload?: any]> => (
         new Promise<[status: 'SUCCESS' | 'FAILURE', payload?: any]>((resolve, _) => {
             let URLObject;
-            if ((typeof process !== 'undefined') && (process.release.name === 'node')) {
+            if ((typeof process !== 'undefined') && (process.release) && (process.release.name === 'node')) {
                 URLObject = new NodeURL(postURLPath);
             } else {
                 URLObject = new URL(postURLPath);
