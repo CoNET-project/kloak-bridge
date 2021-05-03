@@ -37,6 +37,7 @@ class KloakBridge {
         keychain: '',
         network: ''
     }
+    private requestedConnection = false
 
     constructor(skipNetwork = false, localServerPath?: string) {
         this.skipNetwork = skipNetwork;
@@ -223,8 +224,9 @@ class KloakBridge {
                             const [, decryptedContainer] = await this.containerEncrypter.decryptMessage(encryptedKeychain);
                             this.keyContainer = new KeyContainer(this.containerEncrypter, keyChainContainer.keychain, decryptedContainer as unknown as KeyChain);
                             // await this.establishConnection();
-                            if (!this.skipNetwork) {
+                            if (!this.skipNetwork && !this.requestedConnection) {
                                 await this.establishConnection();
+                                this.requestedConnection = true;
                             }
                             return resolve(['SUCCESS']);
                         }
@@ -265,8 +267,9 @@ class KloakBridge {
                 await this.IDBHelper.save('KeyContainer', keyContainer);
                 await this.IDBHelper.retrieve('KeyContainer');
                 resolve(<CreateContainerResolve>['SUCCESS', keyContainer]);
-                if (!this.skipNetwork) {
+                if (!this.skipNetwork && !this.requestedConnection) {
                     await this.establishConnection();
+                    this.requestedConnection = true;
                 }
                 return;
             } catch (err) {
