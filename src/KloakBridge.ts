@@ -1,3 +1,4 @@
+import { URL as NodeURL } from 'url';
 import EncryptHelper from './EncryptHelper';
 import IDBDatabaseHelper from './IDBDatabaseHelper';
 import {
@@ -17,6 +18,10 @@ import Network from './Network';
 
 class KloakBridge {
 
+    private localServerURL = {
+        host: 'localhost',
+        port: '3000'
+    };
     private uploadHelpers: {[name: string]: DisassemblyHelper} = {};
     private assemblyHelpers: {[name: string]: AssemblyHelper} = {};
     private keyContainer: KeyContainer | undefined
@@ -33,8 +38,27 @@ class KloakBridge {
         network: ''
     }
 
-    constructor(skipNetwork = false) {
+    constructor(skipNetwork = false, localServerPath?: string) {
         this.skipNetwork = skipNetwork;
+        if (localServerPath) {
+            this.getURLData(localServerPath);
+        } else if (typeof window !== 'undefined') {
+            this.getURLData(window.location.href);
+        }
+        console.log(this.localServerURL);
+    }
+
+    private getURLData = (url: string) => {
+        let URLObject;
+        if ((typeof process !== 'undefined') && (process.release) && (process.release.name === 'node')) {
+            URLObject = new NodeURL(url);
+        } else {
+            URLObject = new URL(url);
+        }
+        this.localServerURL = {
+            host: URLObject?.hostname,
+            port: URLObject?.port
+        };
     }
 
     private generateDefaultKeychain = (): Promise<KeyChain> => (
@@ -124,7 +148,7 @@ class KloakBridge {
         })
     )
 
-    private establishConnection = async (urlPath: string = 'http://localhost:3000/getInformationFromSeguro') => {
+    private establishConnection = async (urlPath: string = `http://${this.localServerURL.host}:${this.localServerURL.port}/getInformationFromSeguro`) => {
         const [deviceKeyStatus, deviceKey] = await this.getDeviceKey();
         const [kloakKeyStatus, kloakKey] = await this.getSeguroKey();
         let imapAccount:IMAPAccount | undefined;
@@ -155,7 +179,7 @@ class KloakBridge {
             if (networkConnection[0] === 'SUCCESS') {
                 const connectRequest: connectRequest = networkConnection[1];
                 await this.saveNetworkInfo(connectRequest.next_time_connect?.imap_account as IMAPAccount, connectRequest.next_time_connect?.server_folder as string);
-                const ws = Network.wsConnect('ws://localhost:3000/connectToSeguro', connectRequest.connect_info, (err, data) => {
+                const ws = Network.wsConnect(`ws://${this.localServerURL.host}:${this.localServerURL.port}/connectToSeguro`, connectRequest.connect_info, (err, data) => {
                     if (err) {
                         console.log(err);
                         ws.close();
