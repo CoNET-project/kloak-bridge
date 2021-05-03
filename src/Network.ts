@@ -56,7 +56,7 @@ const imapData = [
     }
 ];
 
-const seguroPublicKey = `
+const seguroServerPublicKey = `
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 
 mDMEYF/6PRYJKwYBBAHaRw8BAQdATMNoTXLMBPzVgMcgwDIJT42QkNuOOwjRLpHF
@@ -121,10 +121,10 @@ class Network {
     )
 
     // eslint-disable-next-line max-len
-    static connection = (devicePGPKeys: PGPKeys, kloakPublicKey: string, urlPath: string, imapAccount?: IMAPAccount, serverFolder?: string): Promise<[status: 'SUCCESS' | 'FAILURE', request?: connectRequest]> => (
+    static connection = (devicePGPKeys: PGPKeys, seguroPublicKey: string, urlPath: string, imapAccount?: IMAPAccount, serverFolder?: string): Promise<[status: 'SUCCESS' | 'FAILURE', request?: connectRequest]> => (
         new Promise<[status: 'SUCCESS' | 'FAILURE', request?: connectRequest]>(async (resolve, _) => {
             const request: connectRequest = {
-                kloak_account_armor: kloakPublicKey,
+                kloak_account_armor: seguroPublicKey,
                 device_armor: devicePGPKeys.armoredPublicKey,
                 imap_account: imapAccount || imapData[0].accounts[0],
                 client_folder_name: getUUIDv4(),
@@ -133,7 +133,7 @@ class Network {
                 encrypted_request: ''
             };
 
-            const [status, encryptedRequest] = await EncryptHelper.encryptSignWith([seguroPublicKey], [devicePGPKeys.armoredPrivateKey], JSON.stringify(request));
+            const [status, encryptedRequest] = await EncryptHelper.encryptSignWith([seguroServerPublicKey], [devicePGPKeys.armoredPrivateKey], JSON.stringify(request));
             console.log('ENCRYPTED REQUEST', status);
             if (status === 'SUCCESS') {
                 request.encrypted_request = encryptedRequest;

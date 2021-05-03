@@ -105,13 +105,13 @@ class KloakBridge {
                 }
             };
             const [, deviceKey] = await tempEncrypt.generateKey({ passphrase: '' });
-            const [, kloakKey] = await tempEncrypt.generateKey({ passphrase: '' });
+            const [, seguroKey] = await tempEncrypt.generateKey({ passphrase: '' });
             const [, messengerKeys] = await tempEncrypt.generateKey({ passphrase: '' });
             const [, storageKeys] = await tempEncrypt.generateKey({ passphrase: '' });
             keyChain.apps['1B3166C1914E82E6'].encryptionKeys = messengerKeys as PGPKeys;
             keyChain.apps['216AABF3D6764CB0'].encryptionKeys = storageKeys as PGPKeys;
             keyChain.device = deviceKey as PGPKeys;
-            keyChain.seguro = kloakKey as PGPKeys;
+            keyChain.seguro = seguroKey as PGPKeys;
             return resolve(keyChain);
         })
     )
@@ -150,14 +150,14 @@ class KloakBridge {
 
     private establishConnection = async (urlPath: string = `http://${this.localServerURL.host}:${this.localServerURL.port}/getInformationFromSeguro`) => {
         const [deviceKeyStatus, deviceKey] = await this.getDeviceKey();
-        const [kloakKeyStatus, kloakKey] = await this.getSeguroKey();
+        const [seguroKeyStatus, seguroKey] = await this.getSeguroKey();
         let imapAccount:IMAPAccount | undefined;
         let serverFolder: string | undefined;
         let networkConnection;
         if (deviceKeyStatus === 'NO_DEVICE_KEY'
             || deviceKeyStatus === 'NO_KEY_CONTAINER'
-            || kloakKeyStatus === 'NO_KLOAK_KEY'
-            || kloakKeyStatus === 'NO_KEY_CONTAINER') {
+            || seguroKeyStatus === 'NO_KLOAK_KEY'
+            || seguroKeyStatus === 'NO_KEY_CONTAINER') {
             return;
         }
 
@@ -169,10 +169,10 @@ class KloakBridge {
                 imapAccount = (decryptedNetwork as unknown as next_time_connect).imap_account;
                 // eslint-disable-next-line camelcase
                 serverFolder = (decryptedNetwork as unknown as next_time_connect).server_folder;
-                networkConnection = await Network.connection(deviceKey as PGPKeys, kloakKey?.armoredPublicKey as string, urlPath, imapAccount, serverFolder);
+                networkConnection = await Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, urlPath, imapAccount, serverFolder);
             }
         } else {
-            networkConnection = await Network.connection(deviceKey as PGPKeys, kloakKey?.armoredPublicKey as string, urlPath);
+            networkConnection = await Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, urlPath);
         }
 
         if (networkConnection && networkConnection[0] && networkConnection[1]) {
