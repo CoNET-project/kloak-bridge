@@ -277,7 +277,7 @@ class KloakBridge {
     public deleteKeyContainer = (): Promise<DeleteKeychainResolve> => (
         new Promise<DeleteKeychainResolve>(async (resolve, _) => {
             try {
-                await this.IDBHelper.delete('KeyContainer');
+                await this.IDBHelper.clearObjectStore();
                 return resolve(<DeleteKeychainResolve>['SUCCESS']);
             } catch (err) {
                 return resolve(<DeleteKeychainResolve>['FAILURE']);

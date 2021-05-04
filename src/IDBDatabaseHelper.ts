@@ -37,6 +37,18 @@ class IDBDatabaseHelper {
         };
     });
 
+    public clearObjectStore = (): Promise<boolean> => (
+        new Promise<boolean>(async (resolve, _) => {
+            const [tx, objectStore] = await this.getObjectStore();
+            tx.oncomplete = () => resolve(true);
+            tx.onerror = (err) => {
+                console.log(err);
+                return resolve(false);
+            };
+            objectStore.clear();
+        })
+    )
+
     public save = (uuid: string, data: any): Promise<string> => new Promise<string>(async (resolve, reject) => {
         try {
             const [tx, objectStore] = await this.getObjectStore();
