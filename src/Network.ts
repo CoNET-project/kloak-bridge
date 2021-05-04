@@ -137,18 +137,18 @@ class Network {
             const [status, encryptedRequest] = await EncryptHelper.encryptSignWith([seguroServerPublicKey], [devicePGPKeys.armoredPrivateKey], JSON.stringify(request));
             console.log('ENCRYPTED REQUEST', status, encryptedRequest);
             if (status === 'SUCCESS') {
-            //     request.encrypted_request = encryptedRequest;
+                request.encrypted_request = encryptedRequest;
                 const [status, response] = await Network.requestPost(request, urlPath);
                 console.log(status, response);
-            //     if (status === 'SUCCESS') {
-            //         console.log(response);
-            //         const [status, decryptedResponse] = await EncryptHelper.decryptWith(devicePGPKeys, response.encrypted_response, seguroKeyID);
-            //         if (status === 'SUCCESS') {
-            //             return resolve(['SUCCESS', JSON.parse(decryptedResponse.data) as connectRequest]);
-            //         }
-            //     }
+                if (status === 'SUCCESS') {
+                    console.log(response);
+                    const [status, decryptedResponse] = await EncryptHelper.decryptWith(devicePGPKeys, response.encrypted_response, seguroKeyID);
+                    if (status === 'SUCCESS') {
+                        return resolve(['SUCCESS', JSON.parse(decryptedResponse.data) as connectRequest]);
+                    }
+                }
             }
-            // return resolve(['FAILURE']);
+            return resolve(['FAILURE']);
         })
     )
 

@@ -1,7 +1,6 @@
 describe('Network test', () => {
     test('Should pass', () => {});
 });
-//
 // import EncryptHelper from '../EncryptHelper';
 // import { PGPKeys } from '../../dist';
 // import Network from '../Network';
@@ -48,34 +47,34 @@ describe('Network test', () => {
 //             nextConnectInfo.serverFolder = connRequest?.next_time_connect?.server_folder as string;
 //         }
 //     });
-//
-//     // test('Should connect using connect_info', (done) => {
-//     //     const ws = Network.wsConnect('ws://localhost:3000/connectToSeguro', connRequest.connect_info, (err, data) => {
-//     //         if (err) {
-//     //             console.log(err);
-//     //         }
-//     //         if (data) {
-//     //             console.log(data);
-//     //             if (/Connected/.test(data.status)) {
-//     //                 ws.close();
-//     //                 done();
-//     //             }
-//     //         }
-//     //     });
-//     // });
-//
-//     // test('Should connect using next_connect_info and connect to webSocket', async () => {
-//     //     const [status, request] = await Network.connection(device, kloak.armoredPublicKey,
-//     //         'http://localhost:3000/getInformationFromSeguro', nextConnectInfo.imapAccount, nextConnectInfo.serverFolder);
-//     //     if (status === 'SUCCESS') {
-//     //         Network.wsConnect('ws://localhost:3000/connectToSeguro', request?.connect_info, (err, data) => {
-//     //             if (err) {
-//     //                 console.log(err);
-//     //             }
-//     //             if (data) {
-//     //                 console.log(data);
-//     //             }
-//     //         });
-//     //     }
-//     // });
+
+// test('Should connect using connect_info', (done) => {
+//     const ws = Network.wsConnect('ws://localhost:3000/connectToSeguro', connRequest.connect_info, (err, data) => {
+//         if (err) {
+//             console.log(err);
+//         }
+//         if (data) {
+//             console.log(data);
+//             if (/Connected/.test(data.status)) {
+//                 ws.close();
+//                 done();
+//             }
+//         }
+//     });
+// });
+
+// test('Should connect using next_connect_info and connect to webSocket', async () => {
+//     const [status, request] = await Network.connection(device, kloak.armoredPublicKey,
+//         'http://localhost:3000/getInformationFromSeguro', nextConnectInfo.imapAccount, nextConnectInfo.serverFolder);
+//     if (status === 'SUCCESS') {
+//         Network.wsConnect('ws://localhost:3000/connectToSeguro', request?.connect_info, (err, data) => {
+//             if (err) {
+//                 console.log(err);
+//             }
+//             if (data) {
+//                 console.log(data);
+//             }
+//         });
+//     }
+// });
 // });
