@@ -1,7 +1,7 @@
 import { URL as NodeURL } from 'url';
 import Websocket from 'ws';
 import { request } from 'http';
-import { connectRequest, IMAPAccount, PGPKeys } from './define';
+import { ConnectRequest, IMAPAccount, NetworkPostStatus, PGPKeys, PostMessageRequest, RequestData, WebsocketResponse } from './define';
 import { getUUIDv4 } from './utils';
 import EncryptHelper from './EncryptHelper';
 
@@ -75,8 +75,60 @@ iUatG/EQn9VLAanhlsOMmZApsHnIxwc=
 const seguroKeyID = 'BC934C7133E2B088';
 
 class Network {
+    private connectUUID: string = '';
+    private host: string = '';
+    private port: number | string = ''
 
-    static requestPost = (postData: connectRequest, postURLPath: string = 'http://localhost:3000'): Promise<[status: 'SUCCESS' | 'FAILURE', payload?: any]> => (
+    constructor(connectUUID: string, host: string, port: number | string) {
+        this.connectUUID = connectUUID;
+        this.host = host;
+        this.port = port;
+    }
+
+    public sendToClient = (message: string, encryptPublicKey: string, signPrivateKey: string, path?: string): Promise<NetworkPostStatus> => (
+        new Promise<NetworkPostStatus>(async (resolve, _) => {
+            const [encryptStatus, encryptedMessage] = await EncryptHelper.encryptSignWith([encryptPublicKey], [signPrivateKey], message);
+            if (encryptStatus === 'SUCCESS') {
+                const postMessageRequest: PostMessageRequest = {
+                    connectUUID: this.connectUUID,
+                    encryptedMessage: encryptedMessage as string
+                };
+                const [ status ] = await Network.postToLocalServer(postMessageRequest, this.host, this.port, path || '/postMessage');
+                return resolve([status]);
+            }
+        })
+    )
+
+    static postToLocalServer = (postData: PostMessageRequest, host: string, port: number | string, path: string): Promise<[status: 'SUCCESS' | 'NETWORK_NOT_AVAILABLE' | 'NOT_CONNECTED' | 'FAILURE']> => (
+        new Promise<[status: 'SUCCESS' | 'NETWORK_NOT_AVAILABLE' | 'NOT_CONNECTED' | 'FAILURE']>((resolve, _) => {
+            const postString = JSON.stringify(postData);
+            const options = {
+                host,
+                port,
+                path,
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Content-Length': Buffer.byteLength(postString)
+                }
+            };
+            const req = request(options, (res) => {
+                switch (res.statusCode) {
+                    case 200:
+                        return resolve(['SUCCESS']);
+                    case 404:
+                        return resolve(['NOT_CONNECTED']);
+                    case 500:
+                        return resolve(['NETWORK_NOT_AVAILABLE']);
+                    default:
+                        return resolve(['FAILURE']);
+                }
+            });
+            req.end(postString);
+        })
+    )
+
+    static getInformationFromSeguro = (postData: ConnectRequest, postURLPath: string = 'http://localhost:3000'): Promise<[status: 'SUCCESS' | 'FAILURE', payload?: any]> => (
         new Promise<[status: 'SUCCESS' | 'FAILURE', payload?: any]>((resolve, _) => {
             let URLObject;
             if ((typeof process !== 'undefined') && (process.release) && (process.release.name === 'node')) {
@@ -110,6 +162,7 @@ class Network {
                     let returnJSON = null;
                     try {
                         returnJSON = JSON.parse(returnedData);
+                        console.log('RETURNED JSON DATA', returnJSON);
                     } catch (exceptions) {
                         return resolve(['FAILURE', exceptions]);
                     }
@@ -121,30 +174,32 @@ class Network {
     )
 
     // eslint-disable-next-line max-len
-    static connection = (devicePGPKeys: PGPKeys, seguroPublicKey: string, urlPath: string, imapAccount?: IMAPAccount, serverFolder?: string): Promise<[status: 'SUCCESS' | 'FAILURE', request?: connectRequest]> => (
-        new Promise<[status: 'SUCCESS' | 'FAILURE', request?: connectRequest]>(async (resolve, _) => {
-            const request: connectRequest = {
-                kloak_account_armor: seguroPublicKey,
+    static connection = (devicePGPKeys: PGPKeys, seguroPublicKey: string, urlPath: string, imapAccount?: IMAPAccount, serverFolder?: string): Promise<[status: 'SUCCESS' | 'FAILURE', request?: ConnectRequest]> => (
+        new Promise<[status: 'SUCCESS' | 'FAILURE', request?: ConnectRequest]>(async (resolve, _) => {
+            const clientFolderName = getUUIDv4();
+            const requestData: RequestData = {
                 device_armor: devicePGPKeys.armoredPublicKey,
-                imap_account: imapAccount || imapData[0].accounts[0],
-                client_folder_name: getUUIDv4(),
-                use_kloak_shared_imap_account: true,
-                server_folder: serverFolder || imapData[0].server_folder,
-                encrypted_request: ''
+                kloak_account_armor: seguroPublicKey,
+                client_folder_name: clientFolderName
             };
-            console.log(request);
 
-            const [status, encryptedRequest] = await EncryptHelper.encryptSignWith([seguroServerPublicKey], [devicePGPKeys.armoredPrivateKey], JSON.stringify(request));
-            console.log('ENCRYPTED REQUEST', status, encryptedRequest);
-            if (status === 'SUCCESS') {
-                request.encrypted_request = encryptedRequest;
-                const [status, response] = await Network.requestPost(request, urlPath);
-                console.log(status, response);
-                if (status === 'SUCCESS') {
-                    console.log(response);
-                    const [status, decryptedResponse] = await EncryptHelper.decryptWith(devicePGPKeys, response.encrypted_response, seguroKeyID);
-                    if (status === 'SUCCESS') {
-                        return resolve(['SUCCESS', JSON.parse(decryptedResponse.data) as connectRequest]);
+            const [encryptRequestDataStatus, encryptedRequestData] = await EncryptHelper.encryptSignWith([seguroServerPublicKey], [devicePGPKeys.armoredPrivateKey], JSON.stringify(requestData));
+
+            if (encryptRequestDataStatus === 'SUCCESS') {
+                console.log(encryptedRequestData);
+                const request: ConnectRequest = {
+                    imap_account: imapAccount || imapData[0].accounts[0],
+                    server_folder: serverFolder || imapData[0].server_folder,
+                    encrypted_request: encryptedRequestData,
+                    client_folder_name: clientFolderName
+                };
+                const [postStatus, postResponse] = await Network.getInformationFromSeguro(request, urlPath);
+                if (postStatus === 'SUCCESS' && postResponse) {
+                    console.log(postResponse.encrypted_response);
+                    const [decryptStatus, decryptedResponse] = await EncryptHelper.decryptWith(devicePGPKeys, postResponse.encrypted_response as string);
+                    if (decryptStatus === 'SUCCESS') {
+                        const JSONResponse = JSON.parse(decryptedResponse);
+                        return resolve(['SUCCESS', JSONResponse as ConnectRequest]);
                     }
                 }
             }
@@ -152,17 +207,16 @@ class Network {
         })
     )
 
-    static wsConnect = (url: string, connectionInfo: connectRequest['connect_info'], callback: (err: any, data: any) => void) => {
-        const ws = new Websocket(url);
+    static wsConnect = (host: string, port: number | string, connectionInfo: ConnectRequest['connect_info'], callback: (err: any, networkInstance: Network | null) => void) => {
+        const ws = new Websocket(`ws://${host}:${port}/connectToSeguro`);
 
         ws.on('message', (message: string) => {
-            let returnedData = null;
             try {
-                returnedData = JSON.parse(message);
+                const websocketResponse: WebsocketResponse = JSON.parse(message);
+                return callback(null, new Network(websocketResponse.connectUUID, host, port));
             } catch (ex) {
                 return console.log('wsConnect ws.on ( \'message\' )  JSON.parse Error', ex);
             }
-            return callback(null, returnedData);
         });
 
         ws.once('close', () => callback(new Error('Closed'), null));

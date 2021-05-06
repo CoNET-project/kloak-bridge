@@ -2,6 +2,7 @@ import * as openpgp from 'openpgp';
 import { Buffer } from 'buffer/';
 // eslint-disable-next-line import/no-cycle
 import EncryptHelper from './EncryptHelper';
+import Network from './Network';
 
 // NETWORK DECLARATIONS FOR SEGURO LOCAL SERVER
 
@@ -23,36 +24,40 @@ export interface IMAPAccount {
     imap_server: string
 }
 
-export interface next_time_connect {
+export interface nextTimeConnect {
     imap_account: IMAPAccount
     server_folder: string
 }
 
-export interface connect_imap_reqponse {
+export interface connectImapResponse {
     imap_account: IMAPAccount
     server_folder: string
     client_folder: string
 }
 
-export interface connectRequest {
+export interface RequestData {
     kloak_account_armor: string
     device_armor: string
     client_folder_name: string
-    use_kloak_shared_imap_account: boolean
+}
+
+export interface ConnectRequest {
+    client_folder_name: string,
+    use_kloak_shared_imap_account?: boolean
     imap_account?: IMAPAccount
-    next_time_connect?: next_time_connect
+    next_time_connect?: nextTimeConnect
     error?: string
     server_folder?: string
     encrypted_response?: string
     encrypted_request?: string
-    connect_info?: connect_imap_reqponse,
+    connect_info?: connectImapResponse,
     requestJSON_text?: string
 }
 
-export interface connectRequest_test extends connectRequest {
+export interface connectRequest_test extends ConnectRequest {
     kloak_private?: string
     device_private?: string
-    reponseJson?: connectRequest
+    reponseJson?: ConnectRequest
 }
 
 //============================================
@@ -203,3 +208,29 @@ export type GetDeviceKey = [status: 'NO_DEVICE_KEY' | 'SUCCESS' | 'FAILURE' | 'N
 export type GetSeguroKey = [status: 'NO_KLOAK_KEY' | 'SUCCESS' | 'FAILURE' | 'NO_KEY_CONTAINER', seguroKey?: PGPKeys];
 
 export type GetAppDataUUID = [status: 'SUCCESS' | 'DOES_NOT_EXIST' | 'FAILURE' | 'NO_KEY_CONTAINER', appData?: {encryptionKeys: PGPKeys, dataUUID: string}]
+
+export type GenericStatus = [status: 'SUCCESS' | 'FAILURE']
+
+export type NetworkPostStatus = [status: 'SUCCESS' | 'NETWORK_NOT_AVAILABLE' | 'NOT_CONNECTED' | 'FAILURE']
+
+export interface NetworkStatusListeners {
+    onConnecting: () => void,
+    onConnected: () => void,
+    onConnectionFail: () => void
+}
+
+export interface WebsocketResponse {
+    status: string,
+    connectUUID: string
+}
+
+export interface PostMessageRequest {
+    connectUUID: string,
+    encryptedMessage: string
+}
+
+export interface SeguroConnection {
+    host: string,
+    port: string | number,
+    networkInstance: Network | null
+}

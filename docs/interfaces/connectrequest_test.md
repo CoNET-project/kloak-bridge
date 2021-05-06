@@ -4,7 +4,7 @@
 
 ## Hierarchy
 
-* [*connectRequest*](connectrequest.md)
+* [*ConnectRequest*](connectrequest.md)
 
   ↳ **connectRequest_test**
 
@@ -14,13 +14,11 @@
 
 - [client\_folder\_name](connectrequest_test.md#client_folder_name)
 - [connect\_info](connectrequest_test.md#connect_info)
-- [device\_armor](connectrequest_test.md#device_armor)
 - [device\_private](connectrequest_test.md#device_private)
 - [encrypted\_request](connectrequest_test.md#encrypted_request)
 - [encrypted\_response](connectrequest_test.md#encrypted_response)
 - [error](connectrequest_test.md#error)
 - [imap\_account](connectrequest_test.md#imap_account)
-- [kloak\_account\_armor](connectrequest_test.md#kloak_account_armor)
 - [kloak\_private](connectrequest_test.md#kloak_private)
 - [next\_time\_connect](connectrequest_test.md#next_time_connect)
 - [reponseJson](connectrequest_test.md#reponsejson)
@@ -34,29 +32,19 @@
 
 • **client\_folder\_name**: *string*
 
-Inherited from: [connectRequest](connectrequest.md).[client_folder_name](connectrequest.md#client_folder_name)
+Inherited from: [ConnectRequest](connectrequest.md).[client_folder_name](connectrequest.md#client_folder_name)
 
-Defined in: [define.ts:40](https://github.com/CoNET-project/kloak-bridge/blob/19e1a59/src/define.ts#L40)
+Defined in: [define.ts:45](https://github.com/CoNET-project/kloak-bridge/blob/b8d77bb/src/define.ts#L45)
 
 ___
 
 ### connect\_info
 
-• `Optional` **connect\_info**: [*connect\_imap\_reqponse*](connect_imap_reqponse.md)
+• `Optional` **connect\_info**: [*connectImapResponse*](connectimapresponse.md)
 
-Inherited from: [connectRequest](connectrequest.md).[connect_info](connectrequest.md#connect_info)
+Inherited from: [ConnectRequest](connectrequest.md).[connect_info](connectrequest.md#connect_info)
 
-Defined in: [define.ts:48](https://github.com/CoNET-project/kloak-bridge/blob/19e1a59/src/define.ts#L48)
-
-___
-
-### device\_armor
-
-• **device\_armor**: *string*
-
-Inherited from: [connectRequest](connectrequest.md).[device_armor](connectrequest.md#device_armor)
-
-Defined in: [define.ts:39](https://github.com/CoNET-project/kloak-bridge/blob/19e1a59/src/define.ts#L39)
+Defined in: [define.ts:53](https://github.com/CoNET-project/kloak-bridge/blob/b8d77bb/src/define.ts#L53)
 
 ___
 
@@ -64,7 +52,7 @@ ___
 
 • `Optional` **device\_private**: *string*
 
-Defined in: [define.ts:54](https://github.com/CoNET-project/kloak-bridge/blob/19e1a59/src/define.ts#L54)
+Defined in: [define.ts:59](https://github.com/CoNET-project/kloak-bridge/blob/b8d77bb/src/define.ts#L59)
 
 ___
 
@@ -72,9 +60,9 @@ ___
 
 • `Optional` **encrypted\_request**: *string*
 
-Inherited from: [connectRequest](connectrequest.md).[encrypted_request](connectrequest.md#encrypted_request)
+Inherited from: [ConnectRequest](connectrequest.md).[encrypted_request](connectrequest.md#encrypted_request)
 
-Defined in: [define.ts:47](https://github.com/CoNET-project/kloak-bridge/blob/19e1a59/src/define.ts#L47)
+Defined in: [define.ts:52](https://github.com/CoNET-project/kloak-bridge/blob/b8d77bb/src/define.ts#L52)
 
 ___
 
@@ -82,9 +70,9 @@ ___
 
 • `Optional` **encrypted\_response**: *string*
 
-Inherited from: [connectRequest](connectrequest.md).[encrypted_response](connectrequest.md#encrypted_response)
+Inherited from: [ConnectRequest](connectrequest.md).[encrypted_response](connectrequest.md#encrypted_response)
 
-Defined in: [define.ts:46](https://github.com/CoNET-project/kloak-bridge/blob/19e1a59/src/define.ts#L46)
+Defined in: [define.ts:51](https://github.com/CoNET-project/kloak-bridge/blob/b8d77bb/src/define.ts#L51)
 
 ___
 
@@ -92,9 +80,9 @@ ___
 
 • `Optional` **error**: *string*
 
-Inherited from: [connectRequest](connectrequest.md).[error](connectrequest.md#error)
+Inherited from: [ConnectRequest](connectrequest.md).[error](connectrequest.md#error)
 
-Defined in: [define.ts:44](https://github.com/CoNET-project/kloak-bridge/blob/19e1a59/src/define.ts#L44)
+Defined in: [define.ts:49](https://github.com/CoNET-project/kloak-bridge/blob/b8d77bb/src/define.ts#L49)
 
 ___
 
@@ -102,19 +90,9 @@ ___
 
 • `Optional` **imap\_account**: [*IMAPAccount*](imapaccount.md)
 
-Inherited from: [connectRequest](connectrequest.md).[imap_account](connectrequest.md#imap_account)
+Inherited from: [ConnectRequest](connectrequest.md).[imap_account](connectrequest.md#imap_account)
 
-Defined in: [define.ts:42](https://github.com/CoNET-project/kloak-bridge/blob/19e1a59/src/define.ts#L42)
-
-___
-
-### kloak\_account\_armor
-
-• **kloak\_account\_armor**: *string*
-
-Inherited from: [connectRequest](connectrequest.md).[kloak_account_armor](connectrequest.md#kloak_account_armor)
-
-Defined in: [define.ts:38](https://github.com/CoNET-project/kloak-bridge/blob/19e1a59/src/define.ts#L38)
+Defined in: [define.ts:47](https://github.com/CoNET-project/kloak-bridge/blob/b8d77bb/src/define.ts#L47)
 
 ___
 
@@ -122,25 +100,25 @@ ___
 
 • `Optional` **kloak\_private**: *string*
 
-Defined in: [define.ts:53](https://github.com/CoNET-project/kloak-bridge/blob/19e1a59/src/define.ts#L53)
+Defined in: [define.ts:58](https://github.com/CoNET-project/kloak-bridge/blob/b8d77bb/src/define.ts#L58)
 
 ___
 
 ### next\_time\_connect
 
-• `Optional` **next\_time\_connect**: [*next\_time\_connect*](next_time_connect.md)
+• `Optional` **next\_time\_connect**: [*nextTimeConnect*](nexttimeconnect.md)
 
-Inherited from: [connectRequest](connectrequest.md).[next_time_connect](connectrequest.md#next_time_connect)
+Inherited from: [ConnectRequest](connectrequest.md).[next_time_connect](connectrequest.md#next_time_connect)
 
-Defined in: [define.ts:43](https://github.com/CoNET-project/kloak-bridge/blob/19e1a59/src/define.ts#L43)
+Defined in: [define.ts:48](https://github.com/CoNET-project/kloak-bridge/blob/b8d77bb/src/define.ts#L48)
 
 ___
 
 ### reponseJson
 
-• `Optional` **reponseJson**: [*connectRequest*](connectrequest.md)
+• `Optional` **reponseJson**: [*ConnectRequest*](connectrequest.md)
 
-Defined in: [define.ts:55](https://github.com/CoNET-project/kloak-bridge/blob/19e1a59/src/define.ts#L55)
+Defined in: [define.ts:60](https://github.com/CoNET-project/kloak-bridge/blob/b8d77bb/src/define.ts#L60)
 
 ___
 
@@ -148,9 +126,9 @@ ___
 
 • `Optional` **requestJSON\_text**: *string*
 
-Inherited from: [connectRequest](connectrequest.md).[requestJSON_text](connectrequest.md#requestjson_text)
+Inherited from: [ConnectRequest](connectrequest.md).[requestJSON_text](connectrequest.md#requestjson_text)
 
-Defined in: [define.ts:49](https://github.com/CoNET-project/kloak-bridge/blob/19e1a59/src/define.ts#L49)
+Defined in: [define.ts:54](https://github.com/CoNET-project/kloak-bridge/blob/b8d77bb/src/define.ts#L54)
 
 ___
 
@@ -158,16 +136,16 @@ ___
 
 • `Optional` **server\_folder**: *string*
 
-Inherited from: [connectRequest](connectrequest.md).[server_folder](connectrequest.md#server_folder)
+Inherited from: [ConnectRequest](connectrequest.md).[server_folder](connectrequest.md#server_folder)
 
-Defined in: [define.ts:45](https://github.com/CoNET-project/kloak-bridge/blob/19e1a59/src/define.ts#L45)
+Defined in: [define.ts:50](https://github.com/CoNET-project/kloak-bridge/blob/b8d77bb/src/define.ts#L50)
 
 ___
 
 ### use\_kloak\_shared\_imap\_account
 
-• **use\_kloak\_shared\_imap\_account**: *boolean*
+• `Optional` **use\_kloak\_shared\_imap\_account**: *boolean*
 
-Inherited from: [connectRequest](connectrequest.md).[use_kloak_shared_imap_account](connectrequest.md#use_kloak_shared_imap_account)
+Inherited from: [ConnectRequest](connectrequest.md).[use_kloak_shared_imap_account](connectrequest.md#use_kloak_shared_imap_account)
 
-Defined in: [define.ts:41](https://github.com/CoNET-project/kloak-bridge/blob/19e1a59/src/define.ts#L41)
+Defined in: [define.ts:46](https://github.com/CoNET-project/kloak-bridge/blob/b8d77bb/src/define.ts#L46)

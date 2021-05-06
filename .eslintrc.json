@@ -44,7 +44,7 @@
         "lines-between-class-members": "off",
         "max-len": [
             "error",
-            200
+            250
         ],
         "import/newline-after-import": "off",
         "no-trailing-spaces": "off",
