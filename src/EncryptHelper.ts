@@ -46,7 +46,7 @@ class EncryptHelper {
 
     public generateKey = (options: PGPGenerateOptions): Promise<KeyResolve> => new Promise<KeyResolve>(async (resolve, _) => {
         const userIds = {
-            name: options.nickname || '',
+            name: options.nickname || 'Anonymous',
             email: options.email || ''
         };
 
