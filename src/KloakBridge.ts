@@ -58,7 +58,7 @@ class KloakBridge {
         if ((typeof process !== 'undefined') && (process.release) && (process.release.name === 'node')) {
             this.getURLData(localServerPath || 'http://localhost:3000/');
         } else {
-            this.getURLData(window.location.href);
+            this.getURLData(localServerPath || window.location.href);
         }
     }
 
