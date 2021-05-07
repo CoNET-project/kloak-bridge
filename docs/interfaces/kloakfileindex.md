@@ -18,7 +18,7 @@
 
 #### Type declaration:
 
-Defined in: [define.ts:133](https://github.com/CoNET-project/kloak-bridge/blob/94a2fac/src/define.ts#L133)
+Defined in: [define.ts:133](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L133)
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **eof**: *boolean*
 
-Defined in: [define.ts:137](https://github.com/CoNET-project/kloak-bridge/blob/94a2fac/src/define.ts#L137)
+Defined in: [define.ts:137](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L137)
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 • **lastOffset**: *number*
 
-Defined in: [define.ts:136](https://github.com/CoNET-project/kloak-bridge/blob/94a2fac/src/define.ts#L136)
+Defined in: [define.ts:136](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L136)

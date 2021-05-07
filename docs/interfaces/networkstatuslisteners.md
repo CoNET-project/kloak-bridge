@@ -22,9 +22,9 @@
 
 **Returns:** *void*
 
-Defined in: [define.ts:218](https://github.com/CoNET-project/kloak-bridge/blob/94a2fac/src/define.ts#L218)
+Defined in: [define.ts:218](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L218)
 
-Defined in: [define.ts:218](https://github.com/CoNET-project/kloak-bridge/blob/94a2fac/src/define.ts#L218)
+Defined in: [define.ts:218](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L218)
 
 ___
 
@@ -38,9 +38,9 @@ ___
 
 **Returns:** *void*
 
-Defined in: [define.ts:217](https://github.com/CoNET-project/kloak-bridge/blob/94a2fac/src/define.ts#L217)
+Defined in: [define.ts:217](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L217)
 
-Defined in: [define.ts:217](https://github.com/CoNET-project/kloak-bridge/blob/94a2fac/src/define.ts#L217)
+Defined in: [define.ts:217](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L217)
 
 ___
 
@@ -54,6 +54,6 @@ ___
 
 **Returns:** *void*
 
-Defined in: [define.ts:219](https://github.com/CoNET-project/kloak-bridge/blob/94a2fac/src/define.ts#L219)
+Defined in: [define.ts:219](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L219)
 
-Defined in: [define.ts:219](https://github.com/CoNET-project/kloak-bridge/blob/94a2fac/src/define.ts#L219)
+Defined in: [define.ts:219](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L219)

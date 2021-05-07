@@ -1,5 +1,5 @@
 import { URL as NodeURL } from 'url';
-import Websocket from 'ws';
+import NodeWebsocket from 'ws';
 import { request } from 'http';
 import { ConnectRequest, IMAPAccount, NetworkPostStatus, PGPKeys, PostMessageRequest, RequestData, WebsocketResponse } from './define';
 import { getUUIDv4 } from './utils';
@@ -208,20 +208,37 @@ class Network {
     )
 
     static wsConnect = (host: string, port: number | string, connectionInfo: ConnectRequest['connect_info'], callback: (err: any, networkInstance: Network | null) => void) => {
-        const ws = new Websocket(`ws://${host}:${port}/connectToSeguro`);
+        const websocketURL = `ws://${host}:${port}/connectToSeguro`;
+        if ((typeof process !== 'undefined') && (process.release) && (process.release.name === 'node')) {
+            const ws = new NodeWebsocket(websocketURL);
+            ws.on('message', (message: string) => {
+                try {
+                    const websocketResponse: WebsocketResponse = JSON.parse(message);
+                    return callback(null, new Network(websocketResponse.connectUUID, host, port));
+                } catch (ex) {
+                    return console.log('wsConnect ws.on ( \'message\' )  JSON.parse Error', ex);
+                }
+            });
 
-        ws.on('message', (message: string) => {
-            try {
-                const websocketResponse: WebsocketResponse = JSON.parse(message);
-                return callback(null, new Network(websocketResponse.connectUUID, host, port));
-            } catch (ex) {
-                return console.log('wsConnect ws.on ( \'message\' )  JSON.parse Error', ex);
-            }
-        });
-
-        ws.once('close', () => callback(new Error('Closed'), null));
-        ws.once('open', () => ws.send(JSON.stringify(connectionInfo)));
-        return ws;
+            ws.once('close', () => callback(new Error('Closed'), null));
+            ws.once('open', () => ws.send(JSON.stringify(connectionInfo)));
+            return ws;
+        }
+        if (typeof window !== 'undefined') {
+            const ws = new WebSocket(websocketURL);
+            ws.onclose = () => callback(new Error('Closed'), null);
+            ws.onerror = (err) => callback(new Error(err.type), null);
+            ws.onopen = () => ws.send(JSON.stringify(connectionInfo));
+            ws.onmessage = (event) => {
+                try {
+                    const websocketResponse: WebsocketResponse = JSON.parse(event.data);
+                    return callback(null, new Network(websocketResponse.connectUUID, host, port));
+                } catch (ex) {
+                    return console.log('wsConnect ws.on ( \'message\' )  JSON.parse Error', ex);
+                }
+            };
+            return ws;
+        }
     }
 }
 

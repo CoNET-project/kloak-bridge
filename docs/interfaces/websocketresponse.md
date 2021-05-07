@@ -15,7 +15,7 @@
 
 • **connectUUID**: *string*
 
-Defined in: [define.ts:224](https://github.com/CoNET-project/kloak-bridge/blob/94a2fac/src/define.ts#L224)
+Defined in: [define.ts:224](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L224)
 
 ___
 
@@ -23,4 +23,4 @@ ___
 
 • **status**: *string*
 
-Defined in: [define.ts:223](https://github.com/CoNET-project/kloak-bridge/blob/94a2fac/src/define.ts#L223)
+Defined in: [define.ts:223](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L223)

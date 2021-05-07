@@ -172,7 +172,7 @@ class KloakBridge {
                         if (err) {
                             console.log(err);
                             this.networkListener.onConnectionFail();
-                            ws.close();
+                            ws?.close();
                         }
                         if (networkInstance) {
                             this.seguroConnection.networkInstance = networkInstance;
