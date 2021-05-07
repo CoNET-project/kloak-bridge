@@ -37,8 +37,9 @@ describe('StorageHelper Class', () => {
             },
             onConnectionFail: () => {
                 console.log('NETWORK CONNECTION FAIL');
-            }
-        }, false, 'http://localhost:3000/');
+            },
+            onMessage: () => {}
+        }, true, 'http://localhost:3000/');
     });
 
     test('Should create a new key pair and NOT unlock', async () => {
