@@ -153,7 +153,6 @@ class KloakBridge {
                     return resolve(true);
                 }
                 resolve(false);
-
             } catch (err) {
                 return resolve(false);
             }

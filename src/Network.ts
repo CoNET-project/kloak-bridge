@@ -209,12 +209,16 @@ class Network {
 
     static wsConnect = (host: string, port: number | string, connectionInfo: ConnectRequest['connect_info'], callback: (err: any, networkInstance: Network | null) => void) => {
         const websocketURL = `ws://${host}:${port}/connectToSeguro`;
+        let networkInstantiated = false;
         if ((typeof process !== 'undefined') && (process.release) && (process.release.name === 'node')) {
             const ws = new NodeWebsocket(websocketURL);
             ws.on('message', (message: string) => {
                 try {
                     const websocketResponse: WebsocketResponse = JSON.parse(message);
-                    return callback(null, new Network(websocketResponse.connectUUID, host, port));
+                    if (/Connected/.test(websocketResponse.status) && !networkInstantiated) {
+                        networkInstantiated = true;
+                        return callback(null, new Network(websocketResponse.connectUUID, host, port));
+                    }
                 } catch (ex) {
                     return console.log('wsConnect ws.on ( \'message\' )  JSON.parse Error', ex);
                 }
@@ -232,7 +236,10 @@ class Network {
             ws.onmessage = (event) => {
                 try {
                     const websocketResponse: WebsocketResponse = JSON.parse(event.data);
-                    return callback(null, new Network(websocketResponse.connectUUID, host, port));
+                    if (/Connected/.test(websocketResponse.status) && !networkInstantiated) {
+                        networkInstantiated = true;
+                        return callback(null, new Network(websocketResponse.connectUUID, host, port));
+                    }
                 } catch (ex) {
                     return console.log('wsConnect ws.on ( \'message\' )  JSON.parse Error', ex);
                 }
