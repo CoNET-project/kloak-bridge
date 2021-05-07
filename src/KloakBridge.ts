@@ -21,7 +21,7 @@ import {
     GetDeviceKey,
     IMAPAccount,
     GetSeguroKey,
-    NetworkStatusListeners, ConnectRequest, SeguroConnection
+    NetworkStatusListeners, ConnectRequest, SeguroConnection, NetworkPostStatus
 } from './define';
 import DisassemblyHelper from './DisassemblyHelper';
 import AssemblyHelper from './AssemblyHelper';
@@ -167,7 +167,7 @@ class KloakBridge {
                     const connectRequest: ConnectRequest = request as ConnectRequest;
                     await this.saveNetworkInfo(connectRequest.next_time_connect?.imap_account as IMAPAccount, connectRequest.next_time_connect?.server_folder as string);
                     // eslint-disable-next-line max-len
-                    const ws = Network.wsConnect(this.seguroConnection.host, this.seguroConnection.port, connectRequest.connect_info, (err, networkInstance: Network | null) => {
+                    const ws = Network.wsConnect(this.seguroConnection.host, this.seguroConnection.port, connectRequest.connect_info, async (err, networkInstance: Network | null, message: string | null) => {
                         if (err) {
                             console.log(err);
                             this.networkListener.onConnectionFail();
@@ -176,6 +176,15 @@ class KloakBridge {
                         if (networkInstance) {
                             this.seguroConnection.networkInstance = networkInstance;
                             return this.networkListener.onConnected();
+                        }
+                        if (message) {
+                            const [deviceKeyStatus, deviceKey] = await this.getDeviceKey();
+                            if (deviceKeyStatus === 'SUCCESS') {
+                                const [decryptStatus, decryptMessage] = await EncryptHelper.decryptWith(deviceKey as PGPKeys, message, (deviceKey as PGPKeys).keyID);
+                                if (decryptStatus === 'SUCCESS') {
+                                    return this.networkListener.onMessage(decryptMessage);
+                                }
+                            }
                         }
                     });
                 }
@@ -486,6 +495,24 @@ class KloakBridge {
             }
             const [status, appData] = await this.keyContainer.getAppDataUUID(appID);
             return resolve([status, appData]);
+        })
+    )
+
+    /*
+    *
+    * NETWORK FUNCTIONS
+    * */
+
+    public sendToClient = (message: string, recipientDeviceKey: string): Promise<NetworkPostStatus> => (
+        new Promise<NetworkPostStatus>(async (resolve, _) => {
+            if (this.seguroConnection.networkInstance) {
+                const [deviceKeyStatus, deviceKey] = await this.getDeviceKey();
+                if (deviceKeyStatus === 'SUCCESS') {
+                    const [ networkStatus ] = await this.seguroConnection.networkInstance.sendToClient(message, recipientDeviceKey, deviceKey?.armoredPrivateKey as string);
+                    return resolve([networkStatus]);
+                }
+            }
+            return resolve(['NOT_CONNECTED']);
         })
     )
 

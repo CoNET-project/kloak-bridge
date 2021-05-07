@@ -216,12 +216,14 @@ export type NetworkPostStatus = [status: 'SUCCESS' | 'NETWORK_NOT_AVAILABLE' | '
 export interface NetworkStatusListeners {
     onConnecting: () => void,
     onConnected: () => void,
-    onConnectionFail: () => void
+    onConnectionFail: () => void,
+    onMessage: (message: string) => void
 }
 
 export interface WebsocketResponse {
     status: string,
-    connectUUID: string
+    connectUUID: string,
+    encryptedMessage?: string
 }
 
 export interface PostMessageRequest {

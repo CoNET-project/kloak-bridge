@@ -207,7 +207,7 @@ class Network {
         })
     )
 
-    static wsConnect = (host: string, port: number | string, connectionInfo: ConnectRequest['connect_info'], callback: (err: any, networkInstance: Network | null) => void) => {
+    static wsConnect = (host: string, port: number | string, connectionInfo: ConnectRequest['connect_info'], callback: (err: any, networkInstance: Network | null, message: string | null) => void) => {
         const websocketURL = `ws://${host}:${port}/connectToSeguro`;
         let networkInstantiated = false;
         if ((typeof process !== 'undefined') && (process.release) && (process.release.name === 'node')) {
@@ -217,28 +217,34 @@ class Network {
                     const websocketResponse: WebsocketResponse = JSON.parse(message);
                     if (/Connected/.test(websocketResponse.status) && !networkInstantiated) {
                         networkInstantiated = true;
-                        return callback(null, new Network(websocketResponse.connectUUID, host, port));
+                        return callback(null, new Network(websocketResponse.connectUUID, host, port), null);
+                    }
+                    if (websocketResponse.encryptedMessage) {
+                        return callback(null, null, websocketResponse.encryptedMessage);
                     }
                 } catch (ex) {
                     return console.log('wsConnect ws.on ( \'message\' )  JSON.parse Error', ex);
                 }
             });
 
-            ws.once('close', () => callback(new Error('Closed'), null));
+            ws.once('close', () => callback(new Error('Closed'), null, null));
             ws.once('open', () => ws.send(JSON.stringify(connectionInfo)));
             return ws;
         }
         if (typeof window !== 'undefined') {
             const ws = new WebSocket(websocketURL);
-            ws.onclose = () => callback(new Error('Closed'), null);
-            ws.onerror = (err) => callback(new Error(err.type), null);
+            ws.onclose = () => callback(new Error('Closed'), null, null);
+            ws.onerror = (err) => callback(new Error(err.type), null, null);
             ws.onopen = () => ws.send(JSON.stringify(connectionInfo));
             ws.onmessage = (event) => {
                 try {
                     const websocketResponse: WebsocketResponse = JSON.parse(event.data);
                     if (/Connected/.test(websocketResponse.status) && !networkInstantiated) {
                         networkInstantiated = true;
-                        return callback(null, new Network(websocketResponse.connectUUID, host, port));
+                        return callback(null, new Network(websocketResponse.connectUUID, host, port), null);
+                    }
+                    if (websocketResponse.encryptedMessage) {
+                        return callback(null, null, websocketResponse.encryptedMessage);
                     }
                 } catch (ex) {
                     return console.log('wsConnect ws.on ( \'message\' )  JSON.parse Error', ex);
