@@ -234,5 +234,6 @@ export interface PostMessageRequest {
 export interface SeguroConnection {
     host: string,
     port: string | number,
-    networkInstance: Network | null
+    networkInstance: Network | null,
+    deviceKey: PGPKeys | null
 }

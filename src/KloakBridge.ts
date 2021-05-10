@@ -32,10 +32,11 @@ import Network from './Network';
 class KloakBridge {
 
     private counter = 0
-    private seguroConnection: SeguroConnection = {
+    static seguroConnection: SeguroConnection = {
         host: '',
         port: '',
-        networkInstance: null
+        networkInstance: null,
+        deviceKey: null
     }
     private uploadHelpers: {[name: string]: DisassemblyHelper} = {};
     private assemblyHelpers: {[name: string]: AssemblyHelper} = {};
@@ -69,8 +70,8 @@ class KloakBridge {
         } else {
             URLObject = new URL(url);
         }
-        this.seguroConnection.host = URLObject?.hostname;
-        this.seguroConnection.port = URLObject?.port;
+        KloakBridge.seguroConnection.host = URLObject?.hostname;
+        KloakBridge.seguroConnection.port = URLObject?.port;
 
     }
 
@@ -167,20 +168,21 @@ class KloakBridge {
                     const connectRequest: ConnectRequest = request as ConnectRequest;
                     await this.saveNetworkInfo(connectRequest.next_time_connect?.imap_account as IMAPAccount, connectRequest.next_time_connect?.server_folder as string);
                     // eslint-disable-next-line max-len
-                    const ws = Network.wsConnect(this.seguroConnection.host, this.seguroConnection.port, connectRequest.connect_info, async (err, networkInstance: Network | null, message: string | null) => {
+                    const ws = Network.wsConnect(KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, connectRequest.connect_info, async (err, networkInstance: Network | null, message: string | null) => {
                         if (err) {
                             console.log(err);
                             this.networkListener.onConnectionFail();
                             ws?.close();
                         }
                         if (networkInstance) {
-                            this.seguroConnection.networkInstance = networkInstance;
+                            KloakBridge.seguroConnection.networkInstance = networkInstance;
                             return this.networkListener.onConnected();
                         }
                         if (message) {
                             const [deviceKeyStatus, deviceKey] = await this.getDeviceKey();
                             if (deviceKeyStatus === 'SUCCESS') {
-                                const [decryptStatus, decryptMessage] = await EncryptHelper.decryptWith(deviceKey as PGPKeys, message, (deviceKey as PGPKeys).keyID);
+                                const [decryptStatus, decryptMessage] = await EncryptHelper.decryptWith(deviceKey as PGPKeys, message);
+                                console.log(decryptStatus, decryptMessage);
                                 if (decryptStatus === 'SUCCESS') {
                                     return this.networkListener.onMessage(decryptMessage);
                                 }
@@ -201,7 +203,7 @@ class KloakBridge {
     }
 
     // eslint-disable-next-line max-len
-    private establishConnection = async (urlPath: string = `http://${this.seguroConnection.host}:${this.seguroConnection.port}/getInformationFromSeguro`): Promise<void> => (
+    private establishConnection = async (urlPath: string = `http://${KloakBridge.seguroConnection.host}:${KloakBridge.seguroConnection.port}/getInformationFromSeguro`): Promise<void> => (
         new Promise<void>(async (resolve, _) => {
             const [deviceKeyStatus, deviceKey] = await this.getDeviceKey();
             const [seguroKeyStatus, seguroKey] = await this.getSeguroKey();
@@ -266,7 +268,12 @@ class KloakBridge {
                             if (!this.skipNetwork) {
                                 await this.establishConnection();
                             }
-                            return resolve(['SUCCESS']);
+                            const [status, deviceKey] = await this.getDeviceKey();
+                            if (status === 'SUCCESS') {
+                                KloakBridge.seguroConnection.deviceKey = deviceKey as PGPKeys;
+                                return resolve(['SUCCESS']);
+                            }
+                            return resolve(['FAILURE']);
                         }
                         return resolve(['INVALID_PASSPHRASE']);
                     }
@@ -503,14 +510,15 @@ class KloakBridge {
     * NETWORK FUNCTIONS
     * */
 
-    public sendToClient = (message: string, recipientDeviceKey: string): Promise<NetworkPostStatus> => (
+    static sendToClient = (message: string, recipientDeviceKey: string): Promise<NetworkPostStatus> => (
         new Promise<NetworkPostStatus>(async (resolve, _) => {
-            if (this.seguroConnection.networkInstance) {
-                const [deviceKeyStatus, deviceKey] = await this.getDeviceKey();
-                if (deviceKeyStatus === 'SUCCESS') {
-                    const [ networkStatus ] = await this.seguroConnection.networkInstance.sendToClient(message, recipientDeviceKey, deviceKey?.armoredPrivateKey as string);
-                    return resolve([networkStatus]);
+            if (KloakBridge.seguroConnection.networkInstance) {
+                const { deviceKey } = KloakBridge.seguroConnection;
+                if (!deviceKey) {
+                    return resolve(['FAILURE']);
                 }
+                const [ networkStatus ] = await KloakBridge.seguroConnection.networkInstance.sendToClient(message, recipientDeviceKey, deviceKey?.armoredPrivateKey as string);
+                return resolve([networkStatus]);
             }
             return resolve(['NOT_CONNECTED']);
         })
