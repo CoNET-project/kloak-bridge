@@ -167,6 +167,7 @@ class KloakBridge {
                 if (request) {
                     const connectRequest: ConnectRequest = request as ConnectRequest;
                     await this.saveNetworkInfo(connectRequest.next_time_connect?.imap_account as IMAPAccount, connectRequest.next_time_connect?.server_folder as string);
+                    console.log(connectRequest);
                     // eslint-disable-next-line max-len
                     const ws = Network.wsConnect(KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, connectRequest.connect_info, async (err, networkInstance: Network | null, message: string | null) => {
                         if (err) {
@@ -224,6 +225,7 @@ class KloakBridge {
                 if (status === 'SUCCESS') {
                     // eslint-disable-next-line camelcase
                     imapAccount = (decryptedNetwork as unknown as nextTimeConnect).imap_account;
+                    console.log(imapAccount);
                     // eslint-disable-next-line camelcase
                     serverFolder = (decryptedNetwork as unknown as nextTimeConnect).server_folder;
                     this.networkStart(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, urlPath, imapAccount, serverFolder);

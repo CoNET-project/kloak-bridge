@@ -39,7 +39,7 @@ describe('StorageHelper Class', () => {
                 console.log('NETWORK CONNECTION FAIL');
             },
             onMessage: () => {}
-        }, true, 'http://localhost:3000/');
+        }, false, 'http://localhost:3000/');
     });
 
     test('Should create a new key pair and NOT unlock', async () => {
@@ -172,8 +172,8 @@ describe('StorageHelper Class', () => {
         expect(status).toBe('DOES_NOT_EXIST');
     });
 
-    // test('Should create new container and unlock container', async () => {
-    //     await kloakBridge.createKeyContainer('mypassword');
-    //     // await kloakBridge.unlockKeyContainer('mypassword');
-    // }, 100000);
+    test('Should create new container and unlock container', async () => {
+        await kloakBridge.createKeyContainer('mypassword');
+        await kloakBridge.unlockKeyContainer('mypassword');
+    }, 100000);
 });
