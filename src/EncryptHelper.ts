@@ -175,9 +175,13 @@ class EncryptHelper {
 
     static getKeyId = async (publicKey: string): Promise<string> => (
         new Promise<string>(async (resolve, _) => {
-            const readKey = await openpgp.readKey({ armoredKey: publicKey });
-            const keyIds = await readKey.getKeyIds();
-            return resolve(keyIds[1].toHex().toUpperCase());
+            try {
+                const readKey = await openpgp.readKey({ armoredKey: publicKey });
+                const keyIds = await readKey.getKeyIds();
+                return resolve(keyIds[1].toHex().toUpperCase());
+            } catch (err) {
+                return resolve('');
+            }
         })
     )
 
