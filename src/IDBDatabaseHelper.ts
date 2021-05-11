@@ -45,7 +45,9 @@ class IDBDatabaseHelper {
                 console.log(err);
                 return resolve(false);
             };
-            objectStore.clear();
+            const storeAction = await objectStore?.clear();
+            storeAction.onsuccess = () => {};
+            storeAction.onerror = () => resolve(false);
         })
     )
 
