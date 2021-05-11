@@ -149,7 +149,7 @@ class KloakBridge {
             try {
                 const [status, encryptedNetwork] = await this.containerEncrypter.encryptMessage(JSON.stringify(network));
                 if (status === 'SUCCESS') {
-                    await this.IDBHelper.save('keyContainer', JSON.stringify(this.keyChainContainer));
+                    await this.IDBHelper.save('KeyContainer', this.keyChainContainer);
                     await this.IDBHelper.save(this.keyChainContainer.network, encryptedNetwork);
                     return resolve(true);
                 }
