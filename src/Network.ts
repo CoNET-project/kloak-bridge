@@ -136,10 +136,6 @@ class Network {
             } else {
                 URLObject = new URL(postURLPath);
             }
-
-            console.log(URLObject);
-            console.log(URLObject?.host);
-            console.log(URLObject?.port);
             const postString = JSON.stringify(postData);
             const options = {
                 host: URLObject?.hostname,
@@ -162,7 +158,6 @@ class Network {
                     let returnJSON = null;
                     try {
                         returnJSON = JSON.parse(returnedData);
-                        console.log('RETURNED JSON DATA', returnJSON);
                     } catch (exceptions) {
                         return resolve(['FAILURE', exceptions]);
                     }
@@ -186,7 +181,6 @@ class Network {
             const [encryptRequestDataStatus, encryptedRequestData] = await EncryptHelper.encryptSignWith([seguroServerPublicKey], [devicePGPKeys.armoredPrivateKey], JSON.stringify(requestData));
 
             if (encryptRequestDataStatus === 'SUCCESS') {
-                console.log(encryptedRequestData);
                 const request: ConnectRequest = {
                     imap_account: imapAccount || imapData[0].accounts[0],
                     server_folder: serverFolder || imapData[0].server_folder,
@@ -195,7 +189,6 @@ class Network {
                 };
                 const [postStatus, postResponse] = await Network.getInformationFromSeguro(request, urlPath);
                 if (postStatus === 'SUCCESS' && postResponse) {
-                    console.log(postResponse.encrypted_response);
                     const [decryptStatus, decryptedResponse] = await EncryptHelper.decryptWith(devicePGPKeys, postResponse.encrypted_response as string);
                     if (decryptStatus === 'SUCCESS') {
                         const JSONResponse = JSON.parse(decryptedResponse);

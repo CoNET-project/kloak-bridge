@@ -29,13 +29,9 @@ class EncryptHelper {
         }
 
         modified = message.replace(pgpHead, '');
-        console.log(modified);
         modified = modified.replace(pgpComment, '');
-        console.log(modified);
         modified = modified.replace(pgpMisc, '');
-        console.log(modified);
         modified = modified.replace(pgpEnd, '');
-        console.log(modified);
 
         if (trim) {
             return modified.trim();
@@ -158,7 +154,6 @@ class EncryptHelper {
     static decryptWith = (pgpKeys: PGPKeys, encryptedMessage: string, checkKeyID?: string): Promise<[status: 'SUCCESS' | 'FAILURE' | 'KEYID_CHECK_ERROR', payload?: any]> => (
         new Promise<[status: 'SUCCESS' | 'FAILURE' | 'KEYID_CHECK_ERROR', payload?: any]>(async (resolve, _) => {
             const modifiedEncryptedMessage = EncryptHelper.modifyPGPMessage(encryptedMessage);
-            console.log(modifiedEncryptedMessage);
             const options = {
                 privateKeys: await openpgp.readKey({ armoredKey: pgpKeys.armoredPrivateKey }),
                 // publicKeys: await openpgp.readKey({ armoredKey: pgpKeys.armoredPublicKey }),

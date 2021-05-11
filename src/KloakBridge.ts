@@ -167,11 +167,9 @@ class KloakBridge {
                 if (request) {
                     const connectRequest: ConnectRequest = request as ConnectRequest;
                     await this.saveNetworkInfo(connectRequest.next_time_connect?.imap_account as IMAPAccount, connectRequest.next_time_connect?.server_folder as string);
-                    console.log(connectRequest);
                     // eslint-disable-next-line max-len
                     const ws = Network.wsConnect(KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, connectRequest.connect_info, async (err, networkInstance: Network | null, message: string | null) => {
                         if (err) {
-                            console.log(err);
                             this.networkListener.onConnectionFail();
                             ws?.close();
                         }
@@ -183,7 +181,6 @@ class KloakBridge {
                             const [deviceKeyStatus, deviceKey] = await this.getDeviceKey();
                             if (deviceKeyStatus === 'SUCCESS') {
                                 const [decryptStatus, decryptMessage] = await EncryptHelper.decryptWith(deviceKey as PGPKeys, message);
-                                console.log(decryptStatus, decryptMessage);
                                 if (decryptStatus === 'SUCCESS') {
                                     return this.networkListener.onMessage(decryptMessage);
                                 }
