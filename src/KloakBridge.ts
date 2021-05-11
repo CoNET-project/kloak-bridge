@@ -140,8 +140,8 @@ class KloakBridge {
     private saveNetworkInfo = async (imapAccount: IMAPAccount, serverFolder: string): Promise<boolean> => (
         new Promise<boolean>(async (resolve, _) => {
             const network = {
-                imapAccount,
-                serverFolder
+                imap_account: imapAccount,
+                server_folder: serverFolder
             };
             if (!this.keyChainContainer.network) {
                 this.keyChainContainer.network = getUUIDv4();
@@ -225,7 +225,6 @@ class KloakBridge {
                 if (status === 'SUCCESS') {
                     // eslint-disable-next-line camelcase
                     imapAccount = (decryptedNetwork as unknown as nextTimeConnect).imap_account;
-                    console.log(imapAccount);
                     // eslint-disable-next-line camelcase
                     serverFolder = (decryptedNetwork as unknown as nextTimeConnect).server_folder;
                     this.networkStart(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, urlPath, imapAccount, serverFolder);
