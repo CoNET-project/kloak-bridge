@@ -73,7 +73,6 @@ class KloakBridge {
         }
         KloakBridge.seguroConnection.host = URLObject?.hostname;
         KloakBridge.seguroConnection.port = URLObject?.port;
-
     }
 
     private generateDefaultKeychain = (): Promise<KeyChain> => (
@@ -197,10 +196,10 @@ class KloakBridge {
             }
         };
 
-        if (imapAccount && serverFolder) {
-            Network.connection(deviceKey, seguroKey, urlPath, imapAccount, serverFolder).then(networkCallback);
-            return;
-        }
+        // if (imapAccount && serverFolder) {
+        //     Network.connection(deviceKey, seguroKey, urlPath, imapAccount, serverFolder).then(networkCallback);
+        //     return;
+        // }
         Network.connection(deviceKey as PGPKeys, seguroKey, urlPath).then(networkCallback);
     }
 
