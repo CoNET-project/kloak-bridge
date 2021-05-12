@@ -204,6 +204,8 @@ class KloakBridge {
         Network.connection(deviceKey as PGPKeys, seguroKey, urlPath).then(networkCallback);
     }
 
+    public reconnect = () => this.establishConnection()
+
     // eslint-disable-next-line max-len
     private establishConnection = async (urlPath: string = `http://${KloakBridge.seguroConnection.host}:${KloakBridge.seguroConnection.port}/getInformationFromSeguro`): Promise<void> => (
         new Promise<void>(async (resolve, _) => {

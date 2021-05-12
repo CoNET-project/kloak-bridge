@@ -1,8 +1,10 @@
 import { URL as NodeURL } from 'url';
 import NodeWebsocket from 'ws';
 import { request, RequestOptions } from 'http';
+// eslint-disable-next-line import/no-cycle
 import { ConnectRequest, IMAPAccount, NetworkPostStatus, PGPKeys, PostMessageRequest, RequestData, WebsocketResponse } from './define';
 import { getUUIDv4 } from './utils';
+// eslint-disable-next-line import/no-cycle
 import EncryptHelper from './EncryptHelper';
 
 const imapData = [
@@ -128,7 +130,7 @@ class Network {
         })
     )
 
-    static getInformationFromSeguro = (postData: ConnectRequest, postURLPath: string = 'http://localhost:3000/getInformationFromSeguro'): Promise<[status: 'SUCCESS' | 'FAILURE' | 'TIMEOUT', payload?: any]> => (
+    static getInformationFromSeguro = (postData: ConnectRequest, postURLPath: string = 'http://localhost:3000'): Promise<[status: 'SUCCESS' | 'FAILURE' | 'TIMEOUT', payload?: any]> => (
         new Promise<[status: 'SUCCESS' | 'FAILURE' | 'TIMEOUT', payload?: any]>((resolve, _) => {
             let URLObject;
             if ((typeof process !== 'undefined') && (process.release) && (process.release.name === 'node')) {
@@ -202,10 +204,8 @@ class Network {
                 }
                 if (postStatus === 'TIMEOUT') {
                     if (ATTEMPTS <= MAX_ATTEMPTS) {
-                        console.log('NETWORK ATTEMPT FAILED');
                         return Network.connection(devicePGPKeys, seguroPublicKey, urlPath, imapAccount, serverFolder);
                     }
-                    console.log('NETWORK MAX ATTEMPT REACHED!');
                     return resolve(['MAX_ATTEMPT_REACHED']);
                 }
             }
