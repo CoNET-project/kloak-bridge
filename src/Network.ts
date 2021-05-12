@@ -1,6 +1,6 @@
 import { URL as NodeURL } from 'url';
 import NodeWebsocket from 'ws';
-import { request } from 'http';
+import { request, RequestOptions } from 'http';
 import { ConnectRequest, IMAPAccount, NetworkPostStatus, PGPKeys, PostMessageRequest, RequestData, WebsocketResponse } from './define';
 import { getUUIDv4 } from './utils';
 import EncryptHelper from './EncryptHelper';
@@ -128,8 +128,8 @@ class Network {
         })
     )
 
-    static getInformationFromSeguro = (postData: ConnectRequest, postURLPath: string = 'http://localhost:3000'): Promise<[status: 'SUCCESS' | 'FAILURE', payload?: any]> => (
-        new Promise<[status: 'SUCCESS' | 'FAILURE', payload?: any]>((resolve, _) => {
+    static getInformationFromSeguro = (postData: ConnectRequest, postURLPath: string = 'http://localhost:3000/getInformationFromSeguro'): Promise<[status: 'SUCCESS' | 'FAILURE' | 'TIMEOUT', payload?: any]> => (
+        new Promise<[status: 'SUCCESS' | 'FAILURE' | 'TIMEOUT', payload?: any]>((resolve, _) => {
             let URLObject;
             if ((typeof process !== 'undefined') && (process.release) && (process.release.name === 'node')) {
                 URLObject = new NodeURL(postURLPath);
@@ -137,7 +137,7 @@ class Network {
                 URLObject = new URL(postURLPath);
             }
             const postString = JSON.stringify(postData);
-            const options = {
+            const options: RequestOptions = {
                 host: URLObject?.hostname,
                 port: URLObject?.port,
                 path: URLObject?.pathname,
@@ -145,7 +145,8 @@ class Network {
                 headers: {
                     'Content-Type': 'application/json',
                     'Content-Length': Buffer.byteLength(postString)
-                }
+                },
+                timeout: 120
             };
             // eslint-disable-next-line no-underscore-dangle
             let returnedData = '';
@@ -164,13 +165,16 @@ class Network {
                     return resolve(['SUCCESS', returnJSON]);
                 });
             });
+            req.on('timeout', () => resolve(['TIMEOUT']));
             req.end(postString);
         })
     )
 
     // eslint-disable-next-line max-len
-    static connection = (devicePGPKeys: PGPKeys, seguroPublicKey: string, urlPath: string, imapAccount?: IMAPAccount, serverFolder?: string): Promise<[status: 'SUCCESS' | 'FAILURE', request?: ConnectRequest]> => (
-        new Promise<[status: 'SUCCESS' | 'FAILURE', request?: ConnectRequest]>(async (resolve, _) => {
+    static connection = (devicePGPKeys: PGPKeys, seguroPublicKey: string, urlPath: string, imapAccount?: IMAPAccount, serverFolder?: string): Promise<[status: 'SUCCESS' | 'FAILURE' | 'MAX_ATTEMPT_REACHED', request?: ConnectRequest]> => (
+        new Promise<[status: 'SUCCESS' | 'FAILURE' | 'MAX_ATTEMPT_REACHED', request?: ConnectRequest]>(async (resolve, _) => {
+            let ATTEMPTS = 0;
+            const MAX_ATTEMPTS = 3;
             const clientFolderName = getUUIDv4();
             const requestData: RequestData = {
                 device_armor: devicePGPKeys.armoredPublicKey,
@@ -181,6 +185,7 @@ class Network {
             const [encryptRequestDataStatus, encryptedRequestData] = await EncryptHelper.encryptSignWith([seguroServerPublicKey], [devicePGPKeys.armoredPrivateKey], JSON.stringify(requestData));
 
             if (encryptRequestDataStatus === 'SUCCESS') {
+                ATTEMPTS += 1;
                 const request: ConnectRequest = {
                     imap_account: imapAccount || imapData[0].accounts[0],
                     server_folder: serverFolder || imapData[0].server_folder,
@@ -194,6 +199,14 @@ class Network {
                         const JSONResponse = JSON.parse(decryptedResponse);
                         return resolve(['SUCCESS', JSONResponse as ConnectRequest]);
                     }
+                }
+                if (postStatus === 'TIMEOUT') {
+                    if (ATTEMPTS <= MAX_ATTEMPTS) {
+                        console.log('NETWORK ATTEMPT FAILED');
+                        return Network.connection(devicePGPKeys, seguroPublicKey, urlPath, imapAccount, serverFolder);
+                    }
+                    console.log('NETWORK MAX ATTEMPT REACHED!');
+                    return resolve(['MAX_ATTEMPT_REACHED']);
                 }
             }
             return resolve(['FAILURE']);
