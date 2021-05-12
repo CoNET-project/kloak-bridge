@@ -1,6 +1,7 @@
 import * as openpgp from 'openpgp';
 import { Buffer } from 'buffer/';
 // eslint-disable-next-line import/no-cycle
+import NodeWebsocket from 'ws';
 import EncryptHelper from './EncryptHelper';
 import Network from './Network';
 
@@ -217,6 +218,7 @@ export interface NetworkStatusListeners {
     onConnecting: () => void,
     onConnected: () => void,
     onConnectionFail: () => void,
+    onDisconnected: () => void,
     onMessage: (message: string) => void
 }
 
@@ -235,5 +237,6 @@ export interface SeguroConnection {
     host: string,
     port: string | number,
     networkInstance: Network | null,
-    deviceKey: PGPKeys | null
+    deviceKey: PGPKeys | null,
+    websocketConnection: WebSocket | NodeWebsocket | null
 }

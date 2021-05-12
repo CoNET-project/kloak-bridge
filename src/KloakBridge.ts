@@ -36,7 +36,8 @@ class KloakBridge {
         host: '',
         port: '',
         networkInstance: null,
-        deviceKey: null
+        deviceKey: null,
+        websocketConnection: null
     }
     private uploadHelpers: {[name: string]: DisassemblyHelper} = {};
     private assemblyHelpers: {[name: string]: AssemblyHelper} = {};
@@ -169,12 +170,13 @@ class KloakBridge {
             if (status === 'SUCCESS') {
                 if (request) {
                     const connectRequest: ConnectRequest = request as ConnectRequest;
+                    console.log(connectRequest);
                     await this.saveNetworkInfo(connectRequest.next_time_connect?.imap_account as IMAPAccount, connectRequest.next_time_connect?.server_folder as string);
                     // eslint-disable-next-line max-len
-                    const ws = Network.wsConnect(KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, connectRequest.connect_info, async (err, networkInstance: Network | null, message: string | null) => {
+                    KloakBridge.seguroConnection.websocketConnection = Network.wsConnect(KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, connectRequest.connect_info, async (err, networkInstance: Network | null, message: string | null) => {
                         if (err) {
                             this.networkListener.onConnectionFail();
-                            ws?.close();
+                            KloakBridge.seguroConnection.websocketConnection?.close();
                         }
                         if (networkInstance) {
                             KloakBridge.seguroConnection.networkInstance = networkInstance;
@@ -204,6 +206,16 @@ class KloakBridge {
     }
 
     public reconnect = () => this.establishConnection()
+
+    public disconnect = () => {
+        try {
+            KloakBridge.seguroConnection.websocketConnection?.close();
+            KloakBridge.seguroConnection.networkInstance = null;
+        } catch (err) {
+            return;
+        }
+        return this.networkListener.onDisconnected();
+    }
 
     // eslint-disable-next-line max-len
     private establishConnection = async (urlPath: string = `http://${KloakBridge.seguroConnection.host}:${KloakBridge.seguroConnection.port}/getInformationFromSeguro`): Promise<void> => (

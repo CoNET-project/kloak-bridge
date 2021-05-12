@@ -213,7 +213,7 @@ class Network {
         })
     )
 
-    static wsConnect = (host: string, port: number | string, connectionInfo: ConnectRequest['connect_info'], callback: (err: any, networkInstance: Network | null, message: string | null) => void) => {
+    static wsConnect = (host: string, port: number | string, connectionInfo: ConnectRequest['connect_info'], callback: (err: any, networkInstance: Network | null, message: string | null) => void): WebSocket | NodeWebsocket | null => {
         const websocketURL = `ws://${host}:${port}/connectToSeguro`;
         let networkInstantiated = false;
         if ((typeof process !== 'undefined') && (process.release) && (process.release.name === 'node')) {
@@ -258,6 +258,7 @@ class Network {
             };
             return ws;
         }
+        return null;
     }
 }
 
