@@ -38,7 +38,8 @@ describe('StorageHelper Class', () => {
             onConnectionFail: () => {
                 console.log('NETWORK CONNECTION FAIL');
             },
-            onMessage: () => {}
+            onMessage: () => {},
+            onDisconnected: () => {}
         }, false, 'http://localhost:3000/');
     });
 
