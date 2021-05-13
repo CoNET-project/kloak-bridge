@@ -160,14 +160,12 @@ class KloakBridge {
         })
     )
 
-    private networkWebSocket = (connectInformation: connectImapResponse, reconnect?: () => void) => {
+    private networkWebSocket = (connectInformation: connectImapResponse) => {
         KloakBridge.seguroConnection.websocketConnection = Network.wsConnect(KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, connectInformation, async (err, networkInstance: Network | null, message: string | null) => {
             if (err) {
+                console.log(err);
                 this.networkListener.onConnectionFail();
                 KloakBridge.seguroConnection.websocketConnection?.close();
-                if (reconnect) {
-                    return this.reconnect();
-                }
             }
             if (networkInstance) {
                 KloakBridge.seguroConnection.networkInstance = networkInstance;
@@ -199,13 +197,14 @@ class KloakBridge {
                 return this.networkListener.onConnectionFail();
             }
         };
-
-        if (nextConnectInformation) {
-            Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, urlPath, nextConnectInformation)
-                .then(networkCallback);
-        } else if (deviceKeyStatus === 'SUCCESS' && seguroKeyStatus === 'SUCCESS') {
-            Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, urlPath)
-                .then(networkCallback);
+        if (deviceKeyStatus === 'SUCCESS' && seguroKeyStatus === 'SUCCESS') {
+            if (nextConnectInformation) {
+                Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, urlPath, nextConnectInformation)
+                    .then(networkCallback);
+            } else {
+                Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, urlPath)
+                    .then(networkCallback);
+            }
         }
 
     }
@@ -233,9 +232,7 @@ class KloakBridge {
                 if (encryptedNetwork && status === 'SUCCESS') {
                     // eslint-disable-next-line camelcase
                     const { nextConnectInformation, connectInformation } = decryptedNetwork as unknown as NetworkInformation;
-                    this.networkWebSocket(connectInformation, () => {
-                        this.networkStart(urlPath, nextConnectInformation);
-                    });
+                    this.networkStart(urlPath, nextConnectInformation);
                     // this.networkStart(urlPath, connectInformation, nextConnectInformation);
                     // this.networkStart(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, urlPath, imapAccount, serverFolder);
                     return resolve();
