@@ -2,7 +2,7 @@ import { URL as NodeURL } from 'url';
 import NodeWebsocket from 'ws';
 import { request, RequestOptions } from 'http';
 // eslint-disable-next-line import/no-cycle
-import { ConnectRequest, IMAPAccount, NetworkPostStatus, PGPKeys, PostMessageRequest, RequestData, WebsocketResponse } from './define';
+import { ConnectRequest, IMAPAccount, NetworkPostStatus, NextTimeConnect, PGPKeys, PostMessageRequest, RequestData, WebsocketResponse } from './define';
 import { getUUIDv4 } from './utils';
 // eslint-disable-next-line import/no-cycle
 import EncryptHelper from './EncryptHelper';
@@ -173,10 +173,8 @@ class Network {
     )
 
     // eslint-disable-next-line max-len
-    static connection = (devicePGPKeys: PGPKeys, seguroPublicKey: string, urlPath: string, imapAccount?: IMAPAccount, serverFolder?: string): Promise<[status: 'SUCCESS' | 'FAILURE' | 'MAX_ATTEMPT_REACHED', request?: ConnectRequest]> => (
+    static connection = (devicePGPKeys: PGPKeys, seguroPublicKey: string, urlPath: string, nextConnectInformation?: NextTimeConnect): Promise<[status: 'SUCCESS' | 'FAILURE' | 'MAX_ATTEMPT_REACHED', request?: ConnectRequest]> => (
         new Promise<[status: 'SUCCESS' | 'FAILURE' | 'MAX_ATTEMPT_REACHED', request?: ConnectRequest]>(async (resolve, _) => {
-            let ATTEMPTS = 0;
-            const MAX_ATTEMPTS = 3;
             const clientFolderName = getUUIDv4();
             const requestData: RequestData = {
                 device_armor: devicePGPKeys.armoredPublicKey,
@@ -187,10 +185,9 @@ class Network {
             const [encryptRequestDataStatus, encryptedRequestData] = await EncryptHelper.encryptSignWith([seguroServerPublicKey], [devicePGPKeys.armoredPrivateKey], JSON.stringify(requestData));
 
             if (encryptRequestDataStatus === 'SUCCESS') {
-                ATTEMPTS += 1;
                 const request: ConnectRequest = {
-                    imap_account: imapAccount || imapData[0].accounts[0],
-                    server_folder: serverFolder || imapData[0].server_folder,
+                    imap_account: nextConnectInformation?.imap_account || imapData[0].accounts[0],
+                    server_folder: nextConnectInformation?.server_folder || imapData[0].server_folder,
                     encrypted_request: encryptedRequestData,
                     client_folder_name: clientFolderName
                 };
@@ -201,12 +198,6 @@ class Network {
                         const JSONResponse = JSON.parse(decryptedResponse);
                         return resolve(['SUCCESS', JSONResponse as ConnectRequest]);
                     }
-                }
-                if (postStatus === 'TIMEOUT') {
-                    if (ATTEMPTS <= MAX_ATTEMPTS) {
-                        return Network.connection(devicePGPKeys, seguroPublicKey, urlPath, imapAccount, serverFolder);
-                    }
-                    return resolve(['MAX_ATTEMPT_REACHED']);
                 }
             }
             return resolve(['FAILURE']);

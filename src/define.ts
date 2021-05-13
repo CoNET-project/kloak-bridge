@@ -25,7 +25,7 @@ export interface IMAPAccount {
     imap_server: string
 }
 
-export interface nextTimeConnect {
+export interface NextTimeConnect {
     imap_account: IMAPAccount
     server_folder: string
 }
@@ -34,6 +34,11 @@ export interface connectImapResponse {
     imap_account: IMAPAccount
     server_folder: string
     client_folder: string
+}
+
+export interface NetworkInformation {
+    connectInformation: connectImapResponse,
+    nextConnectInformation: NextTimeConnect
 }
 
 export interface RequestData {
@@ -46,7 +51,7 @@ export interface ConnectRequest {
     client_folder_name: string,
     use_kloak_shared_imap_account?: boolean
     imap_account?: IMAPAccount
-    next_time_connect?: nextTimeConnect
+    next_time_connect?: NextTimeConnect
     error?: string
     server_folder?: string
     encrypted_response?: string
