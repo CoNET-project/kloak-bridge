@@ -142,6 +142,7 @@ class KloakBridge {
                 connectInformation,
                 nextConnectInformation
             };
+            console.log(network);
             if (!this.keyChainContainer.network) {
                 this.keyChainContainer.network = getUUIDv4();
             }
@@ -160,12 +161,17 @@ class KloakBridge {
         })
     )
 
-    private networkWebSocket = (connectInformation: connectImapResponse) => {
+    private networkWebSocket = (connectInformation: connectImapResponse, reconnect?: () => void) => {
+        let stopReconnect = false;
         KloakBridge.seguroConnection.websocketConnection = Network.wsConnect(KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, connectInformation, async (err, networkInstance: Network | null, message: string | null) => {
             if (err) {
                 console.log(err);
                 this.networkListener.onConnectionFail();
                 KloakBridge.seguroConnection.websocketConnection?.close();
+                if (reconnect && !stopReconnect) {
+                    stopReconnect = true;
+                    return this.reconnect();
+                }
             }
             if (networkInstance) {
                 KloakBridge.seguroConnection.networkInstance = networkInstance;
@@ -190,6 +196,7 @@ class KloakBridge {
             if (status === 'SUCCESS') {
                 if (request) {
                     const connectRequest: ConnectRequest = request as ConnectRequest;
+                    console.log(connectRequest);
                     await this.saveNetworkInfo(connectRequest.connect_info as connectImapResponse, connectRequest.next_time_connect as NextTimeConnect);
                     this.networkWebSocket(connectRequest.connect_info as connectImapResponse);
                 }
@@ -197,14 +204,13 @@ class KloakBridge {
                 return this.networkListener.onConnectionFail();
             }
         };
-        if (deviceKeyStatus === 'SUCCESS' && seguroKeyStatus === 'SUCCESS') {
-            if (nextConnectInformation) {
-                Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, urlPath, nextConnectInformation)
-                    .then(networkCallback);
-            } else {
-                Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, urlPath)
-                    .then(networkCallback);
-            }
+
+        if (nextConnectInformation) {
+            Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, urlPath, nextConnectInformation)
+                .then(networkCallback);
+        } else if (deviceKeyStatus === 'SUCCESS' && seguroKeyStatus === 'SUCCESS') {
+            Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, urlPath)
+                .then(networkCallback);
         }
 
     }
@@ -232,7 +238,9 @@ class KloakBridge {
                 if (encryptedNetwork && status === 'SUCCESS') {
                     // eslint-disable-next-line camelcase
                     const { nextConnectInformation, connectInformation } = decryptedNetwork as unknown as NetworkInformation;
-                    this.networkStart(urlPath, nextConnectInformation);
+                    this.networkWebSocket(connectInformation, () => {
+                        this.networkStart(urlPath, nextConnectInformation);
+                    });
                     // this.networkStart(urlPath, connectInformation, nextConnectInformation);
                     // this.networkStart(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, urlPath, imapAccount, serverFolder);
                     return resolve();

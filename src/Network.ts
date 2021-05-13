@@ -191,6 +191,8 @@ class Network {
                     encrypted_request: encryptedRequestData,
                     client_folder_name: clientFolderName
                 };
+
+                console.log(request);
                 const [postStatus, postResponse] = await Network.getInformationFromSeguro(request, urlPath);
                 if (postStatus === 'SUCCESS' && postResponse) {
                     const [decryptStatus, decryptedResponse] = await EncryptHelper.decryptWith(devicePGPKeys, postResponse.encrypted_response as string);
