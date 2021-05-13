@@ -233,21 +233,21 @@ class KloakBridge {
 
             this.networkListener.onConnecting();
 
-            if (this.keyChainContainer.network && !this.networkMaxAttempt) {
-                const encryptedNetwork = await this.IDBHelper.retrieve(this.keyChainContainer.network);
-                const [ status, decryptedNetwork ] = await this.containerEncrypter.decryptMessage(encryptedNetwork);
-                if (status === 'SUCCESS') {
-                    // eslint-disable-next-line camelcase
-                    imapAccount = (decryptedNetwork as unknown as nextTimeConnect).imap_account;
-                    // eslint-disable-next-line camelcase
-                    serverFolder = (decryptedNetwork as unknown as nextTimeConnect).server_folder;
-                    this.networkStart(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, urlPath, imapAccount, serverFolder);
-                    return resolve();
-                }
-            } else {
-                this.networkStart(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, urlPath);
-                return resolve();
-            }
+            // if (this.keyChainContainer.network && !this.networkMaxAttempt) {
+            //     const encryptedNetwork = await this.IDBHelper.retrieve(this.keyChainContainer.network);
+            //     const [ status, decryptedNetwork ] = await this.containerEncrypter.decryptMessage(encryptedNetwork);
+            //     if (status === 'SUCCESS') {
+            //         // eslint-disable-next-line camelcase
+            //         imapAccount = (decryptedNetwork as unknown as nextTimeConnect).imap_account;
+            //         // eslint-disable-next-line camelcase
+            //         serverFolder = (decryptedNetwork as unknown as nextTimeConnect).server_folder;
+            //         this.networkStart(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, urlPath, imapAccount, serverFolder);
+            //         return resolve();
+            //     }
+            // } else {
+            this.networkStart(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, urlPath);
+            return resolve();
+            // }
         })
     )
 
