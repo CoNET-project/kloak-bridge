@@ -29,7 +29,7 @@ import Network from './Network';
 
 class KloakBridge {
 
-    private counter = 0
+    private reconnected = false
     static seguroConnection: SeguroConnection = {
         host: '',
         port: '',
@@ -162,14 +162,12 @@ class KloakBridge {
     )
 
     private networkWebSocket = (connectInformation: connectImapResponse, reconnect?: () => void) => {
-        let stopReconnect = false;
         KloakBridge.seguroConnection.websocketConnection = Network.wsConnect(KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, connectInformation, async (err, networkInstance: Network | null, message: string | null) => {
             if (err) {
-                console.log(err);
                 this.networkListener.onConnectionFail();
                 KloakBridge.seguroConnection.websocketConnection?.close();
-                if (reconnect && !stopReconnect) {
-                    stopReconnect = true;
+                if (reconnect && !this.reconnected) {
+                    this.reconnected = true;
                     return this.reconnect();
                 }
             }
@@ -231,7 +229,7 @@ class KloakBridge {
     private establishConnection = async (urlPath: string = `http://${KloakBridge.seguroConnection.host}:${KloakBridge.seguroConnection.port}/getInformationFromSeguro`): Promise<void> => (
         new Promise<void>(async (resolve, _) => {
             this.networkListener.onConnecting();
-
+            this.reconnected = false;
             if (this.keyChainContainer.network) {
                 const encryptedNetwork = await this.IDBHelper.retrieve(this.keyChainContainer.network);
                 const [ status, decryptedNetwork ] = await this.containerEncrypter.decryptMessage(encryptedNetwork);
