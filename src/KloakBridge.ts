@@ -21,7 +21,7 @@ import {
     GetDeviceKey,
     IMAPAccount,
     GetSeguroKey,
-    NetworkStatusListeners, ConnectRequest, SeguroConnection, NetworkPostStatus
+    NetworkStatusListeners, ConnectRequest, SeguroConnection, NetworkPostStatus, connectImapResponse
 } from './define';
 import DisassemblyHelper from './DisassemblyHelper';
 import AssemblyHelper from './AssemblyHelper';
@@ -162,6 +162,28 @@ class KloakBridge {
         })
     )
 
+    private networkWebSocket = (connectInformation: connectImapResponse) => {
+        KloakBridge.seguroConnection.websocketConnection = Network.wsConnect(KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, connectInformation, async (err, networkInstance: Network | null, message: string | null) => {
+            if (err) {
+                this.networkListener.onConnectionFail();
+                KloakBridge.seguroConnection.websocketConnection?.close();
+            }
+            if (networkInstance) {
+                KloakBridge.seguroConnection.networkInstance = networkInstance;
+                return this.networkListener.onConnected();
+            }
+            if (message) {
+                const [deviceKeyStatus, deviceKey] = await this.getDeviceKey();
+                if (deviceKeyStatus === 'SUCCESS') {
+                    const [decryptStatus, decryptMessage] = await EncryptHelper.decryptWith(deviceKey as PGPKeys, message);
+                    if (decryptStatus === 'SUCCESS') {
+                        return this.networkListener.onMessage(decryptMessage);
+                    }
+                }
+            }
+        });
+    }
+
     private networkStart = (deviceKey: PGPKeys, seguroKey: string, urlPath = 'http://localhost:3000/getInformationFromSeguro', imapAccount?: IMAPAccount, serverFolder?: string) => {
         const networkCallback = async ([status, request]: [status: 'SUCCESS' | 'FAILURE' | 'MAX_ATTEMPT_REACHED', request?: ConnectRequest]) => {
             if (status === 'MAX_ATTEMPT_REACHED') {
@@ -170,38 +192,22 @@ class KloakBridge {
             if (status === 'SUCCESS') {
                 if (request) {
                     const connectRequest: ConnectRequest = request as ConnectRequest;
-                    console.log(connectRequest);
-                    await this.saveNetworkInfo(connectRequest.next_time_connect?.imap_account as IMAPAccount, connectRequest.next_time_connect?.server_folder as string);
-                    // eslint-disable-next-line max-len
-                    KloakBridge.seguroConnection.websocketConnection = Network.wsConnect(KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, connectRequest.connect_info, async (err, networkInstance: Network | null, message: string | null) => {
-                        if (err) {
-                            this.networkListener.onConnectionFail();
-                            KloakBridge.seguroConnection.websocketConnection?.close();
-                        }
-                        if (networkInstance) {
-                            KloakBridge.seguroConnection.networkInstance = networkInstance;
-                            return this.networkListener.onConnected();
-                        }
-                        if (message) {
-                            const [deviceKeyStatus, deviceKey] = await this.getDeviceKey();
-                            if (deviceKeyStatus === 'SUCCESS') {
-                                const [decryptStatus, decryptMessage] = await EncryptHelper.decryptWith(deviceKey as PGPKeys, message);
-                                if (decryptStatus === 'SUCCESS') {
-                                    return this.networkListener.onMessage(decryptMessage);
-                                }
-                            }
-                        }
-                    });
+                    this.networkWebSocket(connectRequest.connect_info as connectImapResponse);
                 }
             } else {
                 return this.networkListener.onConnectionFail();
             }
         };
 
-        // if (imapAccount && serverFolder) {
-        //     Network.connection(deviceKey, seguroKey, urlPath, imapAccount, serverFolder).then(networkCallback);
-        //     return;
-        // }
+        if (imapAccount && serverFolder) {
+            const connectionInformation: connectImapResponse = {
+                imap_account: imapAccount,
+                server_folder: serverFolder,
+                client_folder: getUUIDv4()
+            };
+            this.networkWebSocket(connectionInformation);
+            return;
+        }
         Network.connection(deviceKey as PGPKeys, seguroKey, urlPath).then(networkCallback);
     }
 
@@ -233,21 +239,22 @@ class KloakBridge {
 
             this.networkListener.onConnecting();
 
-            // if (this.keyChainContainer.network && !this.networkMaxAttempt) {
-            //     const encryptedNetwork = await this.IDBHelper.retrieve(this.keyChainContainer.network);
-            //     const [ status, decryptedNetwork ] = await this.containerEncrypter.decryptMessage(encryptedNetwork);
-            //     if (status === 'SUCCESS') {
-            //         // eslint-disable-next-line camelcase
-            //         imapAccount = (decryptedNetwork as unknown as nextTimeConnect).imap_account;
-            //         // eslint-disable-next-line camelcase
-            //         serverFolder = (decryptedNetwork as unknown as nextTimeConnect).server_folder;
-            //         this.networkStart(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, urlPath, imapAccount, serverFolder);
-            //         return resolve();
-            //     }
-            // } else {
-            this.networkStart(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, urlPath);
-            return resolve();
-            // }
+            if (this.keyChainContainer.network) {
+                const encryptedNetwork = await this.IDBHelper.retrieve(this.keyChainContainer.network);
+                const [ status, decryptedNetwork ] = await this.containerEncrypter.decryptMessage(encryptedNetwork);
+                if (status === 'SUCCESS') {
+                    // eslint-disable-next-line camelcase
+                    imapAccount = (decryptedNetwork as unknown as nextTimeConnect).imap_account;
+                    // eslint-disable-next-line camelcase
+                    serverFolder = (decryptedNetwork as unknown as nextTimeConnect).server_folder;
+                    await this.saveNetworkInfo(imapAccount, serverFolder);
+                    this.networkStart(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, urlPath, imapAccount, serverFolder);
+                    return resolve();
+                }
+            } else {
+                this.networkStart(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, urlPath);
+                return resolve();
+            }
         })
     )
 
