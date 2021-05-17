@@ -130,13 +130,14 @@ class Network {
         })
     )
 
-    static getInformationFromSeguro = (postData: ConnectRequest, postURLPath: string = 'http://localhost:3000'): Promise<[status: 'SUCCESS' | 'FAILURE' | 'TIMEOUT', payload?: any]> => (
+    static getInformationFromSeguro = (postData: ConnectRequest, host: string, port: string | number): Promise<[status: 'SUCCESS' | 'FAILURE' | 'TIMEOUT', payload?: any]> => (
         new Promise<[status: 'SUCCESS' | 'FAILURE' | 'TIMEOUT', payload?: any]>((resolve, _) => {
             let URLObject;
+            const localServerPath = `http://${host}:${port}/getInformationFromSeguro`;
             if ((typeof process !== 'undefined') && (process.release) && (process.release.name === 'node')) {
-                URLObject = new NodeURL(postURLPath);
+                URLObject = new NodeURL(localServerPath);
             } else {
-                URLObject = new URL(postURLPath);
+                URLObject = new URL(localServerPath);
             }
             const postString = JSON.stringify(postData);
             const options: RequestOptions = {
@@ -173,7 +174,7 @@ class Network {
     )
 
     // eslint-disable-next-line max-len
-    static connection = (devicePGPKeys: PGPKeys, seguroPublicKey: string, urlPath: string, nextConnectInformation?: NextTimeConnect): Promise<[status: 'SUCCESS' | 'FAILURE' | 'MAX_ATTEMPT_REACHED', request?: ConnectRequest]> => (
+    static connection = (devicePGPKeys: PGPKeys, seguroPublicKey: string, host: string, port: string | number, nextConnectInformation?: NextTimeConnect): Promise<[status: 'SUCCESS' | 'FAILURE' | 'MAX_ATTEMPT_REACHED', request?: ConnectRequest]> => (
         new Promise<[status: 'SUCCESS' | 'FAILURE' | 'MAX_ATTEMPT_REACHED', request?: ConnectRequest]>(async (resolve, _) => {
             const clientFolderName = getUUIDv4();
             const requestData: RequestData = {
@@ -192,8 +193,7 @@ class Network {
                     client_folder_name: clientFolderName
                 };
 
-                console.log(request);
-                const [postStatus, postResponse] = await Network.getInformationFromSeguro(request, urlPath);
+                const [postStatus, postResponse] = await Network.getInformationFromSeguro(request, host, port);
                 if (postStatus === 'SUCCESS' && postResponse) {
                     const [decryptStatus, decryptedResponse] = await EncryptHelper.decryptWith(devicePGPKeys, postResponse.encrypted_response as string);
                     if (decryptStatus === 'SUCCESS') {

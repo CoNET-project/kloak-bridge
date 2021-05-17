@@ -57,13 +57,13 @@ class KloakBridge {
     constructor(private networkListener: NetworkStatusListeners, skipNetwork = false, localServerPath?: string) {
         this.skipNetwork = skipNetwork;
         if ((typeof process !== 'undefined') && (process.release) && (process.release.name === 'node')) {
-            this.getURLData(localServerPath || 'http://localhost:3000/');
+            this.getNetworkInformation(localServerPath || 'http://localhost:3000/');
         } else {
-            this.getURLData(localServerPath || window.location.href);
+            this.getNetworkInformation(localServerPath || window.location.href);
         }
     }
 
-    private getURLData = (url: string) => {
+    private getNetworkInformation = (url: string) => {
         let URLObject;
         if ((typeof process !== 'undefined') && (process.release) && (process.release.name === 'node')) {
             URLObject = new NodeURL(url);
@@ -72,6 +72,7 @@ class KloakBridge {
         }
         KloakBridge.seguroConnection.host = URLObject?.hostname;
         KloakBridge.seguroConnection.port = URLObject?.port;
+
     }
 
     private generateDefaultKeychain = (): Promise<KeyChain> => (
@@ -142,7 +143,6 @@ class KloakBridge {
                 connectInformation,
                 nextConnectInformation
             };
-            console.log(network);
             if (!this.keyChainContainer.network) {
                 this.keyChainContainer.network = getUUIDv4();
             }
@@ -157,7 +157,6 @@ class KloakBridge {
             } catch (err) {
                 return resolve(false);
             }
-            // container.network = network;
         })
     )
 
@@ -187,32 +186,6 @@ class KloakBridge {
         });
     }
 
-    private networkStart = async (urlPath = 'http://localhost:3000/getInformationFromSeguro', nextConnectInformation?: NextTimeConnect) => {
-        const [deviceKeyStatus, deviceKey] = await this.getDeviceKey();
-        const [seguroKeyStatus, seguroKey] = await this.getSeguroKey();
-        const networkCallback = async ([status, request]: [status: 'SUCCESS' | 'FAILURE' | 'MAX_ATTEMPT_REACHED', request?: ConnectRequest]) => {
-            if (status === 'SUCCESS') {
-                if (request) {
-                    const connectRequest: ConnectRequest = request as ConnectRequest;
-                    console.log(connectRequest);
-                    await this.saveNetworkInfo(connectRequest.connect_info as connectImapResponse, connectRequest.next_time_connect as NextTimeConnect);
-                    this.networkWebSocket(connectRequest.connect_info as connectImapResponse);
-                }
-            } else {
-                return this.networkListener.onConnectionFail();
-            }
-        };
-
-        if (nextConnectInformation) {
-            Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, urlPath, nextConnectInformation)
-                .then(networkCallback);
-        } else if (deviceKeyStatus === 'SUCCESS' && seguroKeyStatus === 'SUCCESS') {
-            Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, urlPath)
-                .then(networkCallback);
-        }
-
-    }
-
     public reconnect = () => this.establishConnection()
 
     public disconnect = () => {
@@ -226,27 +199,61 @@ class KloakBridge {
     }
 
     // eslint-disable-next-line max-len
-    private establishConnection = async (urlPath: string = `http://${KloakBridge.seguroConnection.host}:${KloakBridge.seguroConnection.port}/getInformationFromSeguro`): Promise<void> => (
+    private establishConnection = async (): Promise<void> => (
         new Promise<void>(async (resolve, _) => {
             this.networkListener.onConnecting();
-            this.reconnected = false;
-            if (this.keyChainContainer.network) {
-                const encryptedNetwork = await this.IDBHelper.retrieve(this.keyChainContainer.network);
-                const [ status, decryptedNetwork ] = await this.containerEncrypter.decryptMessage(encryptedNetwork);
-                if (encryptedNetwork && status === 'SUCCESS') {
-                    // eslint-disable-next-line camelcase
-                    const { nextConnectInformation, connectInformation } = decryptedNetwork as unknown as NetworkInformation;
-                    this.networkWebSocket(connectInformation, () => {
-                        this.networkStart(urlPath, nextConnectInformation);
-                    });
-                    // this.networkStart(urlPath, connectInformation, nextConnectInformation);
-                    // this.networkStart(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, urlPath, imapAccount, serverFolder);
-                    return resolve();
+
+            const networkCallback = async ([status, request]: [status: 'SUCCESS' | 'FAILURE' | 'MAX_ATTEMPT_REACHED', request?: ConnectRequest]) => {
+                if (status === 'SUCCESS') {
+                    if (request) {
+                        const connectRequest: ConnectRequest = request as ConnectRequest;
+                        console.log(connectRequest);
+                        // await this.saveNetworkInfo(connectRequest.connect_info as connectImapResponse, connectRequest.next_time_connect as NextTimeConnect);
+                        // this.networkWebSocket(connectRequest.connect_info as connectImapResponse);
+                    }
+                } else {
+                    return this.networkListener.onConnectionFail();
                 }
-            } else {
-                this.networkStart(urlPath);
-                return resolve();
+            };
+
+            const [deviceKeyStatus, deviceKey] = await this.getDeviceKey();
+            const [seguroKeyStatus, seguroKey] = await this.getSeguroKey();
+            let nextConnectInformation: NextTimeConnect;
+            let connectInformation: connectImapResponse;
+            if (deviceKeyStatus === 'SUCCESS' && seguroKeyStatus === 'SUCCESS') {
+                if (this.keyChainContainer.network) {
+                    const encryptedNetwork = await this.IDBHelper.retrieve(this.keyChainContainer.network);
+                    const [ decryptNetworkStatus, decryptedNetwork ] = await this.containerEncrypter.decryptMessage(encryptedNetwork);
+                    // if (decryptNetworkStatus === 'SUCCESS') {
+                    //     // nextConnectInformation = (decryptedNetwork as unknown as NetworkInformation).nextConnectInformation;
+                    //     connectInformation = (decryptedNetwork as unknown as NetworkInformation).connectInformation;
+                    //     return this.networkWebSocket(connectInformation, () => {
+                    //         // Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, nextConnectInformation).then(networkCallback);
+                    //         console.log('WEBSOCKET SHOULD DISCONNECT');
+                    //     });
+                    // }
+                } else {
+                    Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port).then(networkCallback);
+                }
             }
+            return resolve();
+            // if (this.keyChainContainer.network) {
+            //     const encryptedNetwork = await this.IDBHelper.retrieve(this.keyChainContainer.network);
+            //     const [ status, decryptedNetwork ] = await this.containerEncrypter.decryptMessage(encryptedNetwork);
+            //     if (encryptedNetwork && status === 'SUCCESS') {
+            //     // eslint-disable-next-line camelcase
+            //         const { nextConnectInformation, connectInformation } = decryptedNetwork as unknown as NetworkInformation;
+            //         // this.networkWebSocket(connectInformation, () => {
+            //         //     this.networkStart(KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, nextConnectInformation);
+            //         // });
+            //         // this.networkStart(urlPath, connectInformation, nextConnectInformation);
+            //         // this.networkStart(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, urlPath, imapAccount, serverFolder);
+            //         return resolve();
+            //     }
+            // } else {
+            //     this.networkStart(KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port);
+            //     return resolve();
+            // }
         })
     )
 
