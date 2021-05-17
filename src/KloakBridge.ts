@@ -27,7 +27,7 @@ import AssemblyHelper from './AssemblyHelper';
 import { getUUIDv4 } from './utils';
 import KeyContainer from './KeyContainer';
 import Network from './Network';
-const log = logger.getLogger('Kloak-bridge');
+const log = logger.getLogger('KloakBridge()');
 
 class KloakBridge {
 
@@ -153,7 +153,7 @@ class KloakBridge {
                 if (status === 'SUCCESS') {
                     await this.IDBHelper.save('KeyContainer', this.keyChainContainer);
                     await this.IDBHelper.save(this.keyChainContainer.network, encryptedNetwork);
-                    log('Kloak Bridge Network: Saved network information:', network);
+                    log('networkWebSocket()', 'Kloak Bridge Network: Saved network information:', network);
                     return resolve(true);
                 }
                 resolve(false);
@@ -168,21 +168,21 @@ class KloakBridge {
             if (err) {
                 this.networkListener.onConnectionFail();
                 KloakBridge.seguroConnection.websocketConnection?.close();
-                log('Kloak Bridge Network: Websocket disconnected');
+                log('networkWebSocket()', 'Kloak Bridge Network: Websocket disconnected');
                 if (disconnected) {
                     return disconnected();
                 }
             }
             if (networkInstance) {
                 KloakBridge.seguroConnection.networkInstance = networkInstance;
-                log('Kloak Bridge Network: Network Instance returned', KloakBridge.seguroConnection.networkInstance);
+                log('networkWebSocket()', 'Kloak Bridge Network: Network Instance returned', KloakBridge.seguroConnection.networkInstance);
                 return this.networkListener.onConnected();
             }
             if (message) {
                 const [deviceKeyStatus, deviceKey] = await this.getDeviceKey();
                 if (deviceKeyStatus === 'SUCCESS') {
                     const [decryptStatus, decryptMessage] = await EncryptHelper.decryptWith(deviceKey as PGPKeys, message);
-                    log('Kloak Bridge Network: Websocket returned message:', decryptMessage);
+                    log('networkWebSocket()', 'Kloak Bridge Network: Websocket returned message:', decryptMessage);
                     if (decryptStatus === 'SUCCESS') {
                         return this.networkListener.onMessage(decryptMessage);
                     }
@@ -212,7 +212,7 @@ class KloakBridge {
                 if (status === 'SUCCESS') {
                     if (request) {
                         const connectRequest: ConnectRequest = request as ConnectRequest;
-                        log('Kloak Bridge Network: Network returned connectRequest', request);
+                        log('establishConnection() networkCallback()', 'Kloak Bridge Network: Network returned connectRequest', request);
                         await this.saveNetworkInfo(connectRequest.connect_info as connectImapResponse, connectRequest.next_time_connect as NextTimeConnect);
                         this.networkWebSocket(connectRequest.connect_info as connectImapResponse);
                     }
@@ -225,28 +225,27 @@ class KloakBridge {
             const [seguroKeyStatus, seguroKey] = await this.getSeguroKey();
             if (deviceKeyStatus === 'SUCCESS' && seguroKeyStatus === 'SUCCESS') {
                 if (this.keyChainContainer.network) {
-                    log('Kloak Bridge Network: Container has saved network information.');
+                    log('establishConnection()', 'Kloak Bridge Network: Container has saved network information.');
                     const encryptedNetwork = await this.IDBHelper.retrieve(this.keyChainContainer.network);
                     const [decryptNetworkStatus, decryptedNetwork] = await this.containerEncrypter.decryptMessage(encryptedNetwork);
-                    log('Kloak Bridge Network: Saved network information', decryptedNetwork);
+                    log('establishConnection()', 'Kloak Bridge Network: Saved network information', decryptedNetwork);
                     if (decryptNetworkStatus === 'SUCCESS') {
                         const { nextConnectInformation } = decryptedNetwork as unknown as NetworkInformation;
                         const { connectInformation } = decryptedNetwork as unknown as NetworkInformation;
                         if (connectInformation && nextConnectInformation) {
-                            log('Kloak Bridge Network: Saved network has connectInformation and nextConnectInformation', connectInformation, nextConnectInformation);
+                            log('establishConnection()', 'Kloak Bridge Network: Saved network has connectInformation and nextConnectInformation', connectInformation, nextConnectInformation);
                             this.networkWebSocket(connectInformation, async () => {
-                                log('Kloak Bridge Network: Websocket disconnected');
                                 await this.saveNetworkInfo(null, nextConnectInformation);
                                 Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, nextConnectInformation).then(networkCallback);
                             });
                         } else if (nextConnectInformation) {
-                            log('Kloak Bridge Network: Saved network only has nextConnectInformation', nextConnectInformation);
+                            log('establishConnection()', 'Kloak Bridge Network: Saved network only has nextConnectInformation', nextConnectInformation);
                             Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, nextConnectInformation).then(networkCallback);
                         }
                         return resolve();
                     }
                 } else {
-                    log('Kloak Bridge Network: Container does not have saved network information.');
+                    log('establishConnection()', 'Kloak Bridge Network: Container does not have saved network information.');
                     Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port).then(networkCallback);
                     return resolve();
                 }

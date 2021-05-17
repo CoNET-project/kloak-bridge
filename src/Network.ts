@@ -2,10 +2,12 @@ import { URL as NodeURL } from 'url';
 import NodeWebsocket from 'ws';
 import { request, RequestOptions } from 'http';
 // eslint-disable-next-line import/no-cycle
-import { ConnectRequest, IMAPAccount, NetworkPostStatus, NextTimeConnect, PGPKeys, PostMessageRequest, RequestData, WebsocketResponse } from './define';
+import { ConnectRequest, NetworkPostStatus, NextTimeConnect, PGPKeys, PostMessageRequest, RequestData, WebsocketResponse } from './define';
 import { getUUIDv4 } from './utils';
 // eslint-disable-next-line import/no-cycle
 import EncryptHelper from './EncryptHelper';
+import logger from './logger/logger';
+const log = logger.getLogger('Network()');
 
 const imapData = [
     {
@@ -103,6 +105,7 @@ class Network {
 
     static postToLocalServer = (postData: PostMessageRequest, host: string, port: number | string, path: string): Promise<[status: 'SUCCESS' | 'NETWORK_NOT_AVAILABLE' | 'NOT_CONNECTED' | 'FAILURE']> => (
         new Promise<[status: 'SUCCESS' | 'NETWORK_NOT_AVAILABLE' | 'NOT_CONNECTED' | 'FAILURE']>((resolve, _) => {
+            log('Network.postToLocalServer()', 'Attempting to connect to local server', postData);
             const postString = JSON.stringify(postData);
             const options = {
                 host,
@@ -117,10 +120,13 @@ class Network {
             const req = request(options, (res) => {
                 switch (res.statusCode) {
                     case 200:
+                        log('Network.postToLocalServer()', 'Local server returned:', res.statusCode);
                         return resolve(['SUCCESS']);
                     case 404:
+                        log('Network.postToLocalServer()', 'Local server returned:', res.statusCode);
                         return resolve(['NOT_CONNECTED']);
                     case 500:
+                        log('Network.postToLocalServer()', 'Local server returned:', res.statusCode);
                         return resolve(['NETWORK_NOT_AVAILABLE']);
                     default:
                         return resolve(['FAILURE']);
@@ -132,6 +138,7 @@ class Network {
 
     static getInformationFromSeguro = (postData: ConnectRequest, host: string, port: string | number): Promise<[status: 'SUCCESS' | 'FAILURE' | 'TIMEOUT', payload?: any]> => (
         new Promise<[status: 'SUCCESS' | 'FAILURE' | 'TIMEOUT', payload?: any]>((resolve, _) => {
+            log('Network.getInformationFromSeguro()', 'Getting connection information with:', postData);
             let URLObject;
             const localServerPath = `http://${host}:${port}/getInformationFromSeguro`;
             if ((typeof process !== 'undefined') && (process.release) && (process.release.name === 'node')) {
@@ -157,11 +164,13 @@ class Network {
                 res.once('error', (err) => resolve(['FAILURE', err]));
                 res.on('data', (data) => {
                     returnedData += data.toString();
+                    log('Network.getInformationFromSeguro()', 'Local server responded with: ', data);
                 });
                 res.once('end', () => {
                     let returnJSON = null;
                     try {
                         returnJSON = JSON.parse(returnedData);
+                        log('Network.getInformationFromSeguro()', 'Local server ended with: ', returnJSON);
                     } catch (exceptions) {
                         return resolve(['FAILURE', exceptions]);
                     }
@@ -183,6 +192,7 @@ class Network {
                 client_folder_name: clientFolderName
             };
 
+            log('Network.getInformationFromSeguro()', 'Attempting connection with:', requestData);
             const [encryptRequestDataStatus, encryptedRequestData] = await EncryptHelper.encryptSignWith([seguroServerPublicKey], [devicePGPKeys.armoredPrivateKey], JSON.stringify(requestData));
 
             if (encryptRequestDataStatus === 'SUCCESS') {
@@ -192,12 +202,13 @@ class Network {
                     encrypted_request: encryptedRequestData,
                     client_folder_name: clientFolderName
                 };
-
+                log('Network.getInformationFromSeguro()', 'Seguro responded with:', request);
                 const [postStatus, postResponse] = await Network.getInformationFromSeguro(request, host, port);
                 if (postStatus === 'SUCCESS' && postResponse) {
                     const [decryptStatus, decryptedResponse] = await EncryptHelper.decryptWith(devicePGPKeys, postResponse.encrypted_response as string);
                     if (decryptStatus === 'SUCCESS') {
                         const JSONResponse = JSON.parse(decryptedResponse);
+                        log('Network.getInformationFromSeguro()', 'Seguro decrypted response:', JSONResponse);
                         return resolve(['SUCCESS', JSONResponse as ConnectRequest]);
                     }
                 }
@@ -216,6 +227,7 @@ class Network {
                     const websocketResponse: WebsocketResponse = JSON.parse(message);
                     if (/Connected/.test(websocketResponse.status) && !networkInstantiated) {
                         networkInstantiated = true;
+                        log('Network.wsConnect()', 'Websocket connected!', websocketResponse);
                         return callback(null, new Network(websocketResponse.connectUUID, host, port), null);
                     }
                     if (websocketResponse.encryptedMessage) {
@@ -240,6 +252,7 @@ class Network {
                     const websocketResponse: WebsocketResponse = JSON.parse(event.data);
                     if (/Connected/.test(websocketResponse.status) && !networkInstantiated) {
                         networkInstantiated = true;
+                        log('Network.wsConnect()', 'Websocket connected!', websocketResponse);
                         return callback(null, new Network(websocketResponse.connectUUID, host, port), null);
                     }
                     if (websocketResponse.encryptedMessage) {
