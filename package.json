@@ -1,6 +1,6 @@
 {
   "name": "@conet-project/kloak-bridge",
-  "version": "1.31.5",
+  "version": "1.31.6",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "license": "UNLICENSED",
@@ -36,6 +36,7 @@
   "dependencies": {
     "buffer": "^6.0.3",
     "core-js": "^3.10.0",
+    "dayjs": "^1.10.4",
     "openpgp": "5.0.0-1",
     "regenerator-runtime": "^0.13.7",
     "ts-jest": "^26.5.3",
