@@ -37,8 +37,8 @@ export interface connectImapResponse {
 }
 
 export interface NetworkInformation {
-    connectInformation: connectImapResponse,
-    nextConnectInformation: NextTimeConnect
+    connectInformation?: connectImapResponse | null,
+    nextConnectInformation?: NextTimeConnect | null
 }
 
 export interface RequestData {
