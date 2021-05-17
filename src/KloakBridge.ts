@@ -170,7 +170,7 @@ class KloakBridge {
                 KloakBridge.seguroConnection.websocketConnection?.close();
                 log('networkWebSocket()', 'Kloak Bridge Network: Websocket disconnected');
                 if (disconnected) {
-                    return disconnected();
+                    setTimeout(() => disconnected(), 1000);
                 }
             }
             if (networkInstance) {
@@ -236,6 +236,7 @@ class KloakBridge {
                             log('establishConnection()', 'Kloak Bridge Network: Saved network has connectInformation and nextConnectInformation', connectInformation, nextConnectInformation);
                             this.networkWebSocket(connectInformation, async () => {
                                 await this.saveNetworkInfo(null, nextConnectInformation);
+                                log('networkWebSocket()', 'Kloak Bridge Network: Websocket disconnected, attempting to receive new connection information');
                                 Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, nextConnectInformation).then(networkCallback);
                             });
                         } else if (nextConnectInformation) {
