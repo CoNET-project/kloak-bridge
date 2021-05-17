@@ -160,14 +160,13 @@ class KloakBridge {
         })
     )
 
-    private networkWebSocket = (connectInformation: connectImapResponse, reconnect?: () => void) => {
+    private networkWebSocket = (connectInformation: connectImapResponse, disconnected?: () => void) => {
         KloakBridge.seguroConnection.websocketConnection = Network.wsConnect(KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, connectInformation, async (err, networkInstance: Network | null, message: string | null) => {
             if (err) {
                 this.networkListener.onConnectionFail();
                 KloakBridge.seguroConnection.websocketConnection?.close();
-                if (reconnect && !this.reconnected) {
-                    this.reconnected = true;
-                    return this.reconnect();
+                if (disconnected) {
+                    return disconnected();
                 }
             }
             if (networkInstance) {
@@ -208,8 +207,8 @@ class KloakBridge {
                     if (request) {
                         const connectRequest: ConnectRequest = request as ConnectRequest;
                         console.log(connectRequest);
-                        // await this.saveNetworkInfo(connectRequest.connect_info as connectImapResponse, connectRequest.next_time_connect as NextTimeConnect);
-                        // this.networkWebSocket(connectRequest.connect_info as connectImapResponse);
+                        await this.saveNetworkInfo(connectRequest.connect_info as connectImapResponse, connectRequest.next_time_connect as NextTimeConnect);
+                        this.networkWebSocket(connectRequest.connect_info as connectImapResponse);
                     }
                 } else {
                     return this.networkListener.onConnectionFail();
@@ -223,18 +222,20 @@ class KloakBridge {
             if (deviceKeyStatus === 'SUCCESS' && seguroKeyStatus === 'SUCCESS') {
                 if (this.keyChainContainer.network) {
                     const encryptedNetwork = await this.IDBHelper.retrieve(this.keyChainContainer.network);
-                    const [ decryptNetworkStatus, decryptedNetwork ] = await this.containerEncrypter.decryptMessage(encryptedNetwork);
-                    // if (decryptNetworkStatus === 'SUCCESS') {
-                    //     // nextConnectInformation = (decryptedNetwork as unknown as NetworkInformation).nextConnectInformation;
-                    //     connectInformation = (decryptedNetwork as unknown as NetworkInformation).connectInformation;
-                    //     return this.networkWebSocket(connectInformation, () => {
-                    //         // Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, nextConnectInformation).then(networkCallback);
-                    //         console.log('WEBSOCKET SHOULD DISCONNECT');
-                    //     });
-                    // }
-                } else {
-                    Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port).then(networkCallback);
+                    const [decryptNetworkStatus, decryptedNetwork] = await this.containerEncrypter.decryptMessage(encryptedNetwork);
+                    console.log(decryptNetworkStatus, decryptedNetwork);
+                    if (decryptNetworkStatus === 'SUCCESS') {
+                        // nextConnectInformation = (decryptedNetwork as unknown as NetworkInformation).nextConnectInformation;
+                        connectInformation = (decryptedNetwork as unknown as NetworkInformation).connectInformation;
+                        return this.networkWebSocket(connectInformation, () => {
+                            // Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, nextConnectInformation).then(networkCallback);
+                            console.log('WEBSOCKET SHOULD DISCONNECT');
+                        });
+                    }
                 }
+                // } else {
+                //     Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port).then(networkCallback);
+                // }
             }
             return resolve();
             // if (this.keyChainContainer.network) {
