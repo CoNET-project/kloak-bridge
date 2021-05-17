@@ -225,17 +225,17 @@ class KloakBridge {
                     const [decryptNetworkStatus, decryptedNetwork] = await this.containerEncrypter.decryptMessage(encryptedNetwork);
                     console.log(decryptNetworkStatus, decryptedNetwork);
                     if (decryptNetworkStatus === 'SUCCESS') {
-                        // nextConnectInformation = (decryptedNetwork as unknown as NetworkInformation).nextConnectInformation;
+                        nextConnectInformation = (decryptedNetwork as unknown as NetworkInformation).nextConnectInformation;
                         connectInformation = (decryptedNetwork as unknown as NetworkInformation).connectInformation;
-                        return this.networkWebSocket(connectInformation, () => {
-                            // Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, nextConnectInformation).then(networkCallback);
-                            console.log('WEBSOCKET SHOULD DISCONNECT');
+                        this.networkWebSocket(connectInformation, () => {
+                            Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, nextConnectInformation).then(networkCallback);
                         });
+                        return resolve();
                     }
+                } else {
+                    Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port).then(networkCallback);
+                    return resolve();
                 }
-                // } else {
-                //     Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port).then(networkCallback);
-                // }
             }
             return resolve();
             // if (this.keyChainContainer.network) {
