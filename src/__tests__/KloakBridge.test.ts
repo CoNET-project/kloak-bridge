@@ -27,7 +27,7 @@ describe('StorageHelper Class', () => {
         const textEncoding = require('text-encoding-utf-8');
         global.TextEncoder = textEncoding.TextEncoder;
         global.TextDecoder = textEncoding.TextDecoder;
-        kloakBridge = new KloakBridge({
+        kloakBridge = new KloakBridge(() => {}, {
             onConnected: () => {
                 console.log(new Date().toISOString());
                 console.log('NETWORK CONNECTED');
