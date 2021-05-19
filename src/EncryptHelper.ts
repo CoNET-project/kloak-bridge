@@ -18,6 +18,10 @@ class EncryptHelper {
     }
 
     static modifyPGPMessage = (message: string, trim: boolean = false): string => {
+        if (!message) {
+            return '';
+        }
+        
         let modified: string;
         const pgpHead = '-----BEGIN PGP MESSAGE-----';
         const pgpComment = 'Comment: https://openpgpjs.org';
