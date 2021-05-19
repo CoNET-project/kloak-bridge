@@ -183,8 +183,8 @@ class Network {
     )
 
     // eslint-disable-next-line max-len
-    static connection = (devicePGPKeys: PGPKeys, seguroPublicKey: string, host: string, port: string | number, nextConnectInformation?: NextTimeConnect): Promise<[status: 'SUCCESS' | 'FAILURE' | 'MAX_ATTEMPT_REACHED', request?: ConnectRequest]> => (
-        new Promise<[status: 'SUCCESS' | 'FAILURE' | 'MAX_ATTEMPT_REACHED', request?: ConnectRequest]>(async (resolve, _) => {
+    static connection = (devicePGPKeys: PGPKeys, seguroPublicKey: string, host: string, port: string | number, nextConnectInformation?: NextTimeConnect): Promise<[status: 'SUCCESS' | 'FAILURE' | 'CONNECTION_TIMEOUT' | 'CONNECTION_FAILED', request?: ConnectRequest]> => (
+        new Promise<[status: 'SUCCESS' | 'FAILURE' | 'CONNECTION_TIMEOUT' | 'CONNECTION_FAILED', request?: ConnectRequest]>(async (resolve, _) => {
             const clientFolderName = getUUIDv4();
             const requestData: RequestData = {
                 device_armor: devicePGPKeys.armoredPublicKey,
@@ -204,15 +204,22 @@ class Network {
                 };
                 const [postStatus, postResponse] = await Network.getInformationFromSeguro(request, host, port);
                 if (postStatus === 'SUCCESS' && postResponse) {
-                    const [decryptStatus, decryptedResponse] = await EncryptHelper.decryptWith(devicePGPKeys, postResponse.encrypted_response as string);
-                    if (decryptStatus === 'SUCCESS') {
-                        const JSONResponse = JSON.parse(decryptedResponse);
-                        log('Network.getInformationFromSeguro()', 'Seguro decrypted response:', JSONResponse);
-                        return resolve(['SUCCESS', JSONResponse as ConnectRequest]);
+                    if (postResponse.encrypted_response) {
+                        const [decryptStatus, decryptedResponse] = await EncryptHelper.decryptWith(devicePGPKeys, postResponse.encrypted_response as string);
+                        if (decryptStatus === 'SUCCESS') {
+                            const JSONResponse = JSON.parse(decryptedResponse);
+                            log('Network.getInformationFromSeguro()', 'Seguro decrypted response:', JSONResponse);
+                            return resolve(['SUCCESS', JSONResponse as ConnectRequest]);
+                        }
+                    } else if (postResponse.error) {
+                        if (/Listening time out!/.test(postResponse.error)) {
+                            return resolve(['CONNECTION_TIMEOUT']);
+                        }
+                        return resolve(['CONNECTION_FAILED']);
                     }
                 }
             }
-            return resolve(['FAILURE']);
+            return resolve(['CONNECTION_FAILED']);
         })
     )
 

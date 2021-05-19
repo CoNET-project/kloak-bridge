@@ -56,7 +56,7 @@ class KloakBridge {
         network: ''
     }
 
-    constructor(private networkListener: NetworkStatusListeners, skipNetwork = false, localServerPath?: string) {
+    constructor(private onInitialized: () => void, private networkListener: NetworkStatusListeners, skipNetwork = false, localServerPath?: string) {
         this.skipNetwork = skipNetwork;
         if ((typeof process !== 'undefined') && (process.release) && (process.release.name === 'node')) {
             this.getNetworkInformation(localServerPath || 'http://localhost:3000/');
@@ -74,7 +74,7 @@ class KloakBridge {
         }
         KloakBridge.seguroConnection.host = URLObject?.hostname;
         KloakBridge.seguroConnection.port = URLObject?.port;
-
+        this.onInitialized();
     }
 
     private generateDefaultKeychain = (): Promise<KeyChain> => (
@@ -207,22 +207,32 @@ class KloakBridge {
     private establishConnection = async (): Promise<void> => (
         new Promise<void>(async (resolve, _) => {
             this.networkListener.onConnecting();
+            const [deviceKeyStatus, deviceKey] = await this.getDeviceKey();
+            const [seguroKeyStatus, seguroKey] = await this.getSeguroKey();
 
-            const networkCallback = async ([status, request]: [status: 'SUCCESS' | 'FAILURE' | 'MAX_ATTEMPT_REACHED', request?: ConnectRequest]) => {
+            const networkCallback = async ([status, request]: [status: 'SUCCESS' | 'FAILURE' | 'CONNECTION_TIMEOUT' | 'CONNECTION_FAILED', request?: ConnectRequest]) => {
+                if (status === 'CONNECTION_TIMEOUT') {
+                    await this.saveNetworkInfo(null, null);
+                    log('establishConnection() networkCallback()', 'Kloak Bridge Network: Network connection time out', request);
+                    Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port).then(networkCallback);
+                }
+                if (status === 'CONNECTION_FAILED') {
+                    await this.saveNetworkInfo(null, null);
+                    return resolve();
+                }
                 if (status === 'SUCCESS') {
                     if (request) {
                         const connectRequest: ConnectRequest = request as ConnectRequest;
                         log('establishConnection() networkCallback()', 'Kloak Bridge Network: Network returned connectRequest', request);
                         await this.saveNetworkInfo(connectRequest.connect_info as connectImapResponse, connectRequest.next_time_connect as NextTimeConnect);
                         this.networkWebSocket(connectRequest.connect_info as connectImapResponse);
+                        return resolve();
                     }
                 } else {
-                    return this.networkListener.onConnectionFail();
+                    this.networkListener.onConnectionFail();
+                    return resolve();
                 }
             };
-
-            const [deviceKeyStatus, deviceKey] = await this.getDeviceKey();
-            const [seguroKeyStatus, seguroKey] = await this.getSeguroKey();
             if (deviceKeyStatus === 'SUCCESS' && seguroKeyStatus === 'SUCCESS') {
                 if (this.keyChainContainer.network) {
                     log('establishConnection()', 'Kloak Bridge Network: Container has saved network information.');

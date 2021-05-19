@@ -27,7 +27,8 @@ export interface IMAPAccount {
 
 export interface NextTimeConnect {
     imap_account: IMAPAccount
-    server_folder: string
+    server_folder: string,
+    client_folder?: string
 }
 
 export interface connectImapResponse {
