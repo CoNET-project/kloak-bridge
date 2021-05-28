@@ -59,13 +59,18 @@ class KloakBridge {
     private retryAttempts = 0;
     private MAX_RETRY_ATTEMPTS = 3;
 
-    constructor(private onInitialized: () => void, private networkListener: NetworkStatusListeners, skipNetwork = false, localServerPath?: string) {
+    constructor(private onInitialized: () => void, private networkListener: NetworkStatusListeners, skipNetwork = false, private localServerPath?: string) {
         this.skipNetwork = skipNetwork;
+        this.init();
+    }
+
+    private init = async () => {
         if ((typeof process !== 'undefined') && (process.release) && (process.release.name === 'node')) {
-            this.getNetworkInformation(localServerPath || 'http://localhost:3000/');
+            this.getNetworkInformation(this.localServerPath || 'http://localhost:3000/');
         } else {
-            this.getNetworkInformation(localServerPath || window.location.href);
+            this.getNetworkInformation(this.localServerPath || window.location.href);
         }
+        this.testNetworkConnection(KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port);
     }
 
     public testNetworkConnection = (host: string, port: string | number): Promise<[status: 'IMAP_AVAILABLE' | 'IMAP_UNAVAILABLE']> => (
