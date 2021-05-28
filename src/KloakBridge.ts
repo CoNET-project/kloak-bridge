@@ -44,8 +44,6 @@ class KloakBridge {
     private keyContainer: KeyContainer | undefined
     private IDBHelper = new IDBDatabaseHelper();
     private containerEncrypter: EncryptHelper = new EncryptHelper();
-    private skipNetwork = false
-    private networkMaxAttempt = false
     private keyChainContainer: KeyChainContainer = {
         pgpKeys: {
             keyID: '',
@@ -60,7 +58,6 @@ class KloakBridge {
     private MAX_RETRY_ATTEMPTS = 3;
 
     constructor(private onInitialized: () => void, private networkListener: NetworkStatusListeners, private skipNetwork = false, private localServerPath?: string) {
-        this.skipNetwork = skipNetwork;
         this.init();
     }
 
