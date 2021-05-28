@@ -40,7 +40,7 @@ describe('StorageHelper Class', () => {
             },
             onMessage: () => {},
             onDisconnected: () => {}
-        }, false, 'http://localhost:3000/');
+        }, true, 'http://localhost:3000/');
     });
 
     test('Should create a new key pair and NOT unlock', async () => {
