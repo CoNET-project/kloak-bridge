@@ -2,7 +2,9 @@ import * as openpgp from 'openpgp';
 import { Buffer } from 'buffer/';
 // eslint-disable-next-line import/no-cycle
 import NodeWebsocket from 'ws';
+// eslint-disable-next-line import/no-cycle
 import EncryptHelper from './EncryptHelper';
+// eslint-disable-next-line import/no-cycle
 import Network from './Network';
 
 // NETWORK DECLARATIONS FOR SEGURO LOCAL SERVER
@@ -223,10 +225,18 @@ export type NetworkPostStatus = [status: 'SUCCESS' | 'NETWORK_NOT_AVAILABLE' | '
 export interface NetworkStatusListeners {
     onConnecting: () => void,
     onConnected: () => void,
-    onConnectionFail: () => void,
+    onConnectionFail: (error?: 'CONNECTION_UNAVAILABLE' | 'IMAP_UNAVAILABLE') => void,
     onDisconnected: () => void,
     onMessage: (message: string) => void
 }
+
+export interface TestNetworkResponse {
+    name: string,
+    error: string | null,
+    time: number
+}
+
+export type TestNetworkResponses = TestNetworkResponse[]
 
 export interface WebsocketResponse {
     status: string,

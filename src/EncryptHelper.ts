@@ -21,7 +21,7 @@ class EncryptHelper {
         if (!message) {
             return '';
         }
-        
+
         let modified: string;
         const pgpHead = '-----BEGIN PGP MESSAGE-----';
         const pgpComment = 'Comment: https://openpgpjs.org';

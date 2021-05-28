@@ -173,8 +173,8 @@ describe('StorageHelper Class', () => {
         expect(status).toBe('DOES_NOT_EXIST');
     });
 
-    // test('Should create new container and unlock container', async () => {
-    //     await kloakBridge.createKeyContainer('mypassword');
-    //     // await kloakBridge.unlockKeyContainer('mypassword');
+    // test('Should test network', async () => {
+    //     const [status] = await kloakBridge.testNetworkConnection('localhost', 3001);
+    //     console.log(status);
     // }, 100000);
 });

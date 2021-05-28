@@ -2,7 +2,7 @@ import { URL as NodeURL } from 'url';
 import NodeWebsocket from 'ws';
 import { request, RequestOptions } from 'http';
 // eslint-disable-next-line import/no-cycle
-import { ConnectRequest, NetworkPostStatus, NextTimeConnect, PGPKeys, PostMessageRequest, RequestData, WebsocketResponse } from './define';
+import { ConnectRequest, NetworkPostStatus, NextTimeConnect, PGPKeys, PostMessageRequest, RequestData, TestNetworkResponses, WebsocketResponse } from './define';
 import { getUUIDv4 } from './utils';
 // eslint-disable-next-line import/no-cycle
 import EncryptHelper from './EncryptHelper';
@@ -100,6 +100,26 @@ class Network {
                 const [ status ] = await Network.postToLocalServer(postMessageRequest, this.host, this.port, path || '/postMessage');
                 return resolve([status]);
             }
+        })
+    )
+
+    static testNetworkConnection = (host: string, port: string | number): Promise<[status: 'SUCCESS' | 'INTERNET_NOT_AVAILABLE', data?: TestNetworkResponses]> => (
+        new Promise<[status: 'SUCCESS' | 'INTERNET_NOT_AVAILABLE', data?: TestNetworkResponses]>((resolve, _) => {
+            let response = '';
+            const options: RequestOptions = {
+                host,
+                port,
+                path: '/testImapServer',
+                method: 'GET'
+            };
+            const req = request(options, (res) => {
+                res.on('data', (received) => {
+                    response += received;
+                });
+                res.on('end', () => resolve(['SUCCESS', JSON.parse(response).data as TestNetworkResponses]));
+                res.on('error', () => resolve(['INTERNET_NOT_AVAILABLE']));
+            });
+            req.end(() => {});
         })
     )
 

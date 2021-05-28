@@ -20,7 +20,7 @@ import {
     GetAppDataUUID,
     GetDeviceKey,
     GetSeguroKey,
-    NetworkStatusListeners, ConnectRequest, SeguroConnection, NetworkPostStatus, connectImapResponse, NextTimeConnect, NetworkInformation
+    NetworkStatusListeners, ConnectRequest, SeguroConnection, NetworkPostStatus, connectImapResponse, NextTimeConnect, NetworkInformation, TestNetworkResponses
 } from './define';
 import DisassemblyHelper from './DisassemblyHelper';
 import AssemblyHelper from './AssemblyHelper';
@@ -55,6 +55,9 @@ class KloakBridge {
         keychain: '',
         network: ''
     }
+    private availableIMAPConnections: TestNetworkResponses = []
+    private retryAttempts = 0;
+    private MAX_RETRY_ATTEMPTS = 3;
 
     constructor(private onInitialized: () => void, private networkListener: NetworkStatusListeners, skipNetwork = false, localServerPath?: string) {
         this.skipNetwork = skipNetwork;
@@ -64,6 +67,37 @@ class KloakBridge {
             this.getNetworkInformation(localServerPath || window.location.href);
         }
     }
+
+    public testNetworkConnection = (host: string, port: string | number): Promise<[status: 'IMAP_AVAILABLE' | 'IMAP_UNAVAILABLE']> => (
+        new Promise<[status: 'IMAP_AVAILABLE' | 'IMAP_UNAVAILABLE']>(async (resolve, _) => {
+            const [status, data] = await Network.testNetworkConnection(host, port);
+            if (status === 'SUCCESS' && data) {
+                this.availableIMAPConnections = data.filter((imapConnections) => (!imapConnections.error));
+                log('testNetworkConnection()', 'Kloak Bridge Network: Test IMAP availability', `Available IMAP connections: ${this.availableIMAPConnections.length} ${this.availableIMAPConnections}`);
+                if (this.availableIMAPConnections.length) {
+                    log('testNetworkConnection()', 'Kloak Bridge Network: Test IMAP availability: AVAILABLE');
+                    return resolve(['IMAP_AVAILABLE']);
+                }
+            }
+            log('testNetworkConnection()', 'Kloak Bridge Network: Test IMAP availability: UNAVAILABLE');
+            return resolve(['IMAP_UNAVAILABLE']);
+        })
+    )
+
+    private checkNetworkCompatibility = (imapServer: string): Promise<[status: 'OK' | 'UNAVAILABLE']> => (
+        new Promise<[status: 'OK' | 'UNAVAILABLE']>((resolve, _) => {
+            if (this.availableIMAPConnections) {
+                for (let i = 0; i < this.availableIMAPConnections.length; i + 1) {
+                    if (this.availableIMAPConnections[i].name === imapServer) {
+                        log('checkNetworkCompatibility()', 'Kloak Bridge Network: Check Network IMAP compatibility: OK');
+                        return resolve(['OK']);
+                    }
+                }
+            }
+            log('checkNetworkCompatibility()', 'Kloak Bridge Network: Check Network IMAP compatibility: UNAVAILABLE, RETRY');
+            return resolve(['UNAVAILABLE']);
+        })
+    )
 
     private getNetworkInformation = (url: string) => {
         let URLObject;
@@ -170,7 +204,10 @@ class KloakBridge {
                 KloakBridge.seguroConnection.websocketConnection?.close();
                 log('networkWebSocket()', 'Kloak Bridge Network: Websocket disconnected');
                 if (disconnected) {
-                    setTimeout(() => disconnected(), 1000);
+                    if (this.retryAttempts < this.MAX_RETRY_ATTEMPTS) {
+                        this.retryAttempts += 1;
+                        setTimeout(() => disconnected(), 1000);
+                    }
                 }
             }
             if (networkInstance) {
@@ -204,83 +241,87 @@ class KloakBridge {
     }
 
     // eslint-disable-next-line max-len
-    private establishConnection = async (): Promise<void> => (
-        new Promise<void>(async (resolve, _) => {
-            this.networkListener.onConnecting();
-            const [deviceKeyStatus, deviceKey] = await this.getDeviceKey();
-            const [seguroKeyStatus, seguroKey] = await this.getSeguroKey();
+    private establishConnection = async () => {
+        if (!this.availableIMAPConnections.length) {
+            return this.networkListener.onConnectionFail('IMAP_UNAVAILABLE');
+        }
+        this.networkListener.onConnecting();
+        const [deviceKeyStatus, deviceKey] = await this.getDeviceKey();
+        const [seguroKeyStatus, seguroKey] = await this.getSeguroKey();
 
-            const networkCallback = async ([status, request]: [status: 'SUCCESS' | 'FAILURE' | 'CONNECTION_TIMEOUT' | 'CONNECTION_FAILED', request?: ConnectRequest]) => {
-                if (status === 'CONNECTION_TIMEOUT') {
-                    await this.saveNetworkInfo(null, null);
-                    log('establishConnection() networkCallback()', 'Kloak Bridge Network: Network connection time out', request);
-                    Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port).then(networkCallback);
-                }
-                if (status === 'CONNECTION_FAILED') {
-                    await this.saveNetworkInfo(null, null);
-                    return resolve();
-                }
-                if (status === 'SUCCESS') {
-                    if (request) {
-                        const connectRequest: ConnectRequest = request as ConnectRequest;
+        const networkCallback = async ([status, request]: [status: 'SUCCESS' | 'FAILURE' | 'CONNECTION_TIMEOUT' | 'CONNECTION_FAILED', request?: ConnectRequest]) => {
+            if (status === 'CONNECTION_TIMEOUT') {
+                await this.saveNetworkInfo(null, null);
+                log('establishConnection() networkCallback()', 'Kloak Bridge Network: Network connection time out', request);
+                Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port)
+                    .then(networkCallback);
+            }
+            if (status === 'CONNECTION_FAILED') {
+                await this.saveNetworkInfo(null, null);
+            }
+            if (status === 'SUCCESS') {
+                if (request) {
+                    const connectRequest: ConnectRequest = request as ConnectRequest;
+                    const [connectRequestStatus] = await this.checkNetworkCompatibility(connectRequest.connect_info?.imap_account.imap_server as string);
+                    if (connectRequestStatus) {
                         log('establishConnection() networkCallback()', 'Kloak Bridge Network: Network returned connectRequest', request);
                         await this.saveNetworkInfo(connectRequest.connect_info as connectImapResponse, connectRequest.next_time_connect as NextTimeConnect);
                         this.networkWebSocket(connectRequest.connect_info as connectImapResponse);
-                        return resolve();
+                    } else {
+                        return this.establishConnection();
                     }
-                } else {
-                    this.networkListener.onConnectionFail();
-                    return resolve();
                 }
-            };
-            if (deviceKeyStatus === 'SUCCESS' && seguroKeyStatus === 'SUCCESS') {
-                if (this.keyChainContainer.network) {
-                    log('establishConnection()', 'Kloak Bridge Network: Container has saved network information.');
-                    const encryptedNetwork = await this.IDBHelper.retrieve(this.keyChainContainer.network);
-                    const [decryptNetworkStatus, decryptedNetwork] = await this.containerEncrypter.decryptMessage(encryptedNetwork);
-                    log('establishConnection()', 'Kloak Bridge Network: Saved network information', decryptedNetwork);
-                    if (decryptNetworkStatus === 'SUCCESS') {
-                        const { nextConnectInformation } = decryptedNetwork as unknown as NetworkInformation;
-                        const { connectInformation } = decryptedNetwork as unknown as NetworkInformation;
-                        if (connectInformation && nextConnectInformation) {
-                            log('establishConnection()', 'Kloak Bridge Network: Saved network has connectInformation and nextConnectInformation', connectInformation, nextConnectInformation);
-                            this.networkWebSocket(connectInformation, async () => {
-                                await this.saveNetworkInfo(null, nextConnectInformation);
-                                log('networkWebSocket()', 'Kloak Bridge Network: Websocket disconnected, attempting to receive new connection information');
-                                Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, nextConnectInformation).then(networkCallback);
-                            });
-                        } else if (nextConnectInformation) {
-                            log('establishConnection()', 'Kloak Bridge Network: Saved network only has nextConnectInformation', nextConnectInformation);
-                            Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, nextConnectInformation).then(networkCallback);
-                        }
-                        return resolve();
-                    }
-                } else {
-                    log('establishConnection()', 'Kloak Bridge Network: Container does not have saved network information.');
-                    Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port).then(networkCallback);
-                    return resolve();
-                }
+            } else {
+                this.networkListener.onConnectionFail();
             }
-            return resolve();
-            // if (this.keyChainContainer.network) {
-            //     const encryptedNetwork = await this.IDBHelper.retrieve(this.keyChainContainer.network);
-            //     const [ status, decryptedNetwork ] = await this.containerEncrypter.decryptMessage(encryptedNetwork);
-            //     if (encryptedNetwork && status === 'SUCCESS') {
-            //     // eslint-disable-next-line camelcase
-            //         const { nextConnectInformation, connectInformation } = decryptedNetwork as unknown as NetworkInformation;
-            //         // this.networkWebSocket(connectInformation, () => {
-            //         //     this.networkStart(KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, nextConnectInformation);
-            //         // });
-            //         // this.networkStart(urlPath, connectInformation, nextConnectInformation);
-            //         // this.networkStart(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, urlPath, imapAccount, serverFolder);
-            //         return resolve();
-            //     }
-            // } else {
-            //     this.networkStart(KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port);
-            //     return resolve();
-            // }
-        })
-    )
+        };
+        if (deviceKeyStatus === 'SUCCESS' && seguroKeyStatus === 'SUCCESS') {
+            if (this.keyChainContainer.network) {
+                log('establishConnection()', 'Kloak Bridge Network: Container has saved network information.');
+                const encryptedNetwork = await this.IDBHelper.retrieve(this.keyChainContainer.network);
+                const [decryptNetworkStatus, decryptedNetwork] = await this.containerEncrypter.decryptMessage(encryptedNetwork);
+                log('establishConnection()', 'Kloak Bridge Network: Saved network information', decryptedNetwork);
+                if (decryptNetworkStatus === 'SUCCESS') {
+                    const { nextConnectInformation } = decryptedNetwork as unknown as NetworkInformation;
+                    const { connectInformation } = decryptedNetwork as unknown as NetworkInformation;
+                    if (connectInformation && nextConnectInformation) {
+                        log('establishConnection()', 'Kloak Bridge Network: Saved network has connectInformation and nextConnectInformation', connectInformation, nextConnectInformation);
+                        this.networkWebSocket(connectInformation, async () => {
+                            await this.saveNetworkInfo(null, nextConnectInformation);
+                            log('networkWebSocket()', 'Kloak Bridge Network: Websocket disconnected, attempting to receive new connection information');
+                            Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, nextConnectInformation)
+                                .then(networkCallback);
+                        });
+                    } else if (nextConnectInformation) {
+                        log('establishConnection()', 'Kloak Bridge Network: Saved network only has nextConnectInformation', nextConnectInformation);
+                        Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, nextConnectInformation)
+                            .then(networkCallback);
+                    }
+                }
+            } else {
+                log('establishConnection()', 'Kloak Bridge Network: Container does not have saved network information.');
+                Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port)
+                    .then(networkCallback);
+            }
+        }
+        // if (this.keyChainContainer.network) {
+        //     const encryptedNetwork = await this.IDBHelper.retrieve(this.keyChainContainer.network);
+        //     const [ status, decryptedNetwork ] = await this.containerEncrypter.decryptMessage(encryptedNetwork);
+        //     if (encryptedNetwork && status === 'SUCCESS') {
+        //     // eslint-disable-next-line camelcase
+        //         const { nextConnectInformation, connectInformation } = decryptedNetwork as unknown as NetworkInformation;
+        //         // this.networkWebSocket(connectInformation, () => {
+        //         //     this.networkStart(KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, nextConnectInformation);
+        //         // });
+        //         // this.networkStart(urlPath, connectInformation, nextConnectInformation);
+        //         // this.networkStart(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, urlPath, imapAccount, serverFolder);
+        //         return resolve();
+        //     }
+        // } else {
+        //     this.networkStart(KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port);
+        //     return resolve();
+        // }
+    }
 
     /**
      * Check if IndexedDB contains a "KeyChainContainer".
