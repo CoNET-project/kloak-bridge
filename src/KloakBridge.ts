@@ -20,7 +20,7 @@ import {
     GetAppDataUUID,
     GetDeviceKey,
     GetSeguroKey,
-    NetworkStatusListeners, ConnectRequest, SeguroConnection, NetworkPostStatus, connectImapResponse, NextTimeConnect, NetworkInformation, TestNetworkResponses
+    NetworkStatusListeners, ConnectRequest, SeguroConnection, NetworkPostStatus, connectImapResponse, NextTimeConnect, NetworkInformation, TestNetworkResponses, AppMessage, MessagesCache
 } from './define';
 import DisassemblyHelper from './DisassemblyHelper';
 import AssemblyHelper from './AssemblyHelper';
@@ -51,7 +51,8 @@ class KloakBridge {
             armoredPublicKey: ''
         },
         keychain: '',
-        network: ''
+        network: '',
+        messagesCache: ''
     }
     private availableIMAPConnections: TestNetworkResponses = []
     private retryAttempts = 0;
@@ -177,6 +178,21 @@ class KloakBridge {
         })
     )
 
+    private saveToMessagesCache = async (appId: string, message: string) => {
+        const [decryptMessagesCacheStatus, decryptedMessagesCache] = await this.containerEncrypter.decryptMessage(this.keyChainContainer.messagesCache);
+        if (decryptMessagesCacheStatus === 'SUCCESS') {
+            const updatedMessagesCache: MessagesCache = {
+                ...(decryptedMessagesCache as unknown as MessagesCache),
+                [appId]: [
+                    ...(decryptedMessagesCache as unknown as MessagesCache)[appId], message]
+            };
+            const [encryptMessagesCacheStatus, encryptedMessagesCache] = await this.containerEncrypter.encryptMessage(JSON.stringify(updatedMessagesCache));
+            if (encryptMessagesCacheStatus === 'SUCCESS') {
+                await this.IDBHelper.save(this.keyChainContainer.messagesCache, encryptedMessagesCache);
+            }
+        }
+    }
+
     private saveNetworkInfo = async (connectInformation: connectImapResponse | null, nextConnectInformation: NextTimeConnect | null): Promise<boolean> => (
         new Promise<boolean>(async (resolve, _) => {
             const network: NetworkInformation = {
@@ -201,17 +217,17 @@ class KloakBridge {
         })
     )
 
-    private networkWebSocket = (connectInformation: connectImapResponse, disconnected?: () => void) => {
+    private networkWebSocket = (connectInformation: connectImapResponse, reconnected?: () => void) => {
         KloakBridge.seguroConnection.websocketConnection = Network.wsConnect(KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, connectInformation, async (err, networkInstance: Network | null, message: string | null) => {
             if (err) {
                 this.networkListener.onConnectionFail();
                 KloakBridge.seguroConnection.websocketConnection?.close();
                 log('networkWebSocket()', 'Kloak Bridge Network: Websocket disconnected');
-                if (disconnected) {
-                    if (this.retryAttempts < this.MAX_RETRY_ATTEMPTS) {
-                        this.retryAttempts += 1;
-                        setTimeout(() => disconnected(), 1000);
-                    }
+                if (reconnected) {
+                    // if (this.retryAttempts < this.MAX_RETRY_ATTEMPTS) {
+                    //     this.retryAttempts += 1;
+                    setTimeout(() => reconnected(), 1000);
+                    // }
                 }
             }
             if (networkInstance) {
@@ -225,11 +241,23 @@ class KloakBridge {
                     const [decryptStatus, decryptMessage] = await EncryptHelper.decryptWith(deviceKey as PGPKeys, message);
                     log('networkWebSocket()', 'Kloak Bridge Network: Websocket returned message:', decryptMessage);
                     if (decryptStatus === 'SUCCESS') {
-                        return this.networkListener.onMessage(decryptMessage);
+                        const appMessage: AppMessage = decryptMessage as AppMessage;
+                        return this.networkListener.onMessage(appMessage.appId, appMessage.message, (appId: string, message: string) => this.saveToMessagesCache(appId, message));
                     }
                 }
             }
         });
+    }
+
+    public getMessagesCache = async (appId: string) => {
+        const encryptedMessagesCache = await this.IDBHelper.retrieve(this.keyChainContainer.messagesCache);
+        const [decryptedMessagesCacheStatus, decryptedMessagesCache] = await this.containerEncrypter.decryptMessage(encryptedMessagesCache);
+        if (decryptedMessagesCacheStatus === 'SUCCESS') {
+            if ((decryptedMessagesCache as unknown as MessagesCache)[appId]) {
+                return (decryptedMessagesCache as unknown as MessagesCache)[appId];
+            }
+        }
+        return [];
     }
 
     public reconnect = () => this.establishConnection()
@@ -396,10 +424,13 @@ class KloakBridge {
                         armoredPublicKey: containerPGPKey?.armoredPublicKey as string
                     },
                     keychain: keychainUUID,
-                    network: ''
+                    network: '',
+                    messagesCache: getUUIDv4()
                 };
+                const [, encryptedMessagesCache] = await tempEncrypt.encryptMessage(JSON.stringify({}));
                 this.keyContainer = new KeyContainer(tempEncrypt, keychainUUID, defaultKeyChain);
                 await this.IDBHelper.save(keychainUUID, encryptedKeyChain);
+                await this.IDBHelper.save(keyContainer.messagesCache, encryptedMessagesCache);
                 await this.IDBHelper.save('KeyContainer', keyContainer);
                 await this.IDBHelper.retrieve('KeyContainer');
                 return resolve(<CreateContainerResolve>['SUCCESS', keyContainer]);
@@ -448,7 +479,8 @@ class KloakBridge {
                             armoredPrivateKey: newPGPKeys?.armoredPrivateKey as string
                         },
                         keychain: oldContainer.keychain,
-                        network: oldContainer.network
+                        network: oldContainer.network,
+                        messagesCache: oldContainer.messagesCache
                     };
                     await this.IDBHelper.save('keyContainer', JSON.stringify(newContainer));
                     this.keyContainer = new KeyContainer(tempEncrypt, newContainer.keychain, decryptedKeyChain as unknown as KeyChain);
@@ -458,19 +490,6 @@ class KloakBridge {
             } catch (err) {
                 return resolve(['FAILURE']);
             }
-            // const tempEncrypt = new EncryptHelper();
-            // const [, pgpKeys] = await tempEncrypt.generateKey({ passphrase: newPassphrase });
-            // await tempEncrypt.checkPassword(pgpKeys as PGPKeys, newPassphrase);
-            // const [, encryptedKeyChain] = await tempEncrypt.encryptMessage(JSON.stringify(keyChain));
-            // const newContainer: KeyChainContainer = {
-            //     pgpKeys: {
-            //         keyID: (pgpKeys?.keyID as string),
-            //         armoredPrivateKey: (pgpKeys?.armoredPrivateKey as string),
-            //         armoredPublicKey: (pgpKeys?.armoredPublicKey as string)
-            //     },
-            //     keyChain: encryptedKeyChain as string
-            // };
-            // return resolve(<ChangeKeyContainerResolve>['SUCCESS', newContainer]);
         })
     )
 
@@ -601,14 +620,14 @@ class KloakBridge {
     * NETWORK FUNCTIONS
     * */
 
-    static sendToClient = (message: string, recipientDeviceKey: string): Promise<NetworkPostStatus> => (
+    static sendToClient = (message: string, appId: string, recipientDeviceKey: string): Promise<NetworkPostStatus> => (
         new Promise<NetworkPostStatus>(async (resolve, _) => {
             if (KloakBridge.seguroConnection.networkInstance) {
                 const { deviceKey } = KloakBridge.seguroConnection;
                 if (!deviceKey) {
                     return resolve(['FAILURE']);
                 }
-                const [ networkStatus ] = await KloakBridge.seguroConnection.networkInstance.sendToClient(message, recipientDeviceKey, deviceKey?.armoredPrivateKey as string);
+                const [ networkStatus ] = await KloakBridge.seguroConnection.networkInstance.sendToClient(message, appId, recipientDeviceKey, deviceKey?.armoredPrivateKey as string);
                 return resolve([networkStatus]);
             }
             return resolve(['NOT_CONNECTED']);

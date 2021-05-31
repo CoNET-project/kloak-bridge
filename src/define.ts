@@ -127,7 +127,8 @@ export interface KeyChainContainer {
         armoredPrivateKey: string,
     },
     keychain: string,
-    network: string
+    network: string,
+    messagesCache: string
 }
 
 export interface PGPGenerateOptions {
@@ -222,12 +223,21 @@ export type GenericStatus = [status: 'SUCCESS' | 'FAILURE']
 
 export type NetworkPostStatus = [status: 'SUCCESS' | 'NETWORK_NOT_AVAILABLE' | 'NOT_CONNECTED' | 'FAILURE']
 
+export interface AppMessage {
+    appId: string,
+    message: string
+}
+
+export interface MessagesCache {
+    [appId: string]: string[]
+}
+
 export interface NetworkStatusListeners {
     onConnecting: () => void,
     onConnected: () => void,
     onConnectionFail: (error?: 'CONNECTION_UNAVAILABLE' | 'IMAP_UNAVAILABLE') => void,
     onDisconnected: () => void,
-    onMessage: (message: string) => void
+    onMessage: (appId: string, message: string, cacheData: (appId: string, message: string) => Promise<void>) => void
 }
 
 export interface TestNetworkResponse {

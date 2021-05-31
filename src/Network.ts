@@ -2,7 +2,7 @@ import { URL as NodeURL } from 'url';
 import NodeWebsocket from 'ws';
 import { request, RequestOptions } from 'http';
 // eslint-disable-next-line import/no-cycle
-import { ConnectRequest, NetworkPostStatus, NextTimeConnect, PGPKeys, PostMessageRequest, RequestData, TestNetworkResponses, WebsocketResponse } from './define';
+import { AppMessage, ConnectRequest, NetworkPostStatus, NextTimeConnect, PGPKeys, PostMessageRequest, RequestData, TestNetworkResponses, WebsocketResponse } from './define';
 import { getUUIDv4 } from './utils';
 // eslint-disable-next-line import/no-cycle
 import EncryptHelper from './EncryptHelper';
@@ -89,9 +89,13 @@ class Network {
         this.port = port;
     }
 
-    public sendToClient = (message: string, encryptPublicKey: string, signPrivateKey: string, path?: string): Promise<NetworkPostStatus> => (
+    public sendToClient = (message: string, appId: string, encryptPublicKey: string, signPrivateKey: string, path?: string): Promise<NetworkPostStatus> => (
         new Promise<NetworkPostStatus>(async (resolve, _) => {
-            const [encryptStatus, encryptedMessage] = await EncryptHelper.encryptSignWith([encryptPublicKey], [signPrivateKey], message);
+            const appMessage: AppMessage = {
+                appId,
+                message
+            };
+            const [encryptStatus, encryptedMessage] = await EncryptHelper.encryptSignWith([encryptPublicKey], [signPrivateKey], JSON.stringify(appMessage));
             if (encryptStatus === 'SUCCESS') {
                 const postMessageRequest: PostMessageRequest = {
                     connectUUID: this.connectUUID,

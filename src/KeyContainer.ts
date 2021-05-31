@@ -35,14 +35,14 @@ class KeyContainer {
 
     public getEncryptedKeyChain = () => this.encryptHelper?.encryptMessage(JSON.stringify(this.getKeyChain()))
 
-    public addAppID = (appKeyID: string, publicKey: string): Promise<[status: 'SUCCESS' | 'ALREADY_EXISTS']> => (
+    public addAppID = (appKeyId: string, publicKey: string): Promise<[status: 'SUCCESS' | 'ALREADY_EXISTS']> => (
         new Promise<[status: 'SUCCESS' | 'ALREADY_EXISTS']>(async (resolve, _) => {
-            if (this.keyChain.apps[appKeyID]) {
+            if (this.keyChain.apps[appKeyId]) {
                 return resolve(['ALREADY_EXISTS']);
             }
             const tempEncrypter = new EncryptHelper();
             const [, encryptionKeys] = await tempEncrypter.generateKey({ passphrase: '' });
-            this.keyChain.apps[appKeyID] = {
+            this.keyChain.apps[appKeyId] = {
                 encryptionKeys: encryptionKeys as PGPKeys,
                 publicKey,
                 dataUUID: getUUIDv4()
