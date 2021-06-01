@@ -180,15 +180,20 @@ class KloakBridge {
 
     private saveToMessagesCache = async (appId: string, message: string) => {
         const [decryptMessagesCacheStatus, decryptedMessagesCache] = await this.containerEncrypter.decryptMessage(this.keyChainContainer.messagesCache);
+        log('saveToMessagesCache()', `Messages cache decryption status: ${decryptMessagesCacheStatus} with ${decryptedMessagesCache}.`);
         if (decryptMessagesCacheStatus === 'SUCCESS') {
+            log('saveToMessagesCache()', 'Successfully decrypted messages cache.');
             const updatedMessagesCache: MessagesCache = {
                 ...(decryptedMessagesCache as unknown as MessagesCache),
                 [appId]: [
                     ...(decryptedMessagesCache as unknown as MessagesCache)[appId], message]
             };
+            log('saveToMessagesCache()', 'Updated messages cache.');
             const [encryptMessagesCacheStatus, encryptedMessagesCache] = await this.containerEncrypter.encryptMessage(JSON.stringify(updatedMessagesCache));
             if (encryptMessagesCacheStatus === 'SUCCESS') {
+                log('saveToMessagesCache()', 'Successfully encrypted messages cache.');
                 await this.IDBHelper.save(this.keyChainContainer.messagesCache, encryptedMessagesCache);
+                log('saveToMessagesCache()', 'Successfully saved messages cache.');
             }
         }
     }
