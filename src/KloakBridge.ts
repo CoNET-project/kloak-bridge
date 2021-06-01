@@ -229,10 +229,7 @@ class KloakBridge {
                 KloakBridge.seguroConnection.websocketConnection?.close();
                 log('networkWebSocket()', 'Kloak Bridge Network: Websocket disconnected');
                 if (reconnected) {
-                    // if (this.retryAttempts < this.MAX_RETRY_ATTEMPTS) {
-                    //     this.retryAttempts += 1;
                     setTimeout(() => reconnected(), 1000);
-                    // }
                 }
             }
             if (networkInstance) {
@@ -299,15 +296,13 @@ class KloakBridge {
             if (status === 'SUCCESS') {
                 if (request) {
                     const connectRequest: ConnectRequest = request as ConnectRequest;
-                    const [connectRequestStatus] = await this.checkNetworkCompatibility(connectRequest.connect_info?.imap_account.imap_server as string);
-                    if (connectRequestStatus) {
-                        log('establishConnection() networkCallback()', 'Kloak Bridge Network: Network returned connectRequest', request);
-                        await this.saveNetworkInfo(connectRequest.connect_info as connectImapResponse, connectRequest.next_time_connect as NextTimeConnect);
-                        this.networkWebSocket(connectRequest.connect_info as connectImapResponse);
-                    } else {
-                        return this.establishConnection();
-                    }
+                    log('establishConnection() networkCallback()', 'Kloak Bridge Network: Network returned connectRequest', request);
+                    await this.saveNetworkInfo(connectRequest.connect_info as connectImapResponse, connectRequest.next_time_connect as NextTimeConnect);
+                    this.networkWebSocket(connectRequest.connect_info as connectImapResponse);
+                } else {
+                    return this.establishConnection();
                 }
+                
             } else {
                 this.networkListener.onConnectionFail();
             }
