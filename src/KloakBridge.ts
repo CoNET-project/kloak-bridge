@@ -243,8 +243,13 @@ class KloakBridge {
                     const [decryptStatus, decryptMessage] = await EncryptHelper.decryptWith(deviceKey as PGPKeys, message);
                     log('networkWebSocket()', 'Kloak Bridge Network: Websocket returned message:', decryptMessage);
                     if (decryptStatus === 'SUCCESS') {
-                        const appMessage: AppMessage = decryptMessage as AppMessage;
-                        return this.networkListener.onMessage(appMessage.appId, appMessage.message, (appId: string, message: string) => this.saveToMessagesCache(appId, message));
+                        let appMessage: AppMessage;
+                        try {
+                            appMessage = JSON.parse(decryptMessage) as AppMessage;
+                            return this.networkListener.onMessage(appMessage.appId, appMessage.message, (appId: string, message: string) => this.saveToMessagesCache(appId, message));
+                        } catch (err) {
+                            
+                        }
                     }
                 }
             }
@@ -302,7 +307,7 @@ class KloakBridge {
                 } else {
                     return this.establishConnection();
                 }
-                
+
             } else {
                 this.networkListener.onConnectionFail();
             }
