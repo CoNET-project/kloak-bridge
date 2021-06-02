@@ -7,6 +7,7 @@
 ### Properties
 
 - [connectUUID](websocketresponse.md#connectuuid)
+- [encryptedMessage](websocketresponse.md#encryptedmessage)
 - [status](websocketresponse.md#status)
 
 ## Properties
@@ -15,7 +16,15 @@
 
 • **connectUUID**: *string*
 
-Defined in: [define.ts:224](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L224)
+Defined in: [define.ts:253](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/define.ts#L253)
+
+___
+
+### encryptedMessage
+
+• `Optional` **encryptedMessage**: *string*
+
+Defined in: [define.ts:254](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/define.ts#L254)
 
 ___
 
@@ -23,4 +32,4 @@ ___
 
 • **status**: *string*
 
-Defined in: [define.ts:223](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L223)
+Defined in: [define.ts:252](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/define.ts#L252)

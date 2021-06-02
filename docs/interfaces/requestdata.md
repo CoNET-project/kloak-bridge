@@ -16,7 +16,7 @@
 
 • **client\_folder\_name**: *string*
 
-Defined in: [define.ts:41](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L41)
+Defined in: [define.ts:50](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/define.ts#L50)
 
 ___
 
@@ -24,7 +24,7 @@ ___
 
 • **device\_armor**: *string*
 
-Defined in: [define.ts:40](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L40)
+Defined in: [define.ts:49](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/define.ts#L49)
 
 ___
 
@@ -32,4 +32,4 @@ ___
 
 • **kloak\_account\_armor**: *string*
 
-Defined in: [define.ts:39](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L39)
+Defined in: [define.ts:48](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/define.ts#L48)

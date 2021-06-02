@@ -1,21 +1,30 @@
-[Kloak Bridge](../README.md) / [Exports](../modules.md) / nextTimeConnect
+[Kloak Bridge](../README.md) / [Exports](../modules.md) / NextTimeConnect
 
-# Interface: nextTimeConnect
+# Interface: NextTimeConnect
 
 ## Table of contents
 
 ### Properties
 
+- [client\_folder](nexttimeconnect.md#client_folder)
 - [imap\_account](nexttimeconnect.md#imap_account)
 - [server\_folder](nexttimeconnect.md#server_folder)
 
 ## Properties
 
+### client\_folder
+
+• `Optional` **client\_folder**: *string*
+
+Defined in: [define.ts:33](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/define.ts#L33)
+
+___
+
 ### imap\_account
 
 • **imap\_account**: [*IMAPAccount*](imapaccount.md)
 
-Defined in: [define.ts:28](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L28)
+Defined in: [define.ts:31](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/define.ts#L31)
 
 ___
 
@@ -23,4 +32,4 @@ ___
 
 • **server\_folder**: *string*
 
-Defined in: [define.ts:29](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L29)
+Defined in: [define.ts:32](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/define.ts#L32)

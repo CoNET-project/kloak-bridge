@@ -15,7 +15,7 @@
 
 • **connectUUID**: *string*
 
-Defined in: [define.ts:228](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L228)
+Defined in: [define.ts:258](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/define.ts#L258)
 
 ___
 
@@ -23,4 +23,4 @@ ___
 
 • **encryptedMessage**: *string*
 
-Defined in: [define.ts:229](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L229)
+Defined in: [define.ts:259](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/define.ts#L259)

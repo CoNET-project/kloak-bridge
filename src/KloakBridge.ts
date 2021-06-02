@@ -248,7 +248,7 @@ class KloakBridge {
                             appMessage = JSON.parse(decryptMessage) as AppMessage;
                             return this.networkListener.onMessage(appMessage.appId, appMessage.message, (appId: string, message: string) => this.saveToMessagesCache(appId, message));
                         } catch (err) {
-                            
+
                         }
                     }
                 }
@@ -332,6 +332,10 @@ class KloakBridge {
                     } else if (nextConnectInformation) {
                         log('establishConnection()', 'Kloak Bridge Network: Saved network only has nextConnectInformation', nextConnectInformation);
                         Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, nextConnectInformation)
+                            .then(networkCallback);
+                    } else {
+                        log('establishConnection()', 'Kloak Bridge Network: Container has network information but no connectionInformation and nextConnectInformation.');
+                        Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port)
                             .then(networkCallback);
                     }
                 }

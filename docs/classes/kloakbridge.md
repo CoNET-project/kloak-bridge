@@ -11,23 +11,27 @@
 ### Properties
 
 - [IDBHelper](kloakbridge.md#idbhelper)
+- [MAX\_RETRY\_ATTEMPTS](kloakbridge.md#max_retry_attempts)
 - [assemblyHelpers](kloakbridge.md#assemblyhelpers)
+- [availableIMAPConnections](kloakbridge.md#availableimapconnections)
 - [containerEncrypter](kloakbridge.md#containerencrypter)
-- [counter](kloakbridge.md#counter)
 - [keyChainContainer](kloakbridge.md#keychaincontainer)
 - [keyContainer](kloakbridge.md#keycontainer)
-- [seguroConnection](kloakbridge.md#seguroconnection)
-- [skipNetwork](kloakbridge.md#skipnetwork)
+- [reconnected](kloakbridge.md#reconnected)
+- [retryAttempts](kloakbridge.md#retryattempts)
 - [uploadHelpers](kloakbridge.md#uploadhelpers)
+- [seguroConnection](kloakbridge.md#seguroconnection)
 
 ### Methods
 
 - [changeKeyContainer](kloakbridge.md#changekeycontainer)
 - [checkKeyContainer](kloakbridge.md#checkkeycontainer)
+- [checkNetworkCompatibility](kloakbridge.md#checknetworkcompatibility)
 - [createKey](kloakbridge.md#createkey)
 - [createKeyContainer](kloakbridge.md#createkeycontainer)
 - [delete](kloakbridge.md#delete)
 - [deleteKeyContainer](kloakbridge.md#deletekeycontainer)
+- [disconnect](kloakbridge.md#disconnect)
 - [encryptSave](kloakbridge.md#encryptsave)
 - [encryptWithDeviceKey](kloakbridge.md#encryptwithdevicekey)
 - [establishConnection](kloakbridge.md#establishconnection)
@@ -35,34 +39,41 @@
 - [getAppData](kloakbridge.md#getappdata)
 - [getAppDataUUID](kloakbridge.md#getappdatauuid)
 - [getDeviceKey](kloakbridge.md#getdevicekey)
+- [getMessagesCache](kloakbridge.md#getmessagescache)
+- [getNetworkInformation](kloakbridge.md#getnetworkinformation)
 - [getSeguroKey](kloakbridge.md#getsegurokey)
-- [getURLData](kloakbridge.md#geturldata)
+- [init](kloakbridge.md#init)
 - [lockKeyContainer](kloakbridge.md#lockkeycontainer)
-- [networkStart](kloakbridge.md#networkstart)
+- [networkWebSocket](kloakbridge.md#networkwebsocket)
+- [reconnect](kloakbridge.md#reconnect)
 - [retrieve](kloakbridge.md#retrieve)
 - [retrieveDecrypt](kloakbridge.md#retrievedecrypt)
 - [save](kloakbridge.md#save)
 - [saveNetworkInfo](kloakbridge.md#savenetworkinfo)
+- [saveToMessagesCache](kloakbridge.md#savetomessagescache)
+- [testNetworkConnection](kloakbridge.md#testnetworkconnection)
 - [unlockKey](kloakbridge.md#unlockkey)
 - [unlockKeyContainer](kloakbridge.md#unlockkeycontainer)
+- [sendToClient](kloakbridge.md#sendtoclient)
 
 ## Constructors
 
 ### constructor
 
-\+ **new KloakBridge**(`networkListener`: [*NetworkStatusListeners*](../interfaces/networkstatuslisteners.md), `skipNetwork?`: *boolean*, `localServerPath?`: *string*): [*KloakBridge*](kloakbridge.md)
+\+ **new KloakBridge**(`onInitialized`: () => *void*, `networkListener`: [*NetworkStatusListeners*](../interfaces/networkstatuslisteners.md), `skipNetwork?`: *boolean*, `localServerPath?`: *string*): [*KloakBridge*](kloakbridge.md)
 
 #### Parameters:
 
 Name | Type | Default value |
 :------ | :------ | :------ |
+`onInitialized` | () => *void* | - |
 `networkListener` | [*NetworkStatusListeners*](../interfaces/networkstatuslisteners.md) | - |
 `skipNetwork` | *boolean* | false |
 `localServerPath?` | *string* | - |
 
 **Returns:** [*KloakBridge*](kloakbridge.md)
 
-Defined in: [KloakBridge.ts:54](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L54)
+Defined in: [KloakBridge.ts:59](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L59)
 
 ## Properties
 
@@ -70,7 +81,15 @@ Defined in: [KloakBridge.ts:54](https://github.com/CoNET-project/kloak-bridge/bl
 
 • `Private` **IDBHelper**: [*IDBDatabaseHelper*](idbdatabasehelper.md)
 
-Defined in: [KloakBridge.ts:43](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L43)
+Defined in: [KloakBridge.ts:45](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L45)
+
+___
+
+### MAX\_RETRY\_ATTEMPTS
+
+• `Private` **MAX\_RETRY\_ATTEMPTS**: *number*= 3
+
+Defined in: [KloakBridge.ts:59](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L59)
 
 ___
 
@@ -80,7 +99,15 @@ ___
 
 #### Type declaration:
 
-Defined in: [KloakBridge.ts:41](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L41)
+Defined in: [KloakBridge.ts:43](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L43)
+
+___
+
+### availableIMAPConnections
+
+• `Private` **availableIMAPConnections**: [*TestNetworkResponses*](../modules.md#testnetworkresponses)= []
+
+Defined in: [KloakBridge.ts:57](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L57)
 
 ___
 
@@ -88,15 +115,7 @@ ___
 
 • `Private` **containerEncrypter**: [*EncryptHelper*](encrypthelper.md)
 
-Defined in: [KloakBridge.ts:44](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L44)
-
-___
-
-### counter
-
-• `Private` **counter**: *number*= 0
-
-Defined in: [KloakBridge.ts:34](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L34)
+Defined in: [KloakBridge.ts:46](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L46)
 
 ___
 
@@ -104,7 +123,7 @@ ___
 
 • `Private` **keyChainContainer**: [*KeyChainContainer*](../interfaces/keychaincontainer.md)
 
-Defined in: [KloakBridge.ts:46](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L46)
+Defined in: [KloakBridge.ts:47](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L47)
 
 ___
 
@@ -112,23 +131,23 @@ ___
 
 • `Private` **keyContainer**: *undefined* \| [*KeyContainer*](keycontainer.md)
 
-Defined in: [KloakBridge.ts:42](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L42)
+Defined in: [KloakBridge.ts:44](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L44)
 
 ___
 
-### seguroConnection
+### reconnected
 
-• `Private` **seguroConnection**: [*SeguroConnection*](../interfaces/seguroconnection.md)
+• `Private` **reconnected**: *boolean*= false
 
-Defined in: [KloakBridge.ts:35](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L35)
+Defined in: [KloakBridge.ts:34](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L34)
 
 ___
 
-### skipNetwork
+### retryAttempts
 
-• `Private` **skipNetwork**: *boolean*= false
+• `Private` **retryAttempts**: *number*= 0
 
-Defined in: [KloakBridge.ts:45](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L45)
+Defined in: [KloakBridge.ts:58](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L58)
 
 ___
 
@@ -138,7 +157,15 @@ ___
 
 #### Type declaration:
 
-Defined in: [KloakBridge.ts:40](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L40)
+Defined in: [KloakBridge.ts:42](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L42)
+
+___
+
+### seguroConnection
+
+▪ `Static` **seguroConnection**: [*SeguroConnection*](../interfaces/seguroconnection.md)
+
+Defined in: [KloakBridge.ts:35](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L35)
 
 ## Methods
 
@@ -157,7 +184,7 @@ Name | Type |
 
 **Returns:** *Promise*<[*ChangeKeyContainerResolve*](../modules.md#changekeycontainerresolve)\>
 
-Defined in: [KloakBridge.ts:327](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L327)
+Defined in: [KloakBridge.ts:473](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L473)
 
 ___
 
@@ -169,7 +196,23 @@ Check if IndexedDB contains a "KeyChainContainer".
 
 **Returns:** *Promise*<[*CheckContainerResolve*](../modules.md#checkcontainerresolve)\>
 
-Defined in: [KloakBridge.ts:232](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L232)
+Defined in: [KloakBridge.ts:370](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L370)
+
+___
+
+### checkNetworkCompatibility
+
+▸ `Private`**checkNetworkCompatibility**(`imapServer`: *string*): *Promise*<[status: "OK" \| "UNAVAILABLE"]\>
+
+#### Parameters:
+
+Name | Type |
+:------ | :------ |
+`imapServer` | *string* |
+
+**Returns:** *Promise*<[status: "OK" \| "UNAVAILABLE"]\>
+
+Defined in: [KloakBridge.ts:92](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L92)
 
 ___
 
@@ -188,7 +231,7 @@ Name | Type |
 
 **Returns:** *Promise*<[*KeyResolve*](../modules.md#keyresolve)\>
 
-Defined in: [KloakBridge.ts:374](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L374)
+Defined in: [KloakBridge.ts:508](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L508)
 
 ___
 
@@ -206,7 +249,7 @@ Name | Type |
 
 **Returns:** *Promise*<[*CreateContainerResolve*](../modules.md#createcontainerresolve)\>
 
-Defined in: [KloakBridge.ts:277](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L277)
+Defined in: [KloakBridge.ts:420](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L420)
 
 ___
 
@@ -222,7 +265,7 @@ Name | Type |
 
 **Returns:** *Promise*<any\>
 
-Defined in: [KloakBridge.ts:413](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L413)
+Defined in: [KloakBridge.ts:547](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L547)
 
 ___
 
@@ -234,7 +277,17 @@ Delete KeyChainContainer from IndexedDB.
 
 **Returns:** *Promise*<[*DeleteKeychainResolve*](../modules.md#deletekeychainresolve)\>
 
-Defined in: [KloakBridge.ts:309](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L309)
+Defined in: [KloakBridge.ts:455](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L455)
+
+___
+
+### disconnect
+
+▸ **disconnect**(): *void*
+
+**Returns:** *void*
+
+Defined in: [KloakBridge.ts:272](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L272)
 
 ___
 
@@ -252,7 +305,7 @@ Name | Type |
 
 **Returns:** *Promise*<[*EncryptSaveResolve*](../modules.md#encryptsaveresolve)\>
 
-Defined in: [KloakBridge.ts:415](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L415)
+Defined in: [KloakBridge.ts:549](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L549)
 
 ___
 
@@ -268,23 +321,17 @@ Name | Type |
 
 **Returns:** *Promise*<[status: "SUCCESS" \| "FAILURE", encryptedData?: string]\>
 
-Defined in: [KloakBridge.ts:445](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L445)
+Defined in: [KloakBridge.ts:579](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L579)
 
 ___
 
 ### establishConnection
 
-▸ `Private`**establishConnection**(`urlPath?`: *string*): *Promise*<void\>
-
-#### Parameters:
-
-Name | Type |
-:------ | :------ |
-`urlPath` | *string* |
+▸ `Private`**establishConnection**(): *Promise*<void\>
 
 **Returns:** *Promise*<void\>
 
-Defined in: [KloakBridge.ts:196](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L196)
+Defined in: [KloakBridge.ts:283](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L283)
 
 ___
 
@@ -294,7 +341,7 @@ ___
 
 **Returns:** *Promise*<[*KeyChain*](../interfaces/keychain.md)\>
 
-Defined in: [KloakBridge.ts:77](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L77)
+Defined in: [KloakBridge.ts:119](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L119)
 
 ___
 
@@ -310,7 +357,7 @@ Name | Type |
 
 **Returns:** *Promise*<[*GetAppDataUUID*](../modules.md#getappdatauuid)\>
 
-Defined in: [KloakBridge.ts:483](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L483)
+Defined in: [KloakBridge.ts:617](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L617)
 
 ___
 
@@ -326,7 +373,7 @@ Name | Type |
 
 **Returns:** *Promise*<undefined \| [*GetAppDataUUID*](../modules.md#getappdatauuid)\>
 
-Defined in: [KloakBridge.ts:323](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L323)
+Defined in: [KloakBridge.ts:469](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L469)
 
 ___
 
@@ -336,23 +383,29 @@ ___
 
 **Returns:** *Promise*<[*GetDeviceKey*](../modules.md#getdevicekey)\>
 
-Defined in: [KloakBridge.ts:465](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L465)
+Defined in: [KloakBridge.ts:599](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L599)
 
 ___
 
-### getSeguroKey
+### getMessagesCache
 
-▸ **getSeguroKey**(): *Promise*<[*GetSeguroKey*](../modules.md#getsegurokey)\>
+▸ **getMessagesCache**(`appId`: *string*): *Promise*<string[]\>
 
-**Returns:** *Promise*<[*GetSeguroKey*](../modules.md#getsegurokey)\>
+#### Parameters:
 
-Defined in: [KloakBridge.ts:474](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L474)
+Name | Type |
+:------ | :------ |
+`appId` | *string* |
+
+**Returns:** *Promise*<string[]\>
+
+Defined in: [KloakBridge.ts:259](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L259)
 
 ___
 
-### getURLData
+### getNetworkInformation
 
-▸ `Private`**getURLData**(`url`: *string*): *void*
+▸ `Private`**getNetworkInformation**(`url`: *string*): *void*
 
 #### Parameters:
 
@@ -362,7 +415,27 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [KloakBridge.ts:65](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L65)
+Defined in: [KloakBridge.ts:107](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L107)
+
+___
+
+### getSeguroKey
+
+▸ **getSeguroKey**(): *Promise*<[*GetSeguroKey*](../modules.md#getsegurokey)\>
+
+**Returns:** *Promise*<[*GetSeguroKey*](../modules.md#getsegurokey)\>
+
+Defined in: [KloakBridge.ts:608](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L608)
+
+___
+
+### init
+
+▸ `Private`**init**(): *Promise*<void\>
+
+**Returns:** *Promise*<void\>
+
+Defined in: [KloakBridge.ts:65](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L65)
 
 ___
 
@@ -372,27 +445,34 @@ ___
 
 **Returns:** *Promise*<[*LockContainerResolve*](../modules.md#lockcontainerresolve)\>
 
-Defined in: [KloakBridge.ts:132](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L132)
+Defined in: [KloakBridge.ts:174](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L174)
 
 ___
 
-### networkStart
+### networkWebSocket
 
-▸ `Private`**networkStart**(`deviceKey`: [*PGPKeys*](../interfaces/pgpkeys.md), `seguroKey`: *string*, `urlPath?`: *string*, `imapAccount?`: [*IMAPAccount*](../interfaces/imapaccount.md), `serverFolder?`: *string*): *void*
+▸ `Private`**networkWebSocket**(`connectInformation`: [*connectImapResponse*](../interfaces/connectimapresponse.md), `reconnected?`: () => *void*): *void*
 
 #### Parameters:
 
-Name | Type | Default value |
-:------ | :------ | :------ |
-`deviceKey` | [*PGPKeys*](../interfaces/pgpkeys.md) | - |
-`seguroKey` | *string* | - |
-`urlPath` | *string* | 'http://localhost:3000/getInformationFromSeguro' |
-`imapAccount?` | [*IMAPAccount*](../interfaces/imapaccount.md) | - |
-`serverFolder?` | *string* | - |
+Name | Type |
+:------ | :------ |
+`connectInformation` | [*connectImapResponse*](../interfaces/connectimapresponse.md) |
+`reconnected?` | () => *void* |
 
 **Returns:** *void*
 
-Defined in: [KloakBridge.ts:164](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L164)
+Defined in: [KloakBridge.ts:225](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L225)
+
+___
+
+### reconnect
+
+▸ **reconnect**(): *Promise*<void\>
+
+**Returns:** *Promise*<void\>
+
+Defined in: [KloakBridge.ts:270](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L270)
 
 ___
 
@@ -408,7 +488,7 @@ Name | Type |
 
 **Returns:** *Promise*<any\>
 
-Defined in: [KloakBridge.ts:409](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L409)
+Defined in: [KloakBridge.ts:543](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L543)
 
 ___
 
@@ -426,7 +506,7 @@ Name | Type |
 
 **Returns:** *Promise*<[*RetrieveDecryptResolve*](../modules.md#retrievedecryptresolve)\>
 
-Defined in: [KloakBridge.ts:430](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L430)
+Defined in: [KloakBridge.ts:564](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L564)
 
 ___
 
@@ -443,24 +523,58 @@ Name | Type |
 
 **Returns:** *Promise*<any\>
 
-Defined in: [KloakBridge.ts:411](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L411)
+Defined in: [KloakBridge.ts:545](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L545)
 
 ___
 
 ### saveNetworkInfo
 
-▸ `Private`**saveNetworkInfo**(`imapAccount`: [*IMAPAccount*](../interfaces/imapaccount.md), `serverFolder`: *string*): *Promise*<boolean\>
+▸ `Private`**saveNetworkInfo**(`connectInformation`: *null* \| [*connectImapResponse*](../interfaces/connectimapresponse.md), `nextConnectInformation`: *null* \| [*NextTimeConnect*](../interfaces/nexttimeconnect.md)): *Promise*<boolean\>
 
 #### Parameters:
 
 Name | Type |
 :------ | :------ |
-`imapAccount` | [*IMAPAccount*](../interfaces/imapaccount.md) |
-`serverFolder` | *string* |
+`connectInformation` | *null* \| [*connectImapResponse*](../interfaces/connectimapresponse.md) |
+`nextConnectInformation` | *null* \| [*NextTimeConnect*](../interfaces/nexttimeconnect.md) |
 
 **Returns:** *Promise*<boolean\>
 
-Defined in: [KloakBridge.ts:139](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L139)
+Defined in: [KloakBridge.ts:201](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L201)
+
+___
+
+### saveToMessagesCache
+
+▸ `Private`**saveToMessagesCache**(`appId`: *string*, `message`: *string*): *Promise*<void\>
+
+#### Parameters:
+
+Name | Type |
+:------ | :------ |
+`appId` | *string* |
+`message` | *string* |
+
+**Returns:** *Promise*<void\>
+
+Defined in: [KloakBridge.ts:181](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L181)
+
+___
+
+### testNetworkConnection
+
+▸ **testNetworkConnection**(`host`: *string*, `port`: *string* \| *number*): *Promise*<[status: "IMAP\_AVAILABLE" \| "IMAP\_UNAVAILABLE"]\>
+
+#### Parameters:
+
+Name | Type |
+:------ | :------ |
+`host` | *string* |
+`port` | *string* \| *number* |
+
+**Returns:** *Promise*<[status: "IMAP\_AVAILABLE" \| "IMAP\_UNAVAILABLE"]\>
+
+Defined in: [KloakBridge.ts:76](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L76)
 
 ___
 
@@ -479,7 +593,7 @@ Name | Type |
 
 **Returns:** *Promise*<[*UnlockKeyResolve*](../modules.md#unlockkeyresolve)\>
 
-Defined in: [KloakBridge.ts:393](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L393)
+Defined in: [KloakBridge.ts:527](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L527)
 
 ___
 
@@ -498,4 +612,22 @@ Name | Type |
 
 **Returns:** *Promise*<[*UnlockContainerResolve*](../modules.md#unlockcontainerresolve)\>
 
-Defined in: [KloakBridge.ts:246](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/KloakBridge.ts#L246)
+Defined in: [KloakBridge.ts:384](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L384)
+
+___
+
+### sendToClient
+
+▸ `Static`**sendToClient**(`message`: *string*, `appId`: *string*, `recipientDeviceKey`: *string*): *Promise*<[*NetworkPostStatus*](../modules.md#networkpoststatus)\>
+
+#### Parameters:
+
+Name | Type |
+:------ | :------ |
+`message` | *string* |
+`appId` | *string* |
+`recipientDeviceKey` | *string* |
+
+**Returns:** *Promise*<[*NetworkPostStatus*](../modules.md#networkpoststatus)\>
+
+Defined in: [KloakBridge.ts:632](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/KloakBridge.ts#L632)

@@ -16,7 +16,7 @@
 
 • **client\_folder**: *string*
 
-Defined in: [define.ts:35](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L35)
+Defined in: [define.ts:39](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/define.ts#L39)
 
 ___
 
@@ -24,7 +24,7 @@ ___
 
 • **imap\_account**: [*IMAPAccount*](imapaccount.md)
 
-Defined in: [define.ts:33](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L33)
+Defined in: [define.ts:37](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/define.ts#L37)
 
 ___
 
@@ -32,4 +32,4 @@ ___
 
 • **server\_folder**: *string*
 
-Defined in: [define.ts:34](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L34)
+Defined in: [define.ts:38](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/define.ts#L38)

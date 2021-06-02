@@ -6,17 +6,27 @@
 
 ### Properties
 
+- [deviceKey](seguroconnection.md#devicekey)
 - [host](seguroconnection.md#host)
 - [networkInstance](seguroconnection.md#networkinstance)
 - [port](seguroconnection.md#port)
+- [websocketConnection](seguroconnection.md#websocketconnection)
 
 ## Properties
+
+### deviceKey
+
+• **deviceKey**: *null* \| [*PGPKeys*](pgpkeys.md)
+
+Defined in: [define.ts:266](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/define.ts#L266)
+
+___
 
 ### host
 
 • **host**: *string*
 
-Defined in: [define.ts:233](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L233)
+Defined in: [define.ts:263](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/define.ts#L263)
 
 ___
 
@@ -24,7 +34,7 @@ ___
 
 • **networkInstance**: *null* \| *Network*
 
-Defined in: [define.ts:235](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L235)
+Defined in: [define.ts:265](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/define.ts#L265)
 
 ___
 
@@ -32,4 +42,12 @@ ___
 
 • **port**: *string* \| *number*
 
-Defined in: [define.ts:234](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L234)
+Defined in: [define.ts:264](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/define.ts#L264)
+
+___
+
+### websocketConnection
+
+• **websocketConnection**: *null* \| WebSocket \| *WebSocket*
+
+Defined in: [define.ts:267](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/define.ts#L267)

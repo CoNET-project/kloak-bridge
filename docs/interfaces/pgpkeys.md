@@ -20,7 +20,7 @@
 
 • **armoredPrivateKey**: *string*
 
-Defined in: [define.ts:68](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L68)
+Defined in: [define.ts:77](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/define.ts#L77)
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 • **armoredPublicKey**: *string*
 
-Defined in: [define.ts:67](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L67)
+Defined in: [define.ts:76](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/define.ts#L76)
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 • **keyID**: *string*
 
-Defined in: [define.ts:66](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L66)
+Defined in: [define.ts:75](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/define.ts#L75)
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 • `Optional` **passphrase**: *string*
 
-Defined in: [define.ts:69](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L69)
+Defined in: [define.ts:78](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/define.ts#L78)
 
 ___
 
@@ -52,7 +52,7 @@ ___
 
 • `Optional` **readPrivateKey**: *Key*
 
-Defined in: [define.ts:71](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L71)
+Defined in: [define.ts:80](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/define.ts#L80)
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 • `Optional` **readPublicKey**: *Key*
 
-Defined in: [define.ts:70](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L70)
+Defined in: [define.ts:79](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/define.ts#L79)
 
 ___
 
@@ -68,4 +68,4 @@ ___
 
 • `Optional` **unlocked**: *boolean*
 
-Defined in: [define.ts:72](https://github.com/CoNET-project/kloak-bridge/blob/95909fa/src/define.ts#L72)
+Defined in: [define.ts:81](https://github.com/CoNET-project/kloak-bridge/blob/944a10e/src/define.ts#L81)
