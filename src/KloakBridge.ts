@@ -248,7 +248,8 @@ class KloakBridge {
                             appMessage = JSON.parse(decryptMessage) as AppMessage;
                             return this.networkListener.onMessage(appMessage.appId, appMessage.message, (appId: string, message: string) => this.saveToMessagesCache(appId, message));
                         } catch (err) {
-
+                            console.log(err);
+                            return null;
                         }
                     }
                 }
@@ -303,7 +304,7 @@ class KloakBridge {
                     const connectRequest: ConnectRequest = request as ConnectRequest;
                     log('establishConnection() networkCallback()', 'Kloak Bridge Network: Network returned connectRequest', request);
                     await this.saveNetworkInfo(connectRequest.connect_info as connectImapResponse, connectRequest.next_time_connect as NextTimeConnect);
-                    this.networkWebSocket(connectRequest.connect_info as connectImapResponse);
+                    this.networkWebSocket(connectRequest.connect_info as connectImapResponse, () => this.establishConnection());
                 } else {
                     return this.establishConnection();
                 }
@@ -320,16 +321,7 @@ class KloakBridge {
                 log('establishConnection()', 'Kloak Bridge Network: Saved network information', decryptedNetwork);
                 if (decryptNetworkStatus === 'SUCCESS') {
                     const { nextConnectInformation } = decryptedNetwork as unknown as NetworkInformation;
-                    const { connectInformation } = decryptedNetwork as unknown as NetworkInformation;
-                    if (connectInformation && nextConnectInformation) {
-                        log('establishConnection()', 'Kloak Bridge Network: Saved network has connectInformation and nextConnectInformation', connectInformation, nextConnectInformation);
-                        this.networkWebSocket(connectInformation, async () => {
-                            await this.saveNetworkInfo(null, nextConnectInformation);
-                            log('networkWebSocket()', 'Kloak Bridge Network: Websocket disconnected, attempting to receive new connection information');
-                            Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, nextConnectInformation)
-                                .then(networkCallback);
-                        });
-                    } else if (nextConnectInformation) {
+                    if (nextConnectInformation) {
                         log('establishConnection()', 'Kloak Bridge Network: Saved network only has nextConnectInformation', nextConnectInformation);
                         Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, nextConnectInformation)
                             .then(networkCallback);
