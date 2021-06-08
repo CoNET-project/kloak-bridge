@@ -42,7 +42,6 @@ class KloakBridge {
     private uploadHelpers: {[name: string]: DisassemblyHelper} = {};
     private assemblyHelpers: {[name: string]: AssemblyHelper} = {};
     private keyContainer: KeyContainer | undefined
-    private IDBHelper = new IDBDatabaseHelper();
     private containerEncrypter: EncryptHelper = new EncryptHelper();
     private keyChainContainer: KeyChainContainer = {
         pgpKeys: {
@@ -192,9 +191,9 @@ class KloakBridge {
             const [encryptMessagesCacheStatus, encryptedMessagesCache] = await this.containerEncrypter.encryptMessage(JSON.stringify(updatedMessagesCache));
             if (encryptMessagesCacheStatus === 'SUCCESS') {
                 log('saveToMessagesCache()', 'Successfully encrypted messages cache.');
-                const tx = this.IDBHelper.getTransaction();
+                const tx = IDBDatabaseHelper.getTx();
                 if (tx) {
-                    await this.IDBHelper.save(tx, this.keyChainContainer.messagesCache, encryptedMessagesCache);
+                    await IDBDatabaseHelper.save(tx, this.keyChainContainer.messagesCache, encryptedMessagesCache);
                 }
                 log('saveToMessagesCache()', 'Successfully saved messages cache.');
             }
@@ -213,10 +212,10 @@ class KloakBridge {
             try {
                 const [status, encryptedNetwork] = await this.containerEncrypter.encryptMessage(JSON.stringify(network));
                 if (status === 'SUCCESS') {
-                    const tx = this.IDBHelper.getTransaction();
+                    const tx = IDBDatabaseHelper.getTx();
                     if (tx) {
-                        await this.IDBHelper.save(tx, 'KeyContainer', this.keyChainContainer);
-                        await this.IDBHelper.save(tx, this.keyChainContainer.network, encryptedNetwork);
+                        await IDBDatabaseHelper.save(tx, 'KeyContainer', this.keyChainContainer);
+                        await IDBDatabaseHelper.save(tx, this.keyChainContainer.network, encryptedNetwork);
                     }
                     log('networkWebSocket()', 'Kloak Bridge Network: Saved network information:', network);
                     return resolve(true);
@@ -261,9 +260,9 @@ class KloakBridge {
     }
 
     public getMessagesCache = async (appId: string) => {
-        const tx = this.IDBHelper.getTransaction();
+        const tx = IDBDatabaseHelper.getTx();
         if (tx) {
-            const encryptedMessagesCache = await this.IDBHelper.retrieve(tx, this.keyChainContainer.messagesCache);
+            const encryptedMessagesCache = await IDBDatabaseHelper.retrieve(tx, this.keyChainContainer.messagesCache);
             const [decryptedMessagesCacheStatus, decryptedMessagesCache] = await this.containerEncrypter.decryptMessage(encryptedMessagesCache);
             if (decryptedMessagesCacheStatus === 'SUCCESS') {
                 if ((decryptedMessagesCache as unknown as MessagesCache)[appId]) {
@@ -322,10 +321,10 @@ class KloakBridge {
         if (deviceKeyStatus === 'SUCCESS' && seguroKeyStatus === 'SUCCESS') {
             if (this.keyChainContainer.network) {
                 log('establishConnection()', 'Kloak Bridge Network: Container has saved network information.');
-                const tx = this.IDBHelper.getTransaction();
+                const tx = IDBDatabaseHelper.getTx();
                 let encryptedNetwork;
                 if (tx) {
-                    encryptedNetwork = await this.IDBHelper.retrieve(tx, this.keyChainContainer.network);
+                    encryptedNetwork = await IDBDatabaseHelper.retrieve(tx, this.keyChainContainer.network);
                 }
                 const [decryptNetworkStatus, decryptedNetwork] = await this.containerEncrypter.decryptMessage(encryptedNetwork);
                 log('establishConnection()', 'Kloak Bridge Network: Saved network information', decryptedNetwork);
@@ -348,7 +347,7 @@ class KloakBridge {
             }
         }
         // if (this.keyChainContainer.network) {
-        //     const encryptedNetwork = await this.IDBHelper.retrieve(this.keyChainContainer.network);
+        //     const encryptedNetwork = await IDBDatabaseHelper.retrieve(this.keyChainContainer.network);
         //     const [ status, decryptedNetwork ] = await this.containerEncrypter.decryptMessage(encryptedNetwork);
         //     if (encryptedNetwork && status === 'SUCCESS') {
         //     // eslint-disable-next-line camelcase
@@ -371,9 +370,9 @@ class KloakBridge {
      */
     public checkKeyContainer = (): Promise<CheckContainerResolve> => (
         new Promise<CheckContainerResolve>(async (resolve, _) => {
-            const tx = this.IDBHelper.getTransaction();
+            const tx = IDBDatabaseHelper.getTx();
             if (tx) {
-                const keyChainContainer: KeyChainContainer = await this.IDBHelper.retrieve(tx, 'KeyContainer');
+                const keyChainContainer: KeyChainContainer = await IDBDatabaseHelper.retrieve(tx, 'KeyContainer');
                 if (!keyChainContainer) {
                     return resolve(<CheckContainerResolve>['DOES_NOT_EXIST']);
                 }
@@ -396,9 +395,9 @@ class KloakBridge {
                         this.keyChainContainer = keyChainContainer;
                         const [checkStatus] = await this.containerEncrypter.checkPassword(keyChainContainer?.pgpKeys, passphrase);
                         if (checkStatus === 'SUCCESS') {
-                            const tx = this.IDBHelper.getTransaction();
+                            const tx = IDBDatabaseHelper.getTx();
                             if (tx) {
-                                const encryptedKeychain = await this.IDBHelper.retrieve(tx, keyChainContainer.keychain);
+                                const encryptedKeychain = await IDBDatabaseHelper.retrieve(tx, keyChainContainer.keychain);
                                 const [, decryptedContainer] = await this.containerEncrypter.decryptMessage(encryptedKeychain);
                                 this.keyContainer = new KeyContainer(this.containerEncrypter, keyChainContainer.keychain, decryptedContainer as unknown as KeyChain);
                                 if (!this.skipNetwork) {
@@ -447,14 +446,14 @@ class KloakBridge {
                 };
                 const [, encryptedMessagesCache] = await tempEncrypt.encryptMessage(JSON.stringify({}));
                 this.keyContainer = new KeyContainer(tempEncrypt, keychainUUID, defaultKeyChain);
-                const tx = this.IDBHelper.getTransaction();
+                const tx = IDBDatabaseHelper.getTx();
                 console.log('GETTING TRANSACTION', tx);
                 if (tx) {
                     console.log('I HAVE THE TRANSACTION');
-                    await this.IDBHelper.save(tx, keychainUUID, encryptedKeyChain);
-                    await this.IDBHelper.save(tx, keyContainer.messagesCache, encryptedMessagesCache);
-                    await this.IDBHelper.save(tx, 'KeyContainer', keyContainer);
-                    await this.IDBHelper.retrieve(tx, 'KeyContainer');
+                    await IDBDatabaseHelper.save(tx, keychainUUID, encryptedKeyChain);
+                    await IDBDatabaseHelper.save(tx, keyContainer.messagesCache, encryptedMessagesCache);
+                    await IDBDatabaseHelper.save(tx, 'KeyContainer', keyContainer);
+                    await IDBDatabaseHelper.retrieve(tx, 'KeyContainer');
                     return resolve(<CreateContainerResolve>['SUCCESS', keyContainer]);
                 }
                 return resolve(<CreateContainerResolve>['FAILURE']);
@@ -472,9 +471,9 @@ class KloakBridge {
     public deleteKeyContainer = (): Promise<DeleteKeychainResolve> => (
         new Promise<DeleteKeychainResolve>(async (resolve, _) => {
             try {
-                const tx = this.IDBHelper.getTransaction();
+                const tx = IDBDatabaseHelper.getTx();
                 if (tx) {
-                    await this.IDBHelper.clearObjectStore(tx);
+                    await IDBDatabaseHelper.clearObjectStore(tx);
                     return resolve(<DeleteKeychainResolve>['SUCCESS']);
                 }
                 return resolve(<DeleteKeychainResolve>['FAILURE']);
@@ -496,10 +495,10 @@ class KloakBridge {
             const tempEncrypt = new EncryptHelper();
             const [, newPGPKeys] = await tempEncrypt.generateKey({ passphrase: newPassphrase });
             try {
-                const tx = this.IDBHelper.getTransaction();
+                const tx = IDBDatabaseHelper.getTx();
                 if (tx) {
-                    const oldContainer: KeyChainContainer = await this.IDBHelper.retrieve(tx, 'KeyContainer');
-                    const encryptedKeychain = await this.IDBHelper.retrieve(tx, oldContainer.keychain);
+                    const oldContainer: KeyChainContainer = await IDBDatabaseHelper.retrieve(tx, 'KeyContainer');
+                    const encryptedKeychain = await IDBDatabaseHelper.retrieve(tx, oldContainer.keychain);
                     const [status] = await tempEncrypt.checkPassword(oldContainer.pgpKeys, oldPassphrase);
                     if (status === 'SUCCESS') {
                         const [, decryptedKeyChain] = await tempEncrypt.decryptMessage(encryptedKeychain);
@@ -514,7 +513,7 @@ class KloakBridge {
                             network: oldContainer.network,
                             messagesCache: oldContainer.messagesCache
                         };
-                        await this.IDBHelper.save(tx, 'keyContainer', JSON.stringify(newContainer));
+                        await IDBDatabaseHelper.save(tx, 'keyContainer', JSON.stringify(newContainer));
                         this.keyContainer = new KeyContainer(tempEncrypt, newContainer.keychain, decryptedKeyChain as unknown as KeyChain);
                         return resolve(['SUCCESS', newContainer]);
                     }
@@ -566,9 +565,9 @@ class KloakBridge {
 
     public retrieve = (uuid: string): Promise<any> => (
         new Promise<any>(async (resolve) => {
-            const tx = this.IDBHelper.getTransaction();
+            const tx = IDBDatabaseHelper.getTx();
             if (tx) {
-                const value = await this.IDBHelper.retrieve(tx, uuid);
+                const value = await IDBDatabaseHelper.retrieve(tx, uuid);
                 return resolve(value);
             }
         })
@@ -576,9 +575,9 @@ class KloakBridge {
 
     public save = (uuid: string, data: any): Promise<any> => (
         new Promise<any>(async (resolve) => {
-            const tx = this.IDBHelper.getTransaction();
+            const tx = IDBDatabaseHelper.getTx();
             if (tx) {
-                const value = await this.IDBHelper.save(tx, uuid, data);
+                const value = await IDBDatabaseHelper.save(tx, uuid, data);
                 return resolve(value);
             }
             return resolve(null);
@@ -587,9 +586,9 @@ class KloakBridge {
 
     public delete = async (uuid: string): Promise<any> => (
         new Promise<any>(async (resolve) => {
-            const tx = this.IDBHelper.getTransaction();
+            const tx = IDBDatabaseHelper.getTx();
             if (tx) {
-                const value = await this.IDBHelper.delete(tx, uuid);
+                const value = await IDBDatabaseHelper.destroy(tx, uuid);
                 return resolve(value);
             }
             return resolve(null);

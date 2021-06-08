@@ -1,10 +1,9 @@
 import { GetAppDataUUID, GetDeviceKey, GetSeguroKey, KeyChain, PGPKeys } from './define';
 import EncryptHelper from './EncryptHelper';
-import IDBDatabaseHelper from './IDBDatabaseHelper';
 import { getUUIDv4 } from './utils';
+import IDBDatabaseHelper from './IDBDatabaseHelper';
 
 class KeyContainer {
-    private IDBHelper: IDBDatabaseHelper = new IDBDatabaseHelper();
     private encryptHelper: EncryptHelper | null = null
     private keychainUUID: string
     private keyChain: KeyChain = {
@@ -23,9 +22,9 @@ class KeyContainer {
         new Promise<boolean>(async (resolve, reject) => {
             try {
                 const encryptedMessage = await this.encryptHelper?.encryptMessage(JSON.stringify(this.keyChain));
-                const tx = await this.IDBHelper.getTransaction();
+                const tx = IDBDatabaseHelper.getTx();
                 if (tx) {
-                    await this.IDBHelper.save(tx, this.keychainUUID, encryptedMessage);
+                    await IDBDatabaseHelper.save(tx, this.keychainUUID, encryptedMessage);
                 } else {
                     reject();
                 }
