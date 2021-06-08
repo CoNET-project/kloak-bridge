@@ -192,7 +192,7 @@ class KloakBridge {
             const [encryptMessagesCacheStatus, encryptedMessagesCache] = await this.containerEncrypter.encryptMessage(JSON.stringify(updatedMessagesCache));
             if (encryptMessagesCacheStatus === 'SUCCESS') {
                 log('saveToMessagesCache()', 'Successfully encrypted messages cache.');
-                const [tx] = await this.IDBHelper.getTransaction();
+                const tx = this.IDBHelper.getTransaction();
                 if (tx) {
                     await this.IDBHelper.save(tx, this.keyChainContainer.messagesCache, encryptedMessagesCache);
                 }
@@ -213,7 +213,7 @@ class KloakBridge {
             try {
                 const [status, encryptedNetwork] = await this.containerEncrypter.encryptMessage(JSON.stringify(network));
                 if (status === 'SUCCESS') {
-                    const [tx] = await this.IDBHelper.getTransaction();
+                    const tx = this.IDBHelper.getTransaction();
                     if (tx) {
                         await this.IDBHelper.save(tx, 'KeyContainer', this.keyChainContainer);
                         await this.IDBHelper.save(tx, this.keyChainContainer.network, encryptedNetwork);
@@ -261,7 +261,7 @@ class KloakBridge {
     }
 
     public getMessagesCache = async (appId: string) => {
-        const [tx] = await this.IDBHelper.getTransaction();
+        const tx = this.IDBHelper.getTransaction();
         if (tx) {
             const encryptedMessagesCache = await this.IDBHelper.retrieve(tx, this.keyChainContainer.messagesCache);
             const [decryptedMessagesCacheStatus, decryptedMessagesCache] = await this.containerEncrypter.decryptMessage(encryptedMessagesCache);
@@ -322,7 +322,7 @@ class KloakBridge {
         if (deviceKeyStatus === 'SUCCESS' && seguroKeyStatus === 'SUCCESS') {
             if (this.keyChainContainer.network) {
                 log('establishConnection()', 'Kloak Bridge Network: Container has saved network information.');
-                const [tx] = await this.IDBHelper.getTransaction();
+                const tx = this.IDBHelper.getTransaction();
                 let encryptedNetwork;
                 if (tx) {
                     encryptedNetwork = await this.IDBHelper.retrieve(tx, this.keyChainContainer.network);
@@ -371,7 +371,7 @@ class KloakBridge {
      */
     public checkKeyContainer = (): Promise<CheckContainerResolve> => (
         new Promise<CheckContainerResolve>(async (resolve, _) => {
-            const [tx] = await this.IDBHelper.getTransaction();
+            const tx = this.IDBHelper.getTransaction();
             if (tx) {
                 const keyChainContainer: KeyChainContainer = await this.IDBHelper.retrieve(tx, 'KeyContainer');
                 if (!keyChainContainer) {
@@ -396,7 +396,7 @@ class KloakBridge {
                         this.keyChainContainer = keyChainContainer;
                         const [checkStatus] = await this.containerEncrypter.checkPassword(keyChainContainer?.pgpKeys, passphrase);
                         if (checkStatus === 'SUCCESS') {
-                            const [tx] = await this.IDBHelper.getTransaction();
+                            const tx = this.IDBHelper.getTransaction();
                             if (tx) {
                                 const encryptedKeychain = await this.IDBHelper.retrieve(tx, keyChainContainer.keychain);
                                 const [, decryptedContainer] = await this.containerEncrypter.decryptMessage(encryptedKeychain);
@@ -447,7 +447,7 @@ class KloakBridge {
                 };
                 const [, encryptedMessagesCache] = await tempEncrypt.encryptMessage(JSON.stringify({}));
                 this.keyContainer = new KeyContainer(tempEncrypt, keychainUUID, defaultKeyChain);
-                const [tx] = await this.IDBHelper.getTransaction();
+                const tx = this.IDBHelper.getTransaction();
                 console.log('GETTING TRANSACTION', tx);
                 if (tx) {
                     console.log('I HAVE THE TRANSACTION');
@@ -472,7 +472,7 @@ class KloakBridge {
     public deleteKeyContainer = (): Promise<DeleteKeychainResolve> => (
         new Promise<DeleteKeychainResolve>(async (resolve, _) => {
             try {
-                const [tx] = await this.IDBHelper.getTransaction();
+                const tx = this.IDBHelper.getTransaction();
                 if (tx) {
                     await this.IDBHelper.clearObjectStore(tx);
                     return resolve(<DeleteKeychainResolve>['SUCCESS']);
@@ -496,7 +496,7 @@ class KloakBridge {
             const tempEncrypt = new EncryptHelper();
             const [, newPGPKeys] = await tempEncrypt.generateKey({ passphrase: newPassphrase });
             try {
-                const [tx] = await this.IDBHelper.getTransaction();
+                const tx = this.IDBHelper.getTransaction();
                 if (tx) {
                     const oldContainer: KeyChainContainer = await this.IDBHelper.retrieve(tx, 'KeyContainer');
                     const encryptedKeychain = await this.IDBHelper.retrieve(tx, oldContainer.keychain);
@@ -566,7 +566,7 @@ class KloakBridge {
 
     public retrieve = (uuid: string): Promise<any> => (
         new Promise<any>(async (resolve) => {
-            const [tx] = await this.IDBHelper.getTransaction();
+            const tx = this.IDBHelper.getTransaction();
             if (tx) {
                 const value = await this.IDBHelper.retrieve(tx, uuid);
                 return resolve(value);
@@ -576,7 +576,7 @@ class KloakBridge {
 
     public save = (uuid: string, data: any): Promise<any> => (
         new Promise<any>(async (resolve) => {
-            const [tx] = await this.IDBHelper.getTransaction();
+            const tx = this.IDBHelper.getTransaction();
             if (tx) {
                 const value = await this.IDBHelper.save(tx, uuid, data);
                 return resolve(value);
@@ -587,7 +587,7 @@ class KloakBridge {
 
     public delete = async (uuid: string): Promise<any> => (
         new Promise<any>(async (resolve) => {
-            const [tx] = await this.IDBHelper.getTransaction();
+            const tx = this.IDBHelper.getTransaction();
             if (tx) {
                 const value = await this.IDBHelper.delete(tx, uuid);
                 return resolve(value);

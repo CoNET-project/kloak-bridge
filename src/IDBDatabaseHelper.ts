@@ -27,15 +27,7 @@ class IDBDatabaseHelper {
         };
     }
 
-    public getTransaction = (): Promise<[tx: IDBTransaction | null]> => (
-        new Promise<[tx: IDBTransaction | null]>((resolve, _) => {
-            const tx = this.database?.transaction('data', 'readwrite');
-            if (tx) {
-                return resolve([tx]);
-            }
-            return resolve([null]);
-        })
-    )
+    public getTransaction = () => this.database?.transaction('data', 'readwrite')
 
     public clearObjectStore = (tx: IDBTransaction): Promise<boolean> => (
         new Promise<boolean>(async (resolve, _) => {
