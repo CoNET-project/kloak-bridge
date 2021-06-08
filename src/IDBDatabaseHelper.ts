@@ -4,61 +4,63 @@ interface IDBDatabaseEventTarget extends EventTarget {
 
 class IDBDatabaseHelper {
 
+    private database: IDBDatabase | null = null
     private databaseName: string = 'kloak';
     private version: number = 1;
 
     constructor(databaseName?: string, version?: number) {
         if (databaseName) this.databaseName = databaseName;
         if (version) this.version = version;
+        this.init();
     }
 
-    public getObjectStore = (): Promise<[tx: IDBTransaction, objectStore: IDBObjectStore]> => new Promise<[tx: IDBTransaction, objectStore: IDBObjectStore]>((resolve, reject) => {
-        // eslint-disable-next-line no-undef
+    public init = () => {
         const req = indexedDB.open(this.databaseName, this.version);
-        req.onupgradeneeded = async (evt: IDBVersionChangeEvent): Promise<any> => {
-            try {
-                const db = await (evt.target as IDBDatabaseEventTarget).result;
-                const objectStore = await db.createObjectStore('data') as IDBObjectStore;
-                resolve([objectStore.transaction, objectStore]);
-            } catch (err: any) {
-                reject(err);
-            }
+        req.onupgradeneeded = (evt: IDBVersionChangeEvent) => {
+            const db = (evt.target as IDBDatabaseEventTarget).result;
+            db.createObjectStore('data');
         };
 
-        req.onsuccess = async (evt) => {
-            try {
-                const db = await (evt.target as IDBDatabaseEventTarget).result;
-                const tx: IDBTransaction = db.transaction('data', 'readwrite') as IDBTransaction;
-                const objectStore = tx.objectStore('data');
-                resolve([tx, objectStore]);
-            } catch (err: any) {
-                reject(err);
-            }
+        req.onsuccess = (evt) => {
+            const db = (evt.target as IDBDatabaseEventTarget).result;
+            this.database = db;
         };
-    });
+    }
 
-    public clearObjectStore = (): Promise<boolean> => (
+    public getTransaction = (): Promise<[tx: IDBTransaction | null]> => (
+        new Promise<[tx: IDBTransaction | null]>((resolve, _) => {
+            const tx = this.database?.transaction('data', 'readwrite');
+            if (tx) {
+                return resolve([tx]);
+            }
+            return resolve([null]);
+        })
+    )
+
+    public clearObjectStore = (tx: IDBTransaction): Promise<boolean> => (
         new Promise<boolean>(async (resolve, _) => {
-            const [tx, objectStore] = await this.getObjectStore();
+            // eslint-disable-next-line no-param-reassign
             tx.oncomplete = () => resolve(true);
+            // eslint-disable-next-line no-param-reassign
             tx.onerror = (err) => {
                 console.log(err);
                 return resolve(false);
             };
-            const storeAction = await objectStore?.clear();
+            const objectStore = tx.objectStore('data');
+            const storeAction = objectStore.clear();
             storeAction.onsuccess = () => {};
             storeAction.onerror = () => resolve(false);
         })
     )
 
-    public save = (uuid: string, data: any): Promise<string> => new Promise<string>(async (resolve, reject) => {
+    public save = (tx: IDBTransaction, uuid: string, data: any): Promise<string> => new Promise<string>(async (resolve, reject) => {
         try {
-            const [tx, objectStore] = await this.getObjectStore();
+            // eslint-disable-next-line no-param-reassign
             tx.oncomplete = () => resolve(uuid);
+            // eslint-disable-next-line no-param-reassign
             tx.onerror = (err) => console.log(err);
-            const storeAction = await objectStore?.put(JSON.stringify(data), uuid);
-            // @ts-ignore
-            tx.commit();
+            const objectStore = tx.objectStore('data');
+            const storeAction = objectStore.put(JSON.stringify(data), uuid);
             storeAction.onsuccess = () => {};
             storeAction.onerror = (evt: Event) => reject(evt);
         } catch (err) {
@@ -66,12 +68,14 @@ class IDBDatabaseHelper {
         }
     });
 
-    public retrieve = (uuid: string): Promise<any> => new Promise<any>(async (resolve, reject) => {
+    public retrieve = (tx: IDBTransaction, uuid: string): Promise<any> => new Promise<any>(async (resolve, reject) => {
         try {
-            const [tx, objectStore] = await this.getObjectStore();
-            tx.oncomplete = () => {};
+            // eslint-disable-next-line no-param-reassign
+            tx.oncomplete = () => resolve(uuid);
+            // eslint-disable-next-line no-param-reassign
             tx.onerror = (err) => console.log(err);
-            const storeAction = await objectStore?.get(uuid);
+            const objectStore = tx.objectStore('data');
+            const storeAction = objectStore.get(uuid);
             storeAction.onsuccess = (evt: Event) => {
                 const data = (evt.target as IDBDatabaseEventTarget).result;
                 try {
@@ -87,14 +91,14 @@ class IDBDatabaseHelper {
         }
     });
 
-    public delete = (uuid: string): Promise<string> => new Promise<string>(async (resolve, reject) => {
+    public delete = (tx: IDBTransaction, uuid: string): Promise<string> => new Promise<string>(async (resolve, reject) => {
         try {
-            const [tx, objectStore] = await this.getObjectStore();
+            // eslint-disable-next-line no-param-reassign
             tx.oncomplete = () => resolve(uuid);
+            // eslint-disable-next-line no-param-reassign
             tx.onerror = (err) => console.log(err);
-            const storeAction = await objectStore?.delete(uuid);
-            // @ts-ignore
-            tx.commit();
+            const objectStore = tx.objectStore('data');
+            const storeAction = objectStore.delete(uuid);
             storeAction.onsuccess = () => {};
             storeAction.onerror = (evt: Event) => reject(evt);
         } catch (err) {

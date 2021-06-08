@@ -23,7 +23,12 @@ class KeyContainer {
         new Promise<boolean>(async (resolve, reject) => {
             try {
                 const encryptedMessage = await this.encryptHelper?.encryptMessage(JSON.stringify(this.keyChain));
-                await this.IDBHelper.save(this.keychainUUID, encryptedMessage);
+                const [tx] = await this.IDBHelper.getTransaction();
+                if (tx) {
+                    await this.IDBHelper.save(tx, this.keychainUUID, encryptedMessage);
+                } else {
+                    reject();
+                }
                 return resolve(true);
             } catch (err) {
                 return reject(err);
