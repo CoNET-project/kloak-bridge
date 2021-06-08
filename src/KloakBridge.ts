@@ -222,15 +222,12 @@ class KloakBridge {
         })
     )
 
-    private networkWebSocket = (connectInformation: connectImapResponse, reconnected?: () => void) => {
+    private networkWebSocket = (connectInformation: connectImapResponse) => {
         KloakBridge.seguroConnection.websocketConnection = Network.wsConnect(KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, connectInformation, async (err, networkInstance: Network | null, message: string | null) => {
             if (err) {
                 this.networkListener.onConnectionFail();
                 KloakBridge.seguroConnection.websocketConnection?.close();
                 log('networkWebSocket()', 'Kloak Bridge Network: Websocket disconnected');
-                if (reconnected) {
-                    setTimeout(() => reconnected(), 1000);
-                }
             }
             if (networkInstance) {
                 KloakBridge.seguroConnection.networkInstance = networkInstance;
@@ -304,7 +301,7 @@ class KloakBridge {
                     const connectRequest: ConnectRequest = request as ConnectRequest;
                     log('establishConnection() networkCallback()', 'Kloak Bridge Network: Network returned connectRequest', request);
                     await this.saveNetworkInfo(connectRequest.connect_info as connectImapResponse, connectRequest.next_time_connect as NextTimeConnect);
-                    this.networkWebSocket(connectRequest.connect_info as connectImapResponse, () => this.establishConnection());
+                    this.networkWebSocket(connectRequest.connect_info as connectImapResponse);
                 } else {
                     return this.establishConnection();
                 }
