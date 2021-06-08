@@ -31,29 +31,22 @@ class IDBDatabaseHelper {
 
     public clearObjectStore = (tx: IDBTransaction): Promise<boolean> => (
         new Promise<boolean>(async (resolve, _) => {
-            // eslint-disable-next-line no-param-reassign
-            tx.oncomplete = () => resolve(true);
-            // eslint-disable-next-line no-param-reassign
-            tx.onerror = (err) => {
-                console.log(err);
-                return resolve(false);
-            };
             const objectStore = tx.objectStore('data');
             const storeAction = objectStore.clear();
-            storeAction.onsuccess = () => {};
+            storeAction.onsuccess = () => {
+                resolve(true);
+            };
             storeAction.onerror = () => resolve(false);
         })
     )
 
     public save = (tx: IDBTransaction, uuid: string, data: any): Promise<string> => new Promise<string>(async (resolve, reject) => {
         try {
-            // eslint-disable-next-line no-param-reassign
-            tx.oncomplete = () => resolve(uuid);
-            // eslint-disable-next-line no-param-reassign
-            tx.onerror = (err) => console.log(err);
             const objectStore = tx.objectStore('data');
             const storeAction = objectStore.put(JSON.stringify(data), uuid);
-            storeAction.onsuccess = () => {};
+            storeAction.onsuccess = () => {
+                resolve(uuid);
+            };
             storeAction.onerror = (evt: Event) => reject(evt);
         } catch (err) {
             reject(err);
@@ -62,10 +55,6 @@ class IDBDatabaseHelper {
 
     public retrieve = (tx: IDBTransaction, uuid: string): Promise<any> => new Promise<any>(async (resolve, reject) => {
         try {
-            // eslint-disable-next-line no-param-reassign
-            tx.oncomplete = () => resolve(uuid);
-            // eslint-disable-next-line no-param-reassign
-            tx.onerror = (err) => console.log(err);
             const objectStore = tx.objectStore('data');
             const storeAction = objectStore.get(uuid);
             storeAction.onsuccess = (evt: Event) => {
@@ -85,13 +74,11 @@ class IDBDatabaseHelper {
 
     public delete = (tx: IDBTransaction, uuid: string): Promise<string> => new Promise<string>(async (resolve, reject) => {
         try {
-            // eslint-disable-next-line no-param-reassign
-            tx.oncomplete = () => resolve(uuid);
-            // eslint-disable-next-line no-param-reassign
-            tx.onerror = (err) => console.log(err);
             const objectStore = tx.objectStore('data');
             const storeAction = objectStore.delete(uuid);
-            storeAction.onsuccess = () => {};
+            storeAction.onsuccess = () => {
+                resolve(uuid);
+            };
             storeAction.onerror = (evt: Event) => reject(evt);
         } catch (err) {
             reject(err);
