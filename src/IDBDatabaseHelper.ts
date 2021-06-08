@@ -57,6 +57,8 @@ class IDBDatabaseHelper {
             tx.oncomplete = () => resolve(uuid);
             tx.onerror = (err) => console.log(err);
             const storeAction = await objectStore?.put(JSON.stringify(data), uuid);
+            // @ts-ignore
+            tx.commit();
             storeAction.onsuccess = () => {};
             storeAction.onerror = (evt: Event) => reject(evt);
         } catch (err) {
@@ -78,6 +80,7 @@ class IDBDatabaseHelper {
                 } catch (_) {
                     return resolve(data);
                 }
+
             };
         } catch (err) {
             return reject(err);
@@ -90,6 +93,8 @@ class IDBDatabaseHelper {
             tx.oncomplete = () => resolve(uuid);
             tx.onerror = (err) => console.log(err);
             const storeAction = await objectStore?.delete(uuid);
+            // @ts-ignore
+            tx.commit();
             storeAction.onsuccess = () => {};
             storeAction.onerror = (evt: Event) => reject(evt);
         } catch (err) {
