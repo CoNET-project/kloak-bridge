@@ -77,6 +77,7 @@ class KloakBridge {
             this.testNetworkConnection(KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port);
         }
         KloakBridge.IDBDatabase = await getIDBDatabaseHelper();
+        this.onInitialized();
     }
 
     public testNetworkConnection = (host: string, port: string | number): Promise<[status: 'IMAP_AVAILABLE' | 'IMAP_UNAVAILABLE']> => (
@@ -119,7 +120,6 @@ class KloakBridge {
         }
         KloakBridge.seguroConnection.host = URLObject?.hostname;
         KloakBridge.seguroConnection.port = URLObject?.port;
-        this.onInitialized();
     }
 
     private generateDefaultKeychain = (): Promise<KeyChain> => (
