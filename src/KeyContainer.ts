@@ -1,7 +1,8 @@
 import { GetAppDataUUID, GetDeviceKey, GetSeguroKey, KeyChain, PGPKeys } from './define';
 import EncryptHelper from './EncryptHelper';
 import { getUUIDv4 } from './utils';
-import IDBDatabaseHelper from './IDBDatabaseHelper';
+// eslint-disable-next-line import/no-cycle
+import KloakBridge from './KloakBridge';
 
 class KeyContainer {
     private encryptHelper: EncryptHelper | null = null
@@ -22,13 +23,17 @@ class KeyContainer {
         new Promise<boolean>(async (resolve, reject) => {
             try {
                 const encryptedMessage = await this.encryptHelper?.encryptMessage(JSON.stringify(this.keyChain));
-                const tx = IDBDatabaseHelper.getTx();
-                if (tx) {
-                    await IDBDatabaseHelper.save(tx, this.keychainUUID, encryptedMessage);
-                } else {
-                    reject();
+                if (KloakBridge.IDBDatabase) {
+                    const tx = KloakBridge.IDBDatabase.getTx();
+                    if (tx) {
+                        await KloakBridge.IDBDatabase.save(tx, this.keychainUUID, encryptedMessage);
+                    } else {
+                        reject();
+                    }
+                    return resolve(true);
                 }
-                return resolve(true);
+                reject();
+
             } catch (err) {
                 return reject(err);
             }

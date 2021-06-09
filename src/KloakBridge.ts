@@ -1,7 +1,6 @@
 import { URL as NodeURL } from 'url';
 import logger from './logger/logger';
 import EncryptHelper from './EncryptHelper';
-import IDBDatabaseHelper from './IDBDatabaseHelper';
 import {
     KeyChainContainer,
     KeyChain,
@@ -25,8 +24,10 @@ import {
 import DisassemblyHelper from './DisassemblyHelper';
 import AssemblyHelper from './AssemblyHelper';
 import { getUUIDv4 } from './utils';
+// eslint-disable-next-line import/no-cycle
 import KeyContainer from './KeyContainer';
 import Network from './Network';
+import getIDBDatabaseHelper from './IDBDatabaseHelper';
 const log = logger.getLogger('KloakBridge()');
 
 class KloakBridge {
@@ -53,6 +54,11 @@ class KloakBridge {
         network: '',
         messagesCache: ''
     }
+    static IDBDatabase: { getTx: () => IDBTransaction;
+        save: (tx: IDBTransaction, key: string, data: any) => Promise<string>;
+        destroy: (tx: IDBTransaction, key: string) => Promise<string>;
+        retrieve: (tx: IDBTransaction, key: string) => Promise<any>;
+        clearObjectStore: (tx: IDBTransaction) => Promise<boolean> } | null = null;
     private availableIMAPConnections: TestNetworkResponses = []
     private retryAttempts = 0;
     private MAX_RETRY_ATTEMPTS = 3;
@@ -70,6 +76,7 @@ class KloakBridge {
             }
             this.testNetworkConnection(KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port);
         }
+        KloakBridge.IDBDatabase = await getIDBDatabaseHelper();
     }
 
     public testNetworkConnection = (host: string, port: string | number): Promise<[status: 'IMAP_AVAILABLE' | 'IMAP_UNAVAILABLE']> => (
@@ -191,11 +198,13 @@ class KloakBridge {
             const [encryptMessagesCacheStatus, encryptedMessagesCache] = await this.containerEncrypter.encryptMessage(JSON.stringify(updatedMessagesCache));
             if (encryptMessagesCacheStatus === 'SUCCESS') {
                 log('saveToMessagesCache()', 'Successfully encrypted messages cache.');
-                const tx = IDBDatabaseHelper.getTx();
-                if (tx) {
-                    await IDBDatabaseHelper.save(tx, this.keyChainContainer.messagesCache, encryptedMessagesCache);
+                if (KloakBridge.IDBDatabase) {
+                    const tx = KloakBridge.IDBDatabase.getTx();
+                    if (tx) {
+                        await KloakBridge.IDBDatabase.save(tx, this.keyChainContainer.messagesCache, encryptedMessagesCache);
+                    }
+                    log('saveToMessagesCache()', 'Successfully saved messages cache.');
                 }
-                log('saveToMessagesCache()', 'Successfully saved messages cache.');
             }
         }
     }
@@ -212,13 +221,15 @@ class KloakBridge {
             try {
                 const [status, encryptedNetwork] = await this.containerEncrypter.encryptMessage(JSON.stringify(network));
                 if (status === 'SUCCESS') {
-                    const tx = IDBDatabaseHelper.getTx();
-                    if (tx) {
-                        await IDBDatabaseHelper.save(tx, 'KeyContainer', this.keyChainContainer);
-                        await IDBDatabaseHelper.save(tx, this.keyChainContainer.network, encryptedNetwork);
+                    if (KloakBridge.IDBDatabase) {
+                        const tx = KloakBridge.IDBDatabase.getTx();
+                        if (tx) {
+                            await KloakBridge.IDBDatabase.save(tx, 'KeyContainer', this.keyChainContainer);
+                            await KloakBridge.IDBDatabase.save(tx, this.keyChainContainer.network, encryptedNetwork);
+                        }
+                        log('networkWebSocket()', 'Kloak Bridge Network: Saved network information:', network);
+                        return resolve(true);
                     }
-                    log('networkWebSocket()', 'Kloak Bridge Network: Saved network information:', network);
-                    return resolve(true);
                 }
                 resolve(false);
             } catch (err) {
@@ -260,13 +271,15 @@ class KloakBridge {
     }
 
     public getMessagesCache = async (appId: string) => {
-        const tx = IDBDatabaseHelper.getTx();
-        if (tx) {
-            const encryptedMessagesCache = await IDBDatabaseHelper.retrieve(tx, this.keyChainContainer.messagesCache);
-            const [decryptedMessagesCacheStatus, decryptedMessagesCache] = await this.containerEncrypter.decryptMessage(encryptedMessagesCache);
-            if (decryptedMessagesCacheStatus === 'SUCCESS') {
-                if ((decryptedMessagesCache as unknown as MessagesCache)[appId]) {
-                    return (decryptedMessagesCache as unknown as MessagesCache)[appId];
+        if (KloakBridge.IDBDatabase) {
+            const tx = KloakBridge.IDBDatabase.getTx();
+            if (tx) {
+                const encryptedMessagesCache = await KloakBridge.IDBDatabase.retrieve(tx, this.keyChainContainer.messagesCache);
+                const [decryptedMessagesCacheStatus, decryptedMessagesCache] = await this.containerEncrypter.decryptMessage(encryptedMessagesCache);
+                if (decryptedMessagesCacheStatus === 'SUCCESS') {
+                    if ((decryptedMessagesCache as unknown as MessagesCache)[appId]) {
+                        return (decryptedMessagesCache as unknown as MessagesCache)[appId];
+                    }
                 }
             }
         }
@@ -321,23 +334,25 @@ class KloakBridge {
         if (deviceKeyStatus === 'SUCCESS' && seguroKeyStatus === 'SUCCESS') {
             if (this.keyChainContainer.network) {
                 log('establishConnection()', 'Kloak Bridge Network: Container has saved network information.');
-                const tx = IDBDatabaseHelper.getTx();
-                let encryptedNetwork;
-                if (tx) {
-                    encryptedNetwork = await IDBDatabaseHelper.retrieve(tx, this.keyChainContainer.network);
-                }
-                const [decryptNetworkStatus, decryptedNetwork] = await this.containerEncrypter.decryptMessage(encryptedNetwork);
-                log('establishConnection()', 'Kloak Bridge Network: Saved network information', decryptedNetwork);
-                if (decryptNetworkStatus === 'SUCCESS') {
-                    const { nextConnectInformation } = decryptedNetwork as unknown as NetworkInformation;
-                    if (nextConnectInformation) {
-                        log('establishConnection()', 'Kloak Bridge Network: Saved network only has nextConnectInformation', nextConnectInformation);
-                        Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, nextConnectInformation)
-                            .then(networkCallback);
-                    } else {
-                        log('establishConnection()', 'Kloak Bridge Network: Container has network information but no connectionInformation and nextConnectInformation.');
-                        Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port)
-                            .then(networkCallback);
+                if (KloakBridge.IDBDatabase) {
+                    const tx = KloakBridge.IDBDatabase.getTx();
+                    let encryptedNetwork;
+                    if (tx) {
+                        encryptedNetwork = await KloakBridge.IDBDatabase.retrieve(tx, this.keyChainContainer.network);
+                    }
+                    const [decryptNetworkStatus, decryptedNetwork] = await this.containerEncrypter.decryptMessage(encryptedNetwork);
+                    log('establishConnection()', 'Kloak Bridge Network: Saved network information', decryptedNetwork);
+                    if (decryptNetworkStatus === 'SUCCESS') {
+                        const { nextConnectInformation } = decryptedNetwork as unknown as NetworkInformation;
+                        if (nextConnectInformation) {
+                            log('establishConnection()', 'Kloak Bridge Network: Saved network only has nextConnectInformation', nextConnectInformation);
+                            Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port, nextConnectInformation)
+                                .then(networkCallback);
+                        } else {
+                            log('establishConnection()', 'Kloak Bridge Network: Container has network information but no connectionInformation and nextConnectInformation.');
+                            Network.connection(deviceKey as PGPKeys, seguroKey?.armoredPublicKey as string, KloakBridge.seguroConnection.host, KloakBridge.seguroConnection.port)
+                                .then(networkCallback);
+                        }
                     }
                 }
             } else {
@@ -370,15 +385,17 @@ class KloakBridge {
      */
     public checkKeyContainer = (): Promise<CheckContainerResolve> => (
         new Promise<CheckContainerResolve>(async (resolve, _) => {
-            const tx = IDBDatabaseHelper.getTx();
-            if (tx) {
-                const keyChainContainer: KeyChainContainer = await IDBDatabaseHelper.retrieve(tx, 'KeyContainer');
-                if (!keyChainContainer) {
-                    return resolve(<CheckContainerResolve>['DOES_NOT_EXIST']);
+            if (KloakBridge.IDBDatabase) {
+                const tx = KloakBridge.IDBDatabase.getTx();
+                if (tx) {
+                    const keyChainContainer: KeyChainContainer = await KloakBridge.IDBDatabase.retrieve(tx, 'KeyContainer');
+                    if (!keyChainContainer) {
+                        return resolve(<CheckContainerResolve>['DOES_NOT_EXIST']);
+                    }
+                    return resolve(<CheckContainerResolve>['EXISTS', keyChainContainer]);
                 }
-                return resolve(<CheckContainerResolve>['EXISTS', keyChainContainer]);
+                return resolve(<CheckContainerResolve>['DOES_NOT_EXIST']);
             }
-            return resolve(<CheckContainerResolve>['DOES_NOT_EXIST']);
         })
     );
 
@@ -395,18 +412,20 @@ class KloakBridge {
                         this.keyChainContainer = keyChainContainer;
                         const [checkStatus] = await this.containerEncrypter.checkPassword(keyChainContainer?.pgpKeys, passphrase);
                         if (checkStatus === 'SUCCESS') {
-                            const tx = IDBDatabaseHelper.getTx();
-                            if (tx) {
-                                const encryptedKeychain = await IDBDatabaseHelper.retrieve(tx, keyChainContainer.keychain);
-                                const [, decryptedContainer] = await this.containerEncrypter.decryptMessage(encryptedKeychain);
-                                this.keyContainer = new KeyContainer(this.containerEncrypter, keyChainContainer.keychain, decryptedContainer as unknown as KeyChain);
-                                if (!this.skipNetwork) {
-                                    await this.establishConnection();
-                                }
-                                const [status, deviceKey] = await this.getDeviceKey();
-                                if (status === 'SUCCESS') {
-                                    KloakBridge.seguroConnection.deviceKey = deviceKey as PGPKeys;
-                                    return resolve(['SUCCESS']);
+                            if (KloakBridge.IDBDatabase) {
+                                const tx = KloakBridge.IDBDatabase.getTx();
+                                if (tx) {
+                                    const encryptedKeychain = await KloakBridge.IDBDatabase.retrieve(tx, keyChainContainer.keychain);
+                                    const [, decryptedContainer] = await this.containerEncrypter.decryptMessage(encryptedKeychain);
+                                    this.keyContainer = new KeyContainer(this.containerEncrypter, keyChainContainer.keychain, decryptedContainer as unknown as KeyChain);
+                                    if (!this.skipNetwork) {
+                                        await this.establishConnection();
+                                    }
+                                    const [status, deviceKey] = await this.getDeviceKey();
+                                    if (status === 'SUCCESS') {
+                                        KloakBridge.seguroConnection.deviceKey = deviceKey as PGPKeys;
+                                        return resolve(['SUCCESS']);
+                                    }
                                 }
                             }
                             return resolve(['FAILURE']);
@@ -446,15 +465,17 @@ class KloakBridge {
                 };
                 const [, encryptedMessagesCache] = await tempEncrypt.encryptMessage(JSON.stringify({}));
                 this.keyContainer = new KeyContainer(tempEncrypt, keychainUUID, defaultKeyChain);
-                const tx = IDBDatabaseHelper.getTx();
-                console.log('GETTING TRANSACTION', tx);
-                if (tx) {
-                    console.log('I HAVE THE TRANSACTION');
-                    await IDBDatabaseHelper.save(tx, keychainUUID, encryptedKeyChain);
-                    await IDBDatabaseHelper.save(tx, keyContainer.messagesCache, encryptedMessagesCache);
-                    await IDBDatabaseHelper.save(tx, 'KeyContainer', keyContainer);
-                    await IDBDatabaseHelper.retrieve(tx, 'KeyContainer');
-                    return resolve(<CreateContainerResolve>['SUCCESS', keyContainer]);
+                if (KloakBridge.IDBDatabase) {
+                    const tx = KloakBridge.IDBDatabase.getTx();
+                    console.log('GETTING TRANSACTION', tx);
+                    if (tx) {
+                        console.log('I HAVE THE TRANSACTION');
+                        await KloakBridge.IDBDatabase.save(tx, keychainUUID, encryptedKeyChain);
+                        await KloakBridge.IDBDatabase.save(tx, keyContainer.messagesCache, encryptedMessagesCache);
+                        await KloakBridge.IDBDatabase.save(tx, 'KeyContainer', keyContainer);
+                        await KloakBridge.IDBDatabase.retrieve(tx, 'KeyContainer');
+                        return resolve(<CreateContainerResolve>['SUCCESS', keyContainer]);
+                    }
                 }
                 return resolve(<CreateContainerResolve>['FAILURE']);
 
@@ -471,10 +492,12 @@ class KloakBridge {
     public deleteKeyContainer = (): Promise<DeleteKeychainResolve> => (
         new Promise<DeleteKeychainResolve>(async (resolve, _) => {
             try {
-                const tx = IDBDatabaseHelper.getTx();
-                if (tx) {
-                    await IDBDatabaseHelper.clearObjectStore(tx);
-                    return resolve(<DeleteKeychainResolve>['SUCCESS']);
+                if (KloakBridge.IDBDatabase) {
+                    const tx = KloakBridge.IDBDatabase.getTx();
+                    if (tx) {
+                        await KloakBridge.IDBDatabase.clearObjectStore(tx);
+                        return resolve(<DeleteKeychainResolve>['SUCCESS']);
+                    }
                 }
                 return resolve(<DeleteKeychainResolve>['FAILURE']);
             } catch (err) {
@@ -495,27 +518,29 @@ class KloakBridge {
             const tempEncrypt = new EncryptHelper();
             const [, newPGPKeys] = await tempEncrypt.generateKey({ passphrase: newPassphrase });
             try {
-                const tx = IDBDatabaseHelper.getTx();
-                if (tx) {
-                    const oldContainer: KeyChainContainer = await IDBDatabaseHelper.retrieve(tx, 'KeyContainer');
-                    const encryptedKeychain = await IDBDatabaseHelper.retrieve(tx, oldContainer.keychain);
-                    const [status] = await tempEncrypt.checkPassword(oldContainer.pgpKeys, oldPassphrase);
-                    if (status === 'SUCCESS') {
-                        const [, decryptedKeyChain] = await tempEncrypt.decryptMessage(encryptedKeychain);
-                        await tempEncrypt.checkPassword(newPGPKeys as PGPKeys, newPassphrase);
-                        const newContainer: KeyChainContainer = {
-                            pgpKeys: {
-                                keyID: newPGPKeys?.keyID as string,
-                                armoredPublicKey: newPGPKeys?.armoredPublicKey as string,
-                                armoredPrivateKey: newPGPKeys?.armoredPrivateKey as string
-                            },
-                            keychain: oldContainer.keychain,
-                            network: oldContainer.network,
-                            messagesCache: oldContainer.messagesCache
-                        };
-                        await IDBDatabaseHelper.save(tx, 'keyContainer', JSON.stringify(newContainer));
-                        this.keyContainer = new KeyContainer(tempEncrypt, newContainer.keychain, decryptedKeyChain as unknown as KeyChain);
-                        return resolve(['SUCCESS', newContainer]);
+                if (KloakBridge.IDBDatabase) {
+                    const tx = KloakBridge.IDBDatabase.getTx();
+                    if (tx) {
+                        const oldContainer: KeyChainContainer = await KloakBridge.IDBDatabase.retrieve(tx, 'KeyContainer');
+                        const encryptedKeychain = await KloakBridge.IDBDatabase.retrieve(tx, oldContainer.keychain);
+                        const [status] = await tempEncrypt.checkPassword(oldContainer.pgpKeys, oldPassphrase);
+                        if (status === 'SUCCESS') {
+                            const [, decryptedKeyChain] = await tempEncrypt.decryptMessage(encryptedKeychain);
+                            await tempEncrypt.checkPassword(newPGPKeys as PGPKeys, newPassphrase);
+                            const newContainer: KeyChainContainer = {
+                                pgpKeys: {
+                                    keyID: newPGPKeys?.keyID as string,
+                                    armoredPublicKey: newPGPKeys?.armoredPublicKey as string,
+                                    armoredPrivateKey: newPGPKeys?.armoredPrivateKey as string
+                                },
+                                keychain: oldContainer.keychain,
+                                network: oldContainer.network,
+                                messagesCache: oldContainer.messagesCache
+                            };
+                            await KloakBridge.IDBDatabase.save(tx, 'keyContainer', JSON.stringify(newContainer));
+                            this.keyContainer = new KeyContainer(tempEncrypt, newContainer.keychain, decryptedKeyChain as unknown as KeyChain);
+                            return resolve(['SUCCESS', newContainer]);
+                        }
                     }
                 }
                 return resolve(['FAILURE']);
@@ -565,20 +590,24 @@ class KloakBridge {
 
     public retrieve = (uuid: string): Promise<any> => (
         new Promise<any>(async (resolve) => {
-            const tx = IDBDatabaseHelper.getTx();
-            if (tx) {
-                const value = await IDBDatabaseHelper.retrieve(tx, uuid);
-                return resolve(value);
+            if (KloakBridge.IDBDatabase) {
+                const tx = KloakBridge.IDBDatabase.getTx();
+                if (tx) {
+                    const value = await KloakBridge.IDBDatabase.retrieve(tx, uuid);
+                    return resolve(value);
+                }
             }
         })
     )
 
     public save = (uuid: string, data: any): Promise<any> => (
         new Promise<any>(async (resolve) => {
-            const tx = IDBDatabaseHelper.getTx();
-            if (tx) {
-                const value = await IDBDatabaseHelper.save(tx, uuid, data);
-                return resolve(value);
+            if (KloakBridge.IDBDatabase) {
+                const tx = KloakBridge.IDBDatabase.getTx();
+                if (tx) {
+                    const value = await KloakBridge.IDBDatabase.save(tx, uuid, data);
+                    return resolve(value);
+                }
             }
             return resolve(null);
         })
@@ -586,10 +615,12 @@ class KloakBridge {
 
     public delete = async (uuid: string): Promise<any> => (
         new Promise<any>(async (resolve) => {
-            const tx = IDBDatabaseHelper.getTx();
-            if (tx) {
-                const value = await IDBDatabaseHelper.destroy(tx, uuid);
-                return resolve(value);
+            if (KloakBridge.IDBDatabase) {
+                const tx = KloakBridge.IDBDatabase.getTx();
+                if (tx) {
+                    const value = await KloakBridge.IDBDatabase.destroy(tx, uuid);
+                    return resolve(value);
+                }
             }
             return resolve(null);
         })

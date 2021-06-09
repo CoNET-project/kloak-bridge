@@ -2,6 +2,8 @@ interface IDBDatabaseEventTarget extends EventTarget {
     result?: IDBDatabase | any
 }
 
+let db: IDBDatabase;
+
 const getIDBDatabaseHelper = async () => {
     const openDB = () => (
         new Promise<IDBDatabase>((resolve, _) => {
@@ -20,7 +22,9 @@ const getIDBDatabaseHelper = async () => {
         })
     );
 
-    const db = await openDB();
+    if (!db) {
+        db = await openDB();
+    }
 
     const getTx = () => db.transaction(['data'], 'readwrite');
 
@@ -108,9 +112,7 @@ const getIDBDatabaseHelper = async () => {
     };
 };
 
-const IDBDatabaseHelper = await getIDBDatabaseHelper();
-
-export default IDBDatabaseHelper;
+export default getIDBDatabaseHelper;
 
 // class IDBDatabaseHelper {
 //
