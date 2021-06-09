@@ -24,7 +24,7 @@ class KeyContainer {
             try {
                 const encryptedMessage = await this.encryptHelper?.encryptMessage(JSON.stringify(this.keyChain));
                 if (KloakBridge.IDBDatabase) {
-                    const tx = KloakBridge.IDBDatabase.getTx();
+                    const tx = KloakBridge.IDBDatabase.getTx('readwrite');
                     if (tx) {
                         await KloakBridge.IDBDatabase.save(tx, this.keychainUUID, encryptedMessage);
                     } else {

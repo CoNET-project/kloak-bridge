@@ -21,7 +21,7 @@ const openDB = () => (
     })
 );
 
-const getTx = () => db.transaction(['data'], 'readwrite');
+const getTx = (type: 'readonly' | 'readwrite' | 'versionchange') => db.transaction(['data'], type);
 
 const save = (
     tx: IDBTransaction,

@@ -54,7 +54,7 @@ class KloakBridge {
         network: '',
         messagesCache: ''
     }
-    static IDBDatabase: { getTx: () => IDBTransaction;
+    static IDBDatabase: { getTx: (type: ('readonly' | 'readwrite' | 'versionchange')) => IDBTransaction;
         save: (tx: IDBTransaction, key: string, data: any) => Promise<string>;
         destroy: (tx: IDBTransaction, key: string) => Promise<string>;
         retrieve: (tx: IDBTransaction, key: string) => Promise<any>;
@@ -199,7 +199,7 @@ class KloakBridge {
             if (encryptMessagesCacheStatus === 'SUCCESS') {
                 log('saveToMessagesCache()', 'Successfully encrypted messages cache.');
                 if (KloakBridge.IDBDatabase) {
-                    const tx = KloakBridge.IDBDatabase.getTx();
+                    const tx = KloakBridge.IDBDatabase.getTx('readwrite');
                     if (tx) {
                         await KloakBridge.IDBDatabase.save(tx, this.keyChainContainer.messagesCache, encryptedMessagesCache);
                     }
@@ -222,7 +222,7 @@ class KloakBridge {
                 const [status, encryptedNetwork] = await this.containerEncrypter.encryptMessage(JSON.stringify(network));
                 if (status === 'SUCCESS') {
                     if (KloakBridge.IDBDatabase) {
-                        const tx = KloakBridge.IDBDatabase.getTx();
+                        const tx = KloakBridge.IDBDatabase.getTx('readwrite');
                         if (tx) {
                             await KloakBridge.IDBDatabase.save(tx, 'KeyContainer', this.keyChainContainer);
                             await KloakBridge.IDBDatabase.save(tx, this.keyChainContainer.network, encryptedNetwork);
@@ -272,7 +272,7 @@ class KloakBridge {
 
     public getMessagesCache = async (appId: string) => {
         if (KloakBridge.IDBDatabase) {
-            const tx = KloakBridge.IDBDatabase.getTx();
+            const tx = KloakBridge.IDBDatabase.getTx('readonly');
             if (tx) {
                 const encryptedMessagesCache = await KloakBridge.IDBDatabase.retrieve(tx, this.keyChainContainer.messagesCache);
                 const [decryptedMessagesCacheStatus, decryptedMessagesCache] = await this.containerEncrypter.decryptMessage(encryptedMessagesCache);
@@ -335,7 +335,7 @@ class KloakBridge {
             if (this.keyChainContainer.network) {
                 log('establishConnection()', 'Kloak Bridge Network: Container has saved network information.');
                 if (KloakBridge.IDBDatabase) {
-                    const tx = KloakBridge.IDBDatabase.getTx();
+                    const tx = KloakBridge.IDBDatabase.getTx('readonly');
                     let encryptedNetwork;
                     if (tx) {
                         encryptedNetwork = await KloakBridge.IDBDatabase.retrieve(tx, this.keyChainContainer.network);
@@ -386,7 +386,7 @@ class KloakBridge {
     public checkKeyContainer = (): Promise<CheckContainerResolve> => (
         new Promise<CheckContainerResolve>(async (resolve, _) => {
             if (KloakBridge.IDBDatabase) {
-                const tx = KloakBridge.IDBDatabase.getTx();
+                const tx = KloakBridge.IDBDatabase.getTx('readonly');
                 if (tx) {
                     const keyChainContainer: KeyChainContainer = await KloakBridge.IDBDatabase.retrieve(tx, 'KeyContainer');
                     if (!keyChainContainer) {
@@ -413,7 +413,7 @@ class KloakBridge {
                         const [checkStatus] = await this.containerEncrypter.checkPassword(keyChainContainer?.pgpKeys, passphrase);
                         if (checkStatus === 'SUCCESS') {
                             if (KloakBridge.IDBDatabase) {
-                                const tx = KloakBridge.IDBDatabase.getTx();
+                                const tx = KloakBridge.IDBDatabase.getTx('readonly');
                                 if (tx) {
                                     const encryptedKeychain = await KloakBridge.IDBDatabase.retrieve(tx, keyChainContainer.keychain);
                                     const [, decryptedContainer] = await this.containerEncrypter.decryptMessage(encryptedKeychain);
@@ -466,7 +466,7 @@ class KloakBridge {
                 const [, encryptedMessagesCache] = await tempEncrypt.encryptMessage(JSON.stringify({}));
                 this.keyContainer = new KeyContainer(tempEncrypt, keychainUUID, defaultKeyChain);
                 if (KloakBridge.IDBDatabase) {
-                    const tx = KloakBridge.IDBDatabase.getTx();
+                    const tx = KloakBridge.IDBDatabase.getTx('readwrite');
                     console.log('GETTING TRANSACTION', tx);
                     if (tx) {
                         console.log('I HAVE THE TRANSACTION');
@@ -493,7 +493,7 @@ class KloakBridge {
         new Promise<DeleteKeychainResolve>(async (resolve, _) => {
             try {
                 if (KloakBridge.IDBDatabase) {
-                    const tx = KloakBridge.IDBDatabase.getTx();
+                    const tx = KloakBridge.IDBDatabase.getTx('readwrite');
                     if (tx) {
                         await KloakBridge.IDBDatabase.clearObjectStore(tx);
                         return resolve(<DeleteKeychainResolve>['SUCCESS']);
@@ -519,7 +519,7 @@ class KloakBridge {
             const [, newPGPKeys] = await tempEncrypt.generateKey({ passphrase: newPassphrase });
             try {
                 if (KloakBridge.IDBDatabase) {
-                    const tx = KloakBridge.IDBDatabase.getTx();
+                    const tx = KloakBridge.IDBDatabase.getTx('readonly');
                     if (tx) {
                         const oldContainer: KeyChainContainer = await KloakBridge.IDBDatabase.retrieve(tx, 'KeyContainer');
                         const encryptedKeychain = await KloakBridge.IDBDatabase.retrieve(tx, oldContainer.keychain);
@@ -591,7 +591,7 @@ class KloakBridge {
     public retrieve = (uuid: string): Promise<any> => (
         new Promise<any>(async (resolve) => {
             if (KloakBridge.IDBDatabase) {
-                const tx = KloakBridge.IDBDatabase.getTx();
+                const tx = KloakBridge.IDBDatabase.getTx('readonly');
                 if (tx) {
                     const value = await KloakBridge.IDBDatabase.retrieve(tx, uuid);
                     return resolve(value);
@@ -603,7 +603,7 @@ class KloakBridge {
     public save = (uuid: string, data: any): Promise<any> => (
         new Promise<any>(async (resolve) => {
             if (KloakBridge.IDBDatabase) {
-                const tx = KloakBridge.IDBDatabase.getTx();
+                const tx = KloakBridge.IDBDatabase.getTx('readwrite');
                 if (tx) {
                     const value = await KloakBridge.IDBDatabase.save(tx, uuid, data);
                     return resolve(value);
@@ -616,7 +616,7 @@ class KloakBridge {
     public delete = async (uuid: string): Promise<any> => (
         new Promise<any>(async (resolve) => {
             if (KloakBridge.IDBDatabase) {
-                const tx = KloakBridge.IDBDatabase.getTx();
+                const tx = KloakBridge.IDBDatabase.getTx('readwrite');
                 if (tx) {
                     const value = await KloakBridge.IDBDatabase.destroy(tx, uuid);
                     return resolve(value);

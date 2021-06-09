@@ -102,7 +102,6 @@ class EncryptHelper {
             const modifiedPGP = EncryptHelper.modifyPGPMessage(encryptedMsg, true);
             return resolve(['SUCCESS', modifiedPGP]);
         } catch (err) { resolve(['FAILURE', err]); }
-
     })
 
     public decryptMessage = (encryptedMessage: string, buffer?: boolean): Promise<DecryptResolve> => new Promise<DecryptResolve>(async (resolve, _) => {
