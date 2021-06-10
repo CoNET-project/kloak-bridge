@@ -19,10 +19,10 @@ const getLogger = (
             )
         )
     };
-    // if (process.env.NODE_ENV === 'production' || process.env.KLOAK_APP_ENABLE_PRODUCTION_LOGGING === 'true') {
-    //     logger.log = () => {};
-    //     logger.getLogger = () => () => {};
-    // }
+    if (process.env.NODE_ENV === 'production' || process.env.KLOAK_APP_ENABLE_PRODUCTION_LOGGING === 'true') {
+        logger.log = () => {};
+        logger.getLogger = () => () => {};
+    }
     return logger;
 };
 export default getLogger('kloak-bridge'); // CHANGE THIS TO 'kloak-messages-lib' or 'kloak-bridge'

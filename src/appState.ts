@@ -1,3 +1,14 @@
+const deleteAllProperties = (object: any) => (
+    Object
+        .entries(object)
+        .forEach(([key, value]) => {
+            if (typeof value === 'object') {
+                deleteAllProperties(value);
+            }
+            delete object[key];
+        })
+);
+
 export const getAppState = <AppStateType>(
     initialState: AppStateType
 ) => {
@@ -17,9 +28,9 @@ export const getAppState = <AppStateType>(
         )
     );
 
-    const get = <PropertyStateType>(
-        getFn: (state: AppStateType) => PropertyStateType
-    ): PropertyStateType => (
+    const get = <ValueType>(
+        getFn: (state: AppStateType) => ValueType
+    ): ValueType => (
         getFn(appState)
     );
 
@@ -31,10 +42,16 @@ export const getAppState = <AppStateType>(
         status.isModified = true;
     };
 
-    const getIsModified = () => status.isModified;
+    const getIsModified = () => (
+        status.isModified
+    );
 
     const clearIsModified = () => {
         status.isModified = false;
+    };
+
+    const wipeState = () => {
+        deleteAllProperties(appState);
     };
 
     return {
@@ -42,6 +59,7 @@ export const getAppState = <AppStateType>(
         get,
         set,
         getIsModified,
-        clearIsModified
+        clearIsModified,
+        wipeState
     };
 };

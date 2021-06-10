@@ -59,9 +59,7 @@ class KloakBridge {
         destroy: (tx: IDBTransaction, key: string) => Promise<string>;
         retrieve: (tx: IDBTransaction, key: string) => Promise<any>;
         clearObjectStore: (tx: IDBTransaction) => Promise<boolean> } | null = null;
-    private availableIMAPConnections: TestNetworkResponses = []
-    private retryAttempts = 0;
-    private MAX_RETRY_ATTEMPTS = 3;
+    private availableIMAPConnections: TestNetworkResponses = [];
 
     constructor(private onInitialized: () => void, private networkListener: NetworkStatusListeners, private skipNetwork = false, private localServerPath?: string) {
         this.init();
@@ -326,7 +324,6 @@ class KloakBridge {
                 } else {
                     return this.establishConnection();
                 }
-
             } else {
                 this.networkListener.onConnectionFail();
             }
