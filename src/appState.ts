@@ -1,22 +1,8 @@
-const deleteAllProperties = (
-    object: any
-) => (
-    Object
-        .entries(object)
-        .forEach(([key, value]) => {
-            if (typeof value === 'object') {
-                deleteAllProperties(value);
-            }
-            // eslint-disable-next-line no-param-reassign
-            delete object[key];
-        })
-);
-
 // eslint-disable-next-line import/prefer-default-export
 export const getAppState = <AppStateType>(
     initialState: AppStateType
 ) => {
-    const appState = initialState;
+    let appState = initialState;
 
     const status = {
         isModified: false,
@@ -73,7 +59,8 @@ export const getAppState = <AppStateType>(
     const wipeState = () => {
         throwIsWipedError();
 
-        deleteAllProperties(appState);
+        // @ts-ignore
+        appState = null;
         status.isWiped = true;
     };
 
