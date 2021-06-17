@@ -16,7 +16,7 @@ const imapData = [
             {
                 imap_server: 'imap.mail.me.com',
                 imap_username: 'qtgate_test2@icloud.com',
-                imap_user_password: 'cfes-ofqz-khho-dppa',
+                imap_user_password: 'ivot-jygp-hxzj-pitq',
                 imap_port_number: 993
             }
         ],

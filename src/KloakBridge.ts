@@ -178,6 +178,9 @@ class KloakBridge {
     public lockKeyContainer = (): Promise<LockContainerResolve> => (
         new Promise<LockContainerResolve>((resolve, _) => {
             this.keyContainer = undefined;
+            if (KloakBridge.seguroConnection.websocketConnection) {
+                KloakBridge.seguroConnection.websocketConnection.close();
+            }
             return resolve(<LockContainerResolve>['SUCCESS']);
         })
     )
